@@ -1,0 +1,112 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Inter_face.ViewModel"
+		xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters"
+        xmlns:local="clr-namespace:Inter_face" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight" mc:Ignorable="d" x:Name="ModifyQujianWindow1" x:Class="Inter_face.ModifyQujianWindow"
+        Title="修改区间" Height="233.5" Width="582.425" ResizeMode="NoResize">
+    <Window.Resources>
+        <vm:ModifyQujianViewModel x:Key="ModifyQujianViewModelDataSource" d:IsDataSource="True"/>
+        <Inter_face_Coverters:FloatToEndPositionConverter x:Key="FloatToEndPositionConverter"/>
+        <Inter_face_Coverters:FloatToStartStringConverter x:Key="FloatToStartStringConverter"/>
+        <Inter_face_Coverters:LenToPart1Converter x:Key="LenToPart1Converter"/>
+        <Inter_face_Coverters:LenToPart2Converter x:Key="LenToPart2Converter"/>
+        <Inter_face_Coverters:PosToPart1LenConverter x:Key="PosToPart1LenConverter"/>
+        <Inter_face_Coverters:PosToPart2LenConverter x:Key="PosToPart2LenConverter"/>
+        <Inter_face_Coverters:ValueToLengthConverter x:Key="ValueToLengthConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Mode="OneWay" Source="{StaticResource ModifyQujianViewModelDataSource}"/>
+    </Window.DataContext>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding unregistCommand, Mode=OneWay}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.75*"/>
+            <RowDefinition Height="0.25*"/>
+        </Grid.RowDefinitions>
+        <Grid x:Name="LayoutRoot" Grid.ColumnSpan="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="0.40*"/>
+                <RowDefinition Height="0.3*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.1*"/>
+                <ColumnDefinition Width="0.8*"/>
+                <ColumnDefinition Width="0.1*"/>
+            </Grid.ColumnDefinitions>
+            <Slider x:Name="DivSlider" Grid.Column="1" Margin="0" Grid.Row="1" Minimum="{Binding MinValue}" SmallChange="1" LargeChange="100" Value="{Binding CurrentPosition, Mode=TwoWay}" VerticalAlignment="Center" Maximum="{Binding MaxValue}">
+            	<i:Interaction.Triggers>
+            		<i:EventTrigger EventName="ValueChanged">
+            			<Custom:EventToCommand x:Name="ValueChangedEventToCommand" Command="{Binding ValueChangedCommand, Mode=OneWay}"/>
+            		</i:EventTrigger>
+            	</i:Interaction.Triggers>
+            </Slider>
+            <Label x:Name="StartLabel" Margin="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Content="{Binding StartPosition}"/>
+            <Label x:Name="EndLabel" Grid.Column="2" Margin="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding EndPosition}"/>
+            <Grid x:Name="DivGrid" Grid.Column="1" Margin="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition >
+                        <ColumnDefinition.Width>
+                            <MultiBinding Converter="{StaticResource LenToPart1Converter}">
+                                <Binding Path="MinValue"/>
+                                <Binding Path="MaxValue"/>
+                                <Binding Path="CurrentPosition"/>
+                            </MultiBinding>
+                        </ColumnDefinition.Width>
+                    </ColumnDefinition>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition >
+                        <ColumnDefinition.Width>
+                            <MultiBinding Converter="{StaticResource LenToPart2Converter}">
+                                <Binding Path="MinValue"/>
+                                <Binding Path="MaxValue"/>
+                                <Binding Path="CurrentPosition"/>
+                            </MultiBinding>
+                        </ColumnDefinition.Width>
+                    </ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.196*"/>
+                    <RowDefinition Height="0.471*"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="0.333*"/>
+                </Grid.RowDefinitions>
+                <Label Margin="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" Grid.RowSpan="2">
+                    <MultiBinding Converter="{StaticResource PosToPart1LenConverter}">
+                        <Binding Path="MinValue"/>
+                        <Binding Path="MaxValue"/>
+                        <Binding Path="CurrentPosition"/>
+                    </MultiBinding>
+                </Label>
+                <Label x:Name="ParttwoLabel" Grid.Column="2" Margin="0" VerticalAlignment="Center" HorizontalContentAlignment="Center" Grid.RowSpan="2">
+                    <MultiBinding Converter="{StaticResource PosToPart2LenConverter}">
+                        <Binding Path="MinValue"/>
+                        <Binding Path="MaxValue"/>
+                        <Binding Path="CurrentPosition"/>
+                    </MultiBinding>
+                </Label>
+                <Label x:Name="Hlabel" Content="" Grid.Row="2" d:LayoutOverrides="Width" Background="Black" Grid.ColumnSpan="3"/>
+                <Label x:Name="SLabel" Content="" Grid.Column="1" Grid.RowSpan="3" d:LayoutOverrides="Width" Background="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}" Margin="0,0,0,0" Grid.Row="1"/>
+            </Grid>
+            <TextBox x:Name="LenTextBox" Grid.Column="1" Margin="0" Grid.Row="2" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" HorizontalContentAlignment="Center">
+                <MultiBinding Converter="{StaticResource ValueToLengthConverter}" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding Path="StartPosition"/>
+                    <Binding Path="CurrentPosition"/>
+                </MultiBinding>
+            </TextBox>
+            <Label x:Name="LcLabel" Margin="4,4,-20,4" VerticalContentAlignment="Center" Content="{Binding CurrentLC}" HorizontalContentAlignment="Center" Grid.Row="2"/>
+        </Grid>
+        <Button x:Name="OkButton" Content="确定" Grid.Column="1" Margin="4,9" Grid.Row="1" Command="{Binding InsertCommand, Mode=OneWay}"/>
+        <Button x:Name="CancelButton" Content="取消" Grid.Column="2" Margin="4,9" Grid.Row="1" Command="{Binding CancelCommand, Mode=OneWay}"/>
+    </Grid>
+</Window>

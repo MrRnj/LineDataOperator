@@ -1,0 +1,15 @@
+----------------------------------------------------------------------------------------
+F:\360data\重要数据\我的文档\Visual Studio 2013\Projects\Inter_face\Inter_face\Inter_face.csproj
+----------------------------------------------------------------------------------------
+正在将 <Reference Include=“System.Windows.Interactivity, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL”> 的 <Include> 从“System.Windows.Interactivity, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL”更新为“System.Windows.Interactivity”
+正在将 <ExpressionBlendVersion> 的值设置为“4.0.20621.0”
+正在保存文件
+
+
+--------------------------------------------------------------------------
+F:\360data\重要数据\我的文档\Visual Studio 2013\Projects\Inter_face\Inter_face.sln
+--------------------------------------------------------------------------
+正在将解决方案格式头设置为“Microsoft Visual Studio Solution File, Format Version 11.00”
+正在保存文件
+
+

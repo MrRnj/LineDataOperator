@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+  <TotalSettings>
+    <BasefilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\合并输出.xlsx</BasefilePath>
+  </TotalSettings>
+  <PdSettings>
+    <backupTempfilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\接坡面数据_Single.xlsx</backupTempfilePath>
+    <SourcefilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\接坡面数据.xlsx</SourcefilePath>
+  </PdSettings>
+  <QxSettings>
+    <backupTempfilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\接曲线数据_single.xlsx</backupTempfilePath>
+    <SourcefilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\接曲线数据.xlsx</SourcefilePath>
+  </QxSettings>
+  <BjSettings>
+    <backupTempfilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\接标记数据_single.xlsx</backupTempfilePath>
+    <SourcefilePath>F:\360data\重要数据\我的文档\Visual Studio 2010\Projects\Inter_face\Inter_face\bin\Release\excelmodels\接标记数据.xlsx</SourcefilePath>
+  </BjSettings>
+</Settings>
