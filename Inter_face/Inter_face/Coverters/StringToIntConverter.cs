@@ -10,7 +10,7 @@ namespace Inter_face.Coverters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             string raw = value.ToString();
-            int result = 0;
+            int result = -1;
 
             if (!string.IsNullOrEmpty(raw))
             {

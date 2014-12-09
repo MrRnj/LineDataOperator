@@ -59,7 +59,7 @@
     				<TextBox x:Name="OutP1TextBox" Grid.Column="2" Margin="0" TextWrapping="Wrap" Text="{Binding OutSignalProperty.PartImenber, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}" FontSize="12" IsEnabled="{Binding OutSignalProperty.IsSelected}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
     				<Label x:Name="OutPlus1Label" Content="+" Grid.Column="3" Margin="0" FontSize="8" HorizontalAlignment="Stretch" Padding="2,5,1,5"/>
     				<TextBox x:Name="OutP2Text" Grid.Column="4" Margin="0" TextWrapping="Wrap" Text="{Binding OutSignalProperty.PartII, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}" SelectionOpacity="-2.6" IsEnabled="{Binding OutSignalProperty.IsSelected}" VerticalContentAlignment="Center"/>
-    				<ComboBox x:Name="OutComboBox"  Grid.Column="5" Margin="4,0,-10,0" Width="Auto" HorizontalAlignment="Stretch" ItemsSource="{Binding OutSignalProperty.SecNumbersProperty}" SelectedValue="{Binding OutSignalProperty.SectionNum, Mode=OneWayToSource}" SelectedIndex="{Binding OutSignalProperty.SelectedIndex, Mode=TwoWay}" IsEnabled="{Binding OutSignalProperty.IsSelected}">
+    				<ComboBox x:Name="OutComboBox"  Grid.Column="5" Margin="4,0,-10,0" Width="Auto" HorizontalAlignment="Stretch" ItemsSource="{Binding OutSignalProperty.SecNumbersProperty, Mode=TwoWay}" SelectedValue="{Binding OutSignalProperty.SectionNum, Mode=OneWayToSource}" SelectedIndex="{Binding OutSignalProperty.SelectedIndex, Mode=TwoWay}" IsEnabled="{Binding OutSignalProperty.IsSelected}">
     					<i:Interaction.Triggers>
     						<i:EventTrigger EventName="SelectionChanged">
     							<Custom:EventToCommand x:Name="SelectionChangedEventToCommand1" Command="{Binding OutSignalProperty.SceNumberChangedCommand, Mode=OneWay}" CommandParameter="{Binding OutSignalProperty.TypeProperty}"/>
@@ -84,6 +84,6 @@
 			<RowDefinition Height="0.1*"/>
 		</Grid.RowDefinitions>
 		<ListBox x:Name="StationSignalListBox" Grid.ColumnSpan="3" Margin="4" ItemsSource="{Binding StationSignalCollection}" ItemTemplate="{DynamicResource StationSignalDataTemplate}" SelectedItem="{Binding CurrentStationSignal, Mode=OneWayToSource}"/>
-		<Button x:Name="UpdataButton" Content="更新" Grid.Column="1" Margin="4" Grid.Row="1" Command="{Binding UpDataCommand, Mode=OneWay}"/>
+		<Button x:Name="UpdataButton" Content="更新" Grid.Column="2" Margin="4" Grid.Row="1" Command="{Binding UpDataCommand, Mode=OneWay}"/>
 	</Grid>
 </Window>

@@ -95,7 +95,7 @@ namespace Inter_face.ViewModel
             set
             {
                 if (value != null)
-                    MessengerInstance.Send<DataType>(value.Type, "SelectedChanged");
+                    MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
 
                 if (_CurrentDataProperty == value)
                 {

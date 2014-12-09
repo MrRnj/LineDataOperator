@@ -11,7 +11,7 @@ namespace Inter_face.Coverters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             StationDataMode sdm = value as StationDataMode;
-            if (sdm == null || sdm.Type != DataType.Single)
+            if (sdm == null || (sdm.Type != DataType.Single && sdm.Type != DataType.SingleS))
                 return System.Windows.Visibility.Collapsed;
             else
             {

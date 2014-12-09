@@ -8,6 +8,7 @@ namespace Inter_face
     public enum DataType : int
     {
         Single = 0,
+        SingleS,
         Station,
         Bridge,
         Tunel,
@@ -15,5 +16,5 @@ namespace Inter_face
         Quxian,
         Break,
         Position
-    } 
+    }
 }

@@ -29,5 +29,10 @@ namespace Inter_face
                 });
         }
 
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Unregister<bool?>(this, "status");
+        }
     }
 }

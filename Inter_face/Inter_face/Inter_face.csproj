@@ -75,12 +75,9 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="DataCatcher">
-      <HintPath>..\..\dAtaeXchangefRramwork\DataCatcher\DataCatcher\bin\Debug\DataCatcher.dll</HintPath>
-    </Reference>
     <Reference Include="ExtractData, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\dAtaeXchangefRramwork\ExtractData_1010\ExtractData\ExtractData\bin\Debug\ExtractData.dll</HintPath>
+      <HintPath>..\..\..\..\Visual Studio 2013\Projects\dAtaeXchangefRramwork\ExtractData_1010\ExtractData\ExtractData\bin\Debug\ExtractData.dll</HintPath>
     </Reference>
     <Reference Include="Fluent, Version=2.1.0.0, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -93,6 +90,9 @@
     <Reference Include="GalaSoft.MvvmLight.WPF4, Version=4.3.31.28629, Culture=neutral, PublicKeyToken=63eb5c012e0b3c1c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MvvmLightLibs.4.3.31.1\lib\net40\GalaSoft.MvvmLight.WPF4.dll</HintPath>
+    </Reference>
+    <Reference Include="LateBindingApi.Core">
+      <HintPath>..\..\..\..\Visual Studio 2013\Projects\dAtaeXchangefRramwork\ExtractData_1010\ExtractData\ExtractData\bin\Debug\LateBindingApi.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -134,6 +134,7 @@
     <Compile Include="Coverters\DmToPositionConverter.cs" />
     <Compile Include="Coverters\DmToQjvisibilityConverter.cs" />
     <Compile Include="Coverters\DmToShowDetailConverter.cs" />
+    <Compile Include="Coverters\DmToShowDetailUpConverter.cs" />
     <Compile Include="Coverters\DmToStretchConverter.cs" />
     <Compile Include="Coverters\DmToTypeConverter.cs" />
     <Compile Include="Coverters\DmToVisibilityConverter.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Coverters\DmToXhvisibilityConverter.cs" />
     <Compile Include="Coverters\FloatToEndPositionConverter.cs" />
     <Compile Include="Coverters\FloatToStartStringConverter.cs" />
+    <Compile Include="Coverters\IDatamodelToAliConverter.cs" />
     <Compile Include="Coverters\IDatamodelToToolTipConverter.cs" />
     <Compile Include="Coverters\IDMToDMConverter.cs" />
     <Compile Include="Coverters\LenToPart1Converter.cs" />

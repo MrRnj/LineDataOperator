@@ -12,6 +12,8 @@
                      Height="640" Width="933" WindowState="Maximized" Icon="icons/title.png"
                      >
     <Fluent:RibbonWindow.Resources>        
+    	<Inter_face_Coverters:IDatamodelToAliConverter x:Key="IDatamodelToAliConverter"/>        
+    	<Inter_face_Coverters:DmToShowDetailUpConverter x:Key="DmToShowDetailUpConverter"/>        
     	<Inter_face_Coverters:DmToPartsLengthConverter x:Key="DmToPartsLengthConverter"/>        
     	<Inter_face_Coverters:DmToLengthConverter x:Key="DmToLengthConverter"/>        
     	<Inter_face_Coverters:DmToQjvisibilityConverter x:Key="DmToQjvisibilityConverter"/>        
@@ -119,8 +121,8 @@
     	<DataTemplate x:Key="DetailDataTemplate">
     		<Grid x:Name="grid" Margin="-1,0">
     			<Grid.RowDefinitions>
-    				<RowDefinition Height="20"/>
-    				<RowDefinition Height="20"/>
+    				<RowDefinition Height="10"/>
+    				<RowDefinition Height="30"/>
     				<RowDefinition Height="10"/>
     			</Grid.RowDefinitions>
     			<Grid.ColumnDefinitions>
@@ -148,15 +150,15 @@
     					</TransformGroup>
     				</Path.RenderTransform>
     			</Path>
-    			<TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="Left" Margin="0" Grid.Row="2" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Center" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailConverter}, Mode=OneWay}"/>
-        		
+    			<TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="{Binding Converter={StaticResource IDatamodelToAliConverter}, Mode=OneWay}" Margin="0" Grid.Row="2" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Top" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailConverter}, Mode=OneWay}"/>
+    			<TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="Center" Margin="0" Grid.Row="0" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Top" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailUpConverter}, Mode=OneWay}" Grid.RowSpan="2"/>
     		</Grid>
     	</DataTemplate>
     	<DataTemplate x:Key="SingleDataTemplate">
     		<Grid Height="60">
     			<Grid.ColumnDefinitions>
     				<ColumnDefinition Width="30"/>
-    				<ColumnDefinition Width="60"/>
+    				<ColumnDefinition Width="100"/>
     				<ColumnDefinition Width="*"/>
     			</Grid.ColumnDefinitions>
     			<CheckBox x:Name="ShowDataCheckBox" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding ShowDataProperty}">
@@ -272,7 +274,8 @@
 			<Fluent:RibbonTabItem x:Name="ShowDataRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:LayoutOverrides="Height" Header="数据显示" IsSelected="True">
 				<Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
 					<Fluent:ToggleButton x:Name="loadxhdataButton" Header="读入信号机" LargeIcon="{StaticResource resulticon}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}"/>
-					<Fluent:Button x:Name="testbutton" Content="Button" d:LayoutOverrides="Height" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}"/>      	
+					<Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="读入信号机上" LargeIcon="{StaticResource resulticon}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
+					<Fluent:Button x:Name="ModifyStationsignalButton" Content="修改车站信号机" d:LayoutOverrides="Height" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}"/>      	
 				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox x:Name="LineDataRibbonGroupBox" Header="线路数据">
 					<Fluent:ToggleButton x:Name="LoadPDToggleButton" Content="线路数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsPoduLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding DatasCollectionProperty.LoadPoduDataCommand, Mode=OneWay}" ToolTip="显示坡度数据" Header="线路数据" LargeIcon="{DynamicResource lineicon}" Margin="6,0"/>
@@ -281,7 +284,7 @@
 					<Fluent:ToggleButton x:Name="PositionToggleButton" Content="里程数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsLiChengLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" Command="{Binding DatasCollectionProperty.LoadPositionCommand, Mode=OneWay}" LargeIcon="{DynamicResource ruleicon}" Header="里程数据" ToolTip="显示里程数据"/>
 				</Fluent:RibbonGroupBox>
 			</Fluent:RibbonTabItem>	
-			<Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">
+			<Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}">
 				<Fluent:RibbonGroupBox x:Name="DetailRibbonGroupBox" d:LayoutOverrides="Height" Header="基本信息" Width="159">
 					<Fluent:TextBox x:Name="LiChenTextBox" VerticalContentAlignment="Center" Text="{Binding DatasCollectionProperty.CurrentDatasProperty.CurrentDataProperty, Converter={StaticResource DmToLcConverter}}" Height="20.26" Width="151" IsReadOnly="True" IsUndoEnabled="False" ScrollViewer.VerticalScrollBarVisibility="Hidden" Header="里程："/>
 					<Fluent:TextBox x:Name="LxTextBox" VerticalContentAlignment="Center" Text="{Binding DatasCollectionProperty.CurrentDatasProperty.CurrentDataProperty, Converter={StaticResource DmToTypeConverter}}" Height="20.26" Width="151" IsReadOnly="True" IsUndoEnabled="False" ScrollViewer.VerticalScrollBarVisibility="Hidden" Header="类型："/>
@@ -354,7 +357,7 @@
         <WrapPanel Grid.Row="1" x:Name="infoboxpanel" Orientation="Horizontal"
     		HorizontalAlignment="Stretch" VerticalAlignment="Top" 
     		AllowDrop="True" Height="435" Grid.ColumnSpan="2" Grid.RowSpan="3"/>
-        <ListBox x:Name="DataLlistBox" Margin="8,0,-8,0" Grid.Row="3" ItemsSource="{Binding DatasCollectionProperty.DatasCollection}" ItemTemplate="{DynamicResource SingleDataTemplate}" Grid.ColumnSpan="2" Visibility="{Binding DatasCollectionProperty.CountProperty, Converter={StaticResource DatasCollectionToVisibilityConverter}}" SelectedItem="{Binding DatasCollectionProperty.CurrentDatasProperty}" SelectedIndex="{Binding DatasCollectionProperty.SelectedIndex, Mode=TwoWay}"/>
+        <ListBox x:Name="DataLlistBox" Margin="8,0,-8,0" Grid.Row="3" ItemsSource="{Binding DatasCollectionProperty.DatasCollection}" ItemTemplate="{DynamicResource SingleDataTemplate}" Grid.ColumnSpan="2" Visibility="{Binding DatasCollectionProperty.CountProperty, Converter={StaticResource DatasCollectionToVisibilityConverter}}" SelectedItem="{Binding DatasCollectionProperty.CurrentDatasProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" SelectedIndex="{Binding DatasCollectionProperty.SelectedIndex, Mode=TwoWay}"/>
         <Grid Grid.Row="4" x:Name="statugrid" Background="LightSkyBlue" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
             	<ColumnDefinition Width="4*"/>

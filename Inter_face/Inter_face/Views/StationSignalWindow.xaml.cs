@@ -22,6 +22,12 @@ namespace Inter_face
 			this.InitializeComponent();
 			
 			// 在此点之下插入创建对象所需的代码。
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<bool?>(this, "status",
+              (p) =>
+              {
+                  if (p == true)
+                      this.Close();
+              });
 		}
 	}
 }

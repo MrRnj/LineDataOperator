@@ -107,6 +107,6 @@
             <Label x:Name="LcLabel" Margin="4,4,-20,4" VerticalContentAlignment="Center" Content="{Binding CurrentLC}" HorizontalContentAlignment="Center" Grid.Row="2"/>
         </Grid>
         <Button x:Name="OkButton" Content="确定" Grid.Column="1" Margin="4,9" Grid.Row="1" Command="{Binding InsertCommand, Mode=OneWay}"/>
-        <Button x:Name="CancelButton" Content="取消" Grid.Column="2" Margin="4,9" Grid.Row="1" Command="{Binding CancelCommand, Mode=OneWay}"/>
+        <Button x:Name="CancelButton" Content="取消" Grid.Column="2" Margin="4,9" Grid.Row="1" Command="{Binding CancelCommand, Mode=OneWay}" IsCancel="True"/>
     </Grid>
 </Window>

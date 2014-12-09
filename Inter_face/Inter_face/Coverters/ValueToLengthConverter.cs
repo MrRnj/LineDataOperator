@@ -20,14 +20,26 @@ namespace Inter_face.Coverters
             }
             catch
             {
-                return "0.0";
+                if (values[1].ToString().Contains('-'))
+                    return "-";
+                return "0";
             }
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
-            return new object[] { startpos, (double)(int.Parse((value as string).Equals("") ? "0" : (value as string))) };
-            //return new object[] { startpos, (double)(startpos * 1000 + int.Parse((value as string).Equals("") ? "0" : (value as string))) };
+            int result;
+            try
+            {
+                result = int.Parse((value as string));
+                return new object[] { startpos, result };
+            }
+            catch
+            {
+                if ((value as string).Equals("-"))
+                    return new object[] { startpos, value };
+                return new object[] { startpos, "0" } ;
+            }          
         }
     }
 }

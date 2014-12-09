@@ -322,6 +322,8 @@ namespace Inter_face.ViewModel
                     ?? (_InsertCommand = new RelayCommand(
                                           () =>
                                           {
+                                              if (CurrentPosition < 0)
+                                                  return;
                                               MessengerInstance.Send<string>(string.Format("{0}:{1}:{2}",
                                                   CurrentLC.Split(' ')[1].Replace('+', '.'),
                                                   currentsectionum.ToString(), "2"),

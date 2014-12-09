@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Inter_face.Coverters
 {
-    class DmToShowDetailConverter : System.Windows.Data.IValueConverter
+    class DmToShowDetailUpConverter : System.Windows.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             IDataModel idm = (IDataModel)value;
-            StationDataMode signalmode = null;
+            LineDataModel linemode = null;
 
             try
             {
@@ -20,31 +20,27 @@ namespace Inter_face.Coverters
                 switch (idm.Type)
                 {
                     case DataType.Single:
-                        {
-                            signalmode = (StationDataMode)idm;
-                            if (signalmode.StationNameProperty.StartsWith("Q"))
-                                return (idm.LengthProperty * idm.ScaleProperty + 200).ToString("F0");
-                            return string.Empty;
-                        }
+                        return string.Empty;
                     case DataType.Station:
-                        {
-                            signalmode = (StationDataMode)idm;
-                            if (signalmode.StationNameProperty.Equals("区间"))
-                                return (idm.LengthProperty * idm.ScaleProperty + 100).ToString("F3");
-                            return string.Empty;
-                        }
+                        return string.Empty;
                     case DataType.Bridge:
                         return string.Empty;
                     case DataType.Tunel:
                         return string.Empty;
                     case DataType.Podu:
-                        return (idm.LengthProperty * idm.ScaleProperty).ToString("F3");
+                        {
+                            linemode = (LineDataModel)idm;
+                            return linemode.AngleProperty.ToString("F1");
+                        }
                     case DataType.Quxian:
-                        return (idm.LengthProperty * idm.ScaleProperty).ToString("F0");
+                        {
+                            linemode = (LineDataModel)idm;
+                            return string.Format("{0}", linemode.RadioProperty.ToString("F0"));
+                        }
                     case DataType.Break:
                         return string.Empty;
                     case DataType.Position:
-                        return string.Format("{0} {1}", idm.HatProperty, idm.PositionProperty.ToString("F0"));
+                        return string.Empty;
                     default:
                         return string.Empty;
                 }
