@@ -275,7 +275,8 @@
 				<Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
 					<Fluent:ToggleButton x:Name="loadxhdataButton" Header="读入信号机" LargeIcon="{StaticResource resulticon}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}"/>
 					<Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="读入信号机上" LargeIcon="{StaticResource resulticon}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
-					<Fluent:Button x:Name="ModifyStationsignalButton" Content="修改车站信号机" d:LayoutOverrides="Height" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}"/>      	
+					<Fluent:Button x:Name="ModifyStationsignalButton" Content="修改车站信号机" d:LayoutOverrides="Height" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}"/>
+					<Fluent:Button x:Name="ExportSigDataButton" Content="Button" Height="Auto" Command="{Binding DatasCollectionProperty.ExportSignalDataSeparatelyCommand, Mode=OneWay}"/>      	
 				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox x:Name="LineDataRibbonGroupBox" Header="线路数据">
 					<Fluent:ToggleButton x:Name="LoadPDToggleButton" Content="线路数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsPoduLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding DatasCollectionProperty.LoadPoduDataCommand, Mode=OneWay}" ToolTip="显示坡度数据" Header="线路数据" LargeIcon="{DynamicResource lineicon}" Margin="6,0"/>

@@ -25,9 +25,11 @@ namespace Inter_face.ViewModel
         private string _Pdpath;
         private string _Qxpath;
         private string _Bjpath;
-        private string _XhPath;        
+        private string _XhPath;
+        private string _XHEPath;
 
         private GraphyDataOper GDoper;
+        private SignalDataExportor SDexportor;
         List<ExtractData.ChangeToTxt.PoduOutputData> pdxlist;
         List<ExtractData.ChangeToTxt.PoduOutputData> pdslist;
 
@@ -337,6 +339,7 @@ namespace Inter_face.ViewModel
 
                 RaisePropertyChanging(IsXinhaoLoadedPropertyName);
                 _isxinhaoloadedProperty = value;
+                Direction = 0;
                 RaisePropertyChanged(IsXinhaoLoadedPropertyName);
             }
         }
@@ -368,6 +371,7 @@ namespace Inter_face.ViewModel
 
                 RaisePropertyChanging(IsXinhaoSLoadedPropertyName);
                 _isxinhaosProperty = value;
+                Direction = 1;
                 RaisePropertyChanged(IsXinhaoSLoadedPropertyName);
             }
         }
@@ -533,7 +537,9 @@ namespace Inter_face.ViewModel
             _Qxpath = Path.Combine(_currentdir, @"excelmodels\接曲线数据_single.xlsx");
             _Bjpath = Path.Combine(_currentdir, @"excelmodels\接标记数据_single.xlsx");
             _XhPath = Path.Combine(_currentdir, @"excelmodels\信号机数据_single.xlsx");
+            _XHEPath = Path.Combine(_currentdir, @"excelmodels\信号机位置输出.xlsx");
             GDoper = GraphyDataOper.CreatOper(_Pdpath, _Bjpath, _Qxpath, _XhPath);
+            SDexportor = SignalDataExportor.CreatOper(_XHEPath);
             _DataBin = new List<ISingleDataViewModel>();
 
             MessengerInstance.Register<ISingleDataViewModel>(this, "DisapearData",
@@ -659,6 +665,8 @@ namespace Inter_face.ViewModel
             MessengerInstance.Register<List<StationDataMode>>(this, "UpdataStationSignal", 
                 (p) => 
                 {
+                    if (SeletedXinhaoS)
+                        p.Reverse();
                     UpdataStationSignals(p);
                     Swindow.Close();
                 });
@@ -1844,7 +1852,7 @@ namespace Inter_face.ViewModel
                         ScaleProperty = ScaleProperty,
                         SectionNumProperty = sec,
                         SelectedProperty = false,
-                        StationNameProperty = Direction == 0 ? 
+                        StationNameProperty = IsXinhaoLoadedProperty ? 
                         string.Format("{0}:{1}", "2", ChangeToOdd(pos, false).ToString()) :
                         string.Format("{0}:{1}", "2", ChangeToOdd(pos, true).ToString()),
                         Type = DataType.Single
@@ -2057,7 +2065,7 @@ namespace Inter_face.ViewModel
                         ScaleProperty = ScaleProperty,
                         SectionNumProperty = secnum,
                         SelectedProperty = false,
-                        StationNameProperty = Direction == 0 ?
+                        StationNameProperty = IsXinhaoLoadedProperty ?
                         string.Format("{0}:{1}", singletype, ChangeToOdd(pos, false).ToString()) :
                         string.Format("{0}:{1}", singletype, ChangeToOdd(pos, true).ToString()),
                         Type = DataType.Single
@@ -2176,7 +2184,7 @@ namespace Inter_face.ViewModel
                                 ScaleProperty = ScaleProperty,
                                 SectionNumProperty = secnum,
                                 SelectedProperty = false,
-                                StationNameProperty = Direction == 0 ?
+                                StationNameProperty = IsXinhaoLoadedProperty ?
                                 string.Format("{0}:{1}", singletype, ChangeToOdd(pos, false).ToString()) :
                                 string.Format("{0}:{1}", singletype, ChangeToOdd(pos, true).ToString()),
                                 Type = DataType.Single
@@ -2381,6 +2389,9 @@ namespace Inter_face.ViewModel
 
                 Swindow = new StationWindow();
                 MessengerInstance.Send<System.Collections.Generic.List<string>>(cdlxlist, "cdl");
+                if (SeletedXinhaoS)
+                    stationSignallist.Reverse();
+
                 MessengerInstance.Send<List<StationDataMode>>(stationSignallist, "stationsignal");
                 Swindow.ShowDialog();
             }
@@ -2429,6 +2440,278 @@ namespace Inter_face.ViewModel
                 }
             }
         }
+
+        private void ExportSignalData()
+        {
+            SignalExportData sig_data_s = new SignalExportData();
+            SignalExportData sig_data_x = new SignalExportData();
+            ISingleDataViewModel singledata;
+            StationDataMode currentqj = null;
+            StationDataMode nextxinhao = null;
+            float offset = 0;
+            string[] parts;
+
+            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+            if (singledata.DataCollection.Count > 1)
+            {
+                sig_data_s.StartPosProperty = singledata.DataCollection[1].PositionProperty;
+                for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
+                {
+                    sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                    sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                    {
+                        sig_data_s.StationNameProperty.Add(
+                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                    }
+                    else
+                    {
+                        sig_data_s.StationNameProperty.Add(string.Empty);
+                    }
+
+                    if (i + 1 == singledata.DataCollection.Count - 1)
+                        break;
+
+                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;                    
+
+                    sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                    {
+                        sig_data_s.GapProperty.Add(0);
+                    }
+                    else
+                    {                       
+                        for (int j = singledata.DataCollection[i].SectionNumProperty; j <  nextxinhao.SectionNumProperty; j++)
+                        {
+                            parts = cdlxlist[j - 1].Split(':');
+                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));                            
+                        }
+                        sig_data_s.GapProperty.Add(offset);
+                    }
+                }
+            }
+
+            offset = 0;
+            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+            if (singledata.DataCollection.Count > 1)
+            {
+                sig_data_x.StartPosProperty = singledata.DataCollection[1].PositionProperty;
+                for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
+                {
+                    sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                    sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                    {
+                        sig_data_x.StationNameProperty.Add(
+                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                    }
+                    else
+                    {
+                        sig_data_x.StationNameProperty.Add(string.Empty);
+                    }
+                    
+                    if (i + 1 == singledata.DataCollection.Count - 1)
+                        break;
+                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;                    
+
+                    sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                    {
+                        sig_data_x.GapProperty.Add(0);
+                    }
+                    else
+                    {                        
+                        for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                        {
+                            parts = cdlxlist[j - 1].Split(':');
+                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));                         
+                        }
+                        sig_data_x.GapProperty.Add(offset);
+                    }
+                }
+            }
+
+            SDexportor.ExportDataAsOne(sig_data_s, sig_data_x);
+        }
+
+        private void ExportSignalDataSparately()
+        {
+            SignalExportData sig_data_s = null;
+            SignalExportData sig_data_x = new SignalExportData();
+            List<SignalExportData> datas_s = new List<SignalExportData>();
+            List<SignalExportData> datas_x = new List<SignalExportData>();
+
+            ISingleDataViewModel singledata;
+            StationDataMode currentqj = null;
+            StationDataMode nextxinhao = null;
+            string stationame = string.Empty;
+            float offset = 0;
+            string[] parts;
+
+            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+            if (singledata.DataCollection.Count > 1)
+            {
+                for (int i = singledata.DataCollection.IndexOf(
+                    singledata.DataCollection.First(
+                    p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                {
+                    parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                    if (parts.Length > 2)
+                    {
+                        if (!parts[2].Equals(stationame))
+                        {
+                            if (stationame.Equals(string.Empty))
+                            {
+                                sig_data_s = new SignalExportData();
+                                stationame = parts[2];
+
+                                sig_data_s.StartPosProperty = singledata.DataCollection[i].PositionProperty;
+                            }
+                            else
+                            {
+                                stationame = string.Empty;
+                                sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                                sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                                if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                                {
+                                    sig_data_s.StationNameProperty.Add(
+                                        (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                }
+                                else
+                                {
+                                    sig_data_s.StationNameProperty.Add(string.Empty);
+                                }
+                                datas_s.Add(sig_data_s);
+                                continue;
+                            }
+                        }
+                    }
+
+                    sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                    sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                    {
+                        sig_data_s.StationNameProperty.Add(
+                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                    }
+                    else
+                    {
+                        sig_data_s.StationNameProperty.Add(string.Empty);
+                    }
+
+                    if (i + 1 == singledata.DataCollection.Count - 1)
+                        break;
+
+                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
+
+                    sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                    {
+                        sig_data_s.GapProperty.Add(0);
+                    }
+                    else
+                    {
+                        for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                        {
+                            parts = cdlxlist[j - 1].Split(':');
+                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                        }
+                        sig_data_s.GapProperty.Add(offset);
+                    }
+                }
+            }
+
+            offset = 0;
+            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+            if (singledata.DataCollection.Count > 1)
+            {
+                for (int i = singledata.DataCollection.IndexOf(
+                    singledata.DataCollection.First(
+                    p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                {
+                    parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                    if (parts.Length > 2)
+                    {
+                        if (!parts[2].Equals(stationame))
+                        {
+                            if (stationame.Equals(string.Empty))
+                            {
+                                sig_data_x = new SignalExportData();
+                                stationame = parts[2];
+
+                                sig_data_x.StartPosProperty = singledata.DataCollection[i].PositionProperty;
+                            }
+                            else
+                            {
+                                stationame = string.Empty;
+                                sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                                sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                                if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                                {
+                                    sig_data_x.StationNameProperty.Add(
+                                        (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                }
+                                else
+                                {
+                                    sig_data_x.StationNameProperty.Add(string.Empty);
+                                }
+                                datas_x.Add(sig_data_x);
+                                continue;
+                            }
+                        }
+                    }
+
+                    sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                    sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                    {
+                        sig_data_x.StationNameProperty.Add(
+                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                    }
+                    else
+                    {
+                        sig_data_x.StationNameProperty.Add(string.Empty);
+                    }
+
+                    if (i + 1 == singledata.DataCollection.Count - 1)
+                        break;
+
+                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
+
+                    sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                    {
+                        sig_data_x.GapProperty.Add(0);
+                    }
+                    else
+                    {
+                        for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                        {
+                            parts = cdlxlist[j - 1].Split(':');
+                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                        }
+                        sig_data_x.GapProperty.Add(offset);
+                    }
+                }
+            }
+
+            SDexportor.ExportDataSeparately(datas_s, datas_x);
+        }
+
         #region Commands
        
         private RelayCommand _showdataChangedCommand;
@@ -2761,6 +3044,42 @@ namespace Inter_face.ViewModel
                                           }));
             }
         }
+
+        private RelayCommand _exportsignaldataCommand;
+
+        /// <summary>
+        /// Gets the ExportSignalDataCommand.
+        /// </summary>
+        public RelayCommand ExportSignalDataCommand
+        {
+            get
+            {
+                return _exportsignaldataCommand
+                    ?? (_exportsignaldataCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              ExportSignalData();
+                                          }));
+            }
+        }
+
+        private RelayCommand _exportsignaldataseparatelyCommand;
+
+        /// <summary>
+        /// Gets the ExportSignalDataSeparatelyCommand.
+        /// </summary>
+        public RelayCommand ExportSignalDataSeparatelyCommand
+        {
+            get
+            {
+                return _exportsignaldataseparatelyCommand
+                    ?? (_exportsignaldataseparatelyCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              ExportSignalDataSparately();
+                                          }));
+            }
+        }
        
         #endregion
 
@@ -2774,6 +3093,6 @@ namespace Inter_face.ViewModel
               System.Runtime.Serialization.SerializationInfo info,
               System.Runtime.Serialization.StreamingContext context)
                 : base(info, context) { }
-        }
+        }       
     }
 }
