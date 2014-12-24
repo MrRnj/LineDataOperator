@@ -16,6 +16,8 @@ using ExtractData;
 using System.Windows.Forms;
 using System.Threading;
 using System.IO;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 
 namespace Inter_face
@@ -55,6 +57,10 @@ namespace Inter_face
             InitializeComponent();
             openacessfile = new OpenFileDialog();
             initialWorkbooks();
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p => 
+            {
+                AddInfobox(p, string.Empty, string.Empty, 0, "1");
+            });
         }
 
         private void initialWorkbooks()
@@ -72,7 +78,9 @@ namespace Inter_face
             qxfilepath = ReadSettings.GetQxfilepath();
             qxtempfilepath = ReadSettings.GetQxtempfilepath();
             bjfilepath = ReadSettings.GetBjfilepath();
-            bjtemptfilepath = ReadSettings.GetBjtempfilepath();                    
+            bjtemptfilepath = ReadSettings.GetBjtempfilepath();    
+            
+            
         }
 
         #region loaddatabase

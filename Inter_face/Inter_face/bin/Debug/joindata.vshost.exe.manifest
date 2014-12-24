@@ -71,14 +71,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExtractData.dll" size="68608">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExtractData.dll" size="70656">
       <assemblyIdentity name="ExtractData" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>V8BR3frkHNPYKp8lUkonLv8iWgQ=</dsig:DigestValue>
+        <dsig:DigestValue>TRzfjl79LGogyb4mq2W7c0TuS7Y=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -119,14 +119,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="286592">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="311680">
       <assemblyIdentity name="joindata" version="1.5.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>DKMoYrYEoNJ2Q3k9K2wv2k/PxDY=</dsig:DigestValue>
+        <dsig:DigestValue>AbnitLsjPDHT5XDrb8mpg76v8KE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

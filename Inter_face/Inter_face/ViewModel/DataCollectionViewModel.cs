@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.IO;
+using Microsoft.Win32;
 
 
 namespace Inter_face.ViewModel
@@ -48,6 +49,7 @@ namespace Inter_face.ViewModel
         MoveXinhaoWindow mxwindow;
         ModifyQujianWindow mqjwindow;
         StationWindow Swindow;
+        SaveFileDialog sfwindow;
 
         /// <summary>
         /// The <see cref="Direction" /> property's name.
@@ -527,6 +529,37 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(SeletedXinhaoSPropertyName);
             }
         }
+
+        /// <summary>
+        /// The <see cref="containpddata" /> property's name.
+        /// </summary>
+        public const string containpddataPropertyName = "containpddata";
+
+        private bool _ContainProperty = false;
+
+        /// <summary>
+        /// Sets and gets the containpddata property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool containpddata
+        {
+            get
+            {
+                return _ContainProperty;
+            }
+
+            set
+            {
+                if (_ContainProperty == value)
+                {
+                    return;
+                }
+
+                RaisePropertyChanging(containpddataPropertyName);
+                _ContainProperty = value;
+                RaisePropertyChanged(containpddataPropertyName);
+            }
+        }
         /// <summary>
         /// Initializes a new instance of the DataCollectionViewModel class.
         /// </summary>
@@ -584,6 +617,7 @@ namespace Inter_face.ViewModel
                     DatasCollection.Clear();
                     _DataBin.Clear();
                     CountProperty = 0;
+                    containpddata = false;
                 });
             MessengerInstance.Register<DataType>(this, "SelectedChanged",
                 (p) =>
@@ -665,7 +699,7 @@ namespace Inter_face.ViewModel
             MessengerInstance.Register<List<StationDataMode>>(this, "UpdataStationSignal", 
                 (p) => 
                 {
-                    if (SeletedXinhaoS)
+                    if (!SeletedXinhaoS)
                         p.Reverse();
                     UpdataStationSignals(p);
                     Swindow.Close();
@@ -753,6 +787,7 @@ namespace Inter_face.ViewModel
             }
 
             IsPoduLoadedProperty = true;
+            containpddata = true;
             CountProperty = DatasCollection.Count;            
         }
 
@@ -1253,7 +1288,14 @@ namespace Inter_face.ViewModel
 
                 catch (NullReferenceException ure)
                 {
-                    MessengerInstance.Send<string>(ure.Message, "ReadDataError");
+                    MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
+                    return;
+                }
+
+                catch
+                {
+                    MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
+                    return;
                 }
             }
 
@@ -1468,7 +1510,14 @@ namespace Inter_face.ViewModel
 
                 catch (NullReferenceException ure)
                 {
-                    MessengerInstance.Send<string>(ure.Message, "ReadDataError");
+                    MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
+                    return;
+                }
+
+                catch
+                {
+                    MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
+                    return;
                 }
             }
 
@@ -2255,147 +2304,164 @@ namespace Inter_face.ViewModel
         private void ModifyStationSignal()
         {
             ISingleDataViewModel singledata;
-            if (!SeletedXinhaoS)
-                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
-            else
-                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
-            var stationsignals = singledata.DataCollection.
-                Where(p => (!((StationDataMode)p).StationNameProperty.StartsWith("Q")
-                    && ((StationDataMode)p).StationNameProperty.Split(':')[0].Equals("1"))).
-                Select(q => (StationDataMode)q);
-            List<StationDataMode> stationSignallist = new List<StationDataMode>();
-            string mark = string.Empty;
+            try
+            {
+                if (!SeletedXinhaoS)
+                    singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                else
+                    singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                var stationsignals = singledata.DataCollection.
+                    Where(p => (!((StationDataMode)p).StationNameProperty.StartsWith("Q")
+                        && ((StationDataMode)p).StationNameProperty.Split(':')[0].Equals("1"))).
+                    Select(q => (StationDataMode)q);
+                List<StationDataMode> stationSignallist = new List<StationDataMode>();
+                string mark = string.Empty;
 
-            if (czxlist == null || czxlist.Count == 0)
-            {
-                throw new SatitonNotLoadedException("未载入车站数据，请先载入车站数据！");
-            }
-            else
-            {
-                foreach (ChangeToTxt.CheZhanOutputData item in czxlist)
+                if (czxlist == null || czxlist.Count == 0)
                 {
-                    mark = string.Empty;
-                    foreach (StationDataMode s in stationsignals)
+                    throw new SatitonNotLoadedException("未载入车站数据，请先载入车站数据！");
+                }
+                else
+                {
+                    foreach (ChangeToTxt.CheZhanOutputData item in czxlist)
                     {
-                        if (s.StationNameProperty.Split(':')[2].Equals(item.Bjsj))
+                        mark = string.Empty;
+                        foreach (StationDataMode s in stationsignals)
                         {
-                            if (s.StationNameProperty.Split(':')[3].Equals("J"))
+                            if (s.StationNameProperty.Split(':')[2].Equals(item.Bjsj))
                             {
+                                if (s.StationNameProperty.Split(':')[3].Equals("J"))
+                                {
+                                    stationSignallist.Add(new StationDataMode()
+                                    {
+                                        HatProperty = s.HatProperty,
+                                        StationNameProperty = s.StationNameProperty,
+                                        LengthProperty = s.LengthProperty,
+                                        PathDataProperty = s.PathDataProperty,
+                                        PositionProperty = s.PositionProperty,
+                                        ScaleProperty = s.ScaleProperty,
+                                        SectionNumProperty = s.SectionNumProperty,
+                                        SelectedProperty = s.SelectedProperty,
+                                        Type = s.Type
+                                    });
+                                    mark += "J";
+                                }
+                                else if (s.StationNameProperty.Split(':')[3].Equals("C"))
+                                {
+                                    stationSignallist.Add(new StationDataMode()
+                                    {
+                                        HatProperty = s.HatProperty,
+                                        StationNameProperty = s.StationNameProperty,
+                                        LengthProperty = s.LengthProperty,
+                                        PathDataProperty = s.PathDataProperty,
+                                        PositionProperty = s.PositionProperty,
+                                        ScaleProperty = s.ScaleProperty,
+                                        SectionNumProperty = s.SectionNumProperty,
+                                        SelectedProperty = s.SelectedProperty,
+                                        Type = s.Type
+                                    });
+                                    mark += "C";
+                                }
+                            }
+                        }
+
+                        switch (mark)
+                        {
+                            case "":
+                                //进站
                                 stationSignallist.Add(new StationDataMode()
                                 {
-                                    HatProperty = s.HatProperty,
-                                    StationNameProperty = s.StationNameProperty,
-                                    LengthProperty = s.LengthProperty,
-                                    PathDataProperty = s.PathDataProperty,
-                                    PositionProperty = s.PositionProperty,
-                                    ScaleProperty = s.ScaleProperty,
-                                    SectionNumProperty = s.SectionNumProperty,
-                                    SelectedProperty = s.SelectedProperty,
-                                    Type = s.Type
+                                    HatProperty = item.Gh,
+                                    StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
+                                    "1", string.Empty, item.Bjsj, "J", FormatStationPosition(item.Bjsj)),
+                                    LengthProperty = 200 / ScaleProperty,
+                                    PathDataProperty =
+                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                    PositionProperty = float.Parse(item.Glb),
+                                    ScaleProperty = ScaleProperty,
+                                    SectionNumProperty = int.Parse(item.Ldh),
+                                    SelectedProperty = false,
+                                    Type = DataType.Single
                                 });
-                                mark += "J";
-                            }
-                            else if (s.StationNameProperty.Split(':')[3].Equals("C"))
-                            {
+                                //出站
                                 stationSignallist.Add(new StationDataMode()
                                 {
-                                    HatProperty = s.HatProperty,
-                                    StationNameProperty = s.StationNameProperty,
-                                    LengthProperty = s.LengthProperty,
-                                    PathDataProperty = s.PathDataProperty,
-                                    PositionProperty = s.PositionProperty,
-                                    ScaleProperty = s.ScaleProperty,
-                                    SectionNumProperty = s.SectionNumProperty,
-                                    SelectedProperty = s.SelectedProperty,
-                                    Type = s.Type
+                                    HatProperty = item.Gh,
+                                    StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
+                                    "1", string.Empty, item.Bjsj, "C", FormatStationPosition(item.Bjsj)),
+                                    LengthProperty = 200 / ScaleProperty,
+                                    PathDataProperty =
+                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                    PositionProperty = float.Parse(item.Glb),
+                                    ScaleProperty = ScaleProperty,
+                                    SectionNumProperty = int.Parse(item.Ldh),
+                                    SelectedProperty = false,
+                                    Type = DataType.Single
                                 });
-                                mark += "C";
-                            }
+                                break;
+                            case "J":
+                                //出站
+                                stationSignallist.Add(new StationDataMode()
+                                {
+                                    HatProperty = item.Gh,
+                                    StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
+                                    "1", string.Empty, item.Bjsj, "C", FormatStationPosition(item.Bjsj)),
+                                    LengthProperty = 200 / ScaleProperty,
+                                    PathDataProperty =
+                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                    PositionProperty = float.Parse(item.Glb),
+                                    ScaleProperty = ScaleProperty,
+                                    SectionNumProperty = int.Parse(item.Ldh),
+                                    SelectedProperty = false,
+                                    Type = DataType.Single
+                                });
+                                break;
+                            case "C":
+                                //进站
+                                stationSignallist.Add(new StationDataMode()
+                                {
+                                    HatProperty = item.Gh,
+                                    StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
+                                    "1", string.Empty, item.Bjsj, "J", FormatStationPosition(item.Bjsj)),
+                                    LengthProperty = 200 / ScaleProperty,
+                                    PathDataProperty =
+                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                    PositionProperty = float.Parse(item.Glb),
+                                    ScaleProperty = ScaleProperty,
+                                    SectionNumProperty = int.Parse(item.Ldh),
+                                    SelectedProperty = false,
+                                    Type = DataType.Single
+                                });
+                                break;
+                            default:
+                                break;
                         }
                     }
 
-                    switch (mark)
-                    {
-                        case "":
-                            //进站
-                            stationSignallist.Add(new StationDataMode()
-                            {
-                                HatProperty = item.Gh,
-                                StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
-                                "1", string.Empty, item.Bjsj, "J", FormatStationPosition(item.Bjsj)),
-                                LengthProperty = 200 / ScaleProperty,
-                                PathDataProperty =
-                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                PositionProperty = float.Parse(item.Glb),
-                                ScaleProperty = ScaleProperty,
-                                SectionNumProperty = int.Parse(item.Ldh),
-                                SelectedProperty = false,
-                                Type = DataType.Single
-                            });
-                            //出站
-                            stationSignallist.Add(new StationDataMode()
-                            {
-                                HatProperty = item.Gh,
-                                StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
-                                "1", string.Empty, item.Bjsj, "C", FormatStationPosition(item.Bjsj)),
-                                LengthProperty = 200 / ScaleProperty,
-                                PathDataProperty =
-                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                PositionProperty = float.Parse(item.Glb),
-                                ScaleProperty = ScaleProperty,
-                                SectionNumProperty = int.Parse(item.Ldh),
-                                SelectedProperty = false,
-                                Type = DataType.Single
-                            });
-                            break;
-                        case "J":
-                            //出站
-                            stationSignallist.Add(new StationDataMode()
-                            {
-                                HatProperty = item.Gh,
-                                StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
-                                "1", string.Empty, item.Bjsj, "C", FormatStationPosition(item.Bjsj)),
-                                LengthProperty = 200 / ScaleProperty,
-                                PathDataProperty =
-                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                PositionProperty = float.Parse(item.Glb),
-                                ScaleProperty = ScaleProperty,
-                                SectionNumProperty = int.Parse(item.Ldh),
-                                SelectedProperty = false,
-                                Type = DataType.Single
-                            });
-                            break;
-                        case "C":
-                            //进站
-                            stationSignallist.Add(new StationDataMode()
-                            {
-                                HatProperty = item.Gh,
-                                StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}",
-                                "1", string.Empty, item.Bjsj, "J", FormatStationPosition(item.Bjsj)),
-                                LengthProperty = 200 / ScaleProperty,
-                                PathDataProperty =
-                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                PositionProperty = float.Parse(item.Glb),
-                                ScaleProperty = ScaleProperty,
-                                SectionNumProperty = int.Parse(item.Ldh),
-                                SelectedProperty = false,
-                                Type = DataType.Single
-                            });
-                            break;
-                        default:
-                            break;
-                    }
+                    Swindow = new StationWindow();
+                    MessengerInstance.Send<System.Collections.Generic.List<string>>(cdlxlist, "cdl");
+                    if (!SeletedXinhaoS)
+                        stationSignallist.Reverse();
+
+                    MessengerInstance.Send<List<StationDataMode>>(stationSignallist, "stationsignal");
+                    Swindow.ShowDialog();
                 }
-
-                Swindow = new StationWindow();
-                MessengerInstance.Send<System.Collections.Generic.List<string>>(cdlxlist, "cdl");
-                if (SeletedXinhaoS)
-                    stationSignallist.Reverse();
-
-                MessengerInstance.Send<List<StationDataMode>>(stationSignallist, "stationsignal");
-                Swindow.ShowDialog();
             }
 
+            catch(System.InvalidOperationException ioe)
+            {
+                MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
+            }
+
+            catch (SatitonNotLoadedException sne)
+            {
+                MessengerInstance.Send<string>(sne.Message, "ReadDataError");
+            }
+
+            catch
+            {
+                MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
+            }
         }
 
         private void UpdataStationSignals(List<StationDataMode> stationsignalcollection)
@@ -2451,93 +2517,114 @@ namespace Inter_face.ViewModel
             float offset = 0;
             string[] parts;
 
-            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
-            if (singledata.DataCollection.Count > 1)
+            try
             {
-                sig_data_s.StartPosProperty = singledata.DataCollection[1].PositionProperty;
-                for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                if (singledata.DataCollection.Count > 1)
                 {
-                    sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                    sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                    sig_data_s.StartPosProperty = singledata.DataCollection[1].PositionProperty;
+                    for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
                     {
-                        sig_data_s.StationNameProperty.Add(
-                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                    }
-                    else
-                    {
-                        sig_data_s.StationNameProperty.Add(string.Empty);
-                    }
+                        sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                        sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
 
-                    if (i + 1 == singledata.DataCollection.Count - 1)
-                        break;
-
-                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
-                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;                    
-
-                    sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
-                    {
-                        sig_data_s.GapProperty.Add(0);
-                    }
-                    else
-                    {                       
-                        for (int j = singledata.DataCollection[i].SectionNumProperty; j <  nextxinhao.SectionNumProperty; j++)
+                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
                         {
-                            parts = cdlxlist[j - 1].Split(':');
-                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));                            
+                            sig_data_s.StationNameProperty.Add(
+                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
                         }
-                        sig_data_s.GapProperty.Add(offset);
+                        else
+                        {
+                            sig_data_s.StationNameProperty.Add(string.Empty);
+                        }
+
+                        if (i + 1 == singledata.DataCollection.Count - 1)
+                            break;
+
+                        currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                        nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
+
+                        sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        {
+                            sig_data_s.GapProperty.Add(0);
+                        }
+                        else
+                        {
+                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            {
+                                parts = cdlxlist[j - 1].Split(':');
+                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                            }
+                            sig_data_s.GapProperty.Add(offset);
+                        }
                     }
+                }
+
+                offset = 0;
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                if (singledata.DataCollection.Count > 1)
+                {
+                    sig_data_x.StartPosProperty = singledata.DataCollection[1].PositionProperty;
+                    for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
+                    {
+                        sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                        sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                        {
+                            sig_data_x.StationNameProperty.Add(
+                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                        }
+                        else
+                        {
+                            sig_data_x.StationNameProperty.Add(string.Empty);
+                        }
+
+                        if (i + 1 == singledata.DataCollection.Count - 1)
+                            break;
+                        currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                        nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
+
+                        sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        {
+                            sig_data_x.GapProperty.Add(0);
+                        }
+                        else
+                        {
+                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            {
+                                parts = cdlxlist[j - 1].Split(':');
+                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                            }
+                            sig_data_x.GapProperty.Add(offset);
+                        }
+                    }
+                }
+
+                sfwindow = new SaveFileDialog();
+                //sfwindow.CheckFileExists = true;
+                sfwindow.AddExtension = true;
+                sfwindow.Title = "保存文件";
+                sfwindow.Filter = "xls files (*.xls)|*.xls|All files (*.*)|*.*";
+                if (sfwindow.ShowDialog() == true)
+                {
+                    SDexportor.ExportDataAsOne(sig_data_s, sig_data_x, sfwindow.FileName);
                 }
             }
 
-            offset = 0;
-            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
-            if (singledata.DataCollection.Count > 1)
+            catch (System.InvalidOperationException ioe)
             {
-                sig_data_x.StartPosProperty = singledata.DataCollection[1].PositionProperty;
-                for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
-                {
-                    sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                    sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
 
-                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                    {
-                        sig_data_x.StationNameProperty.Add(
-                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                    }
-                    else
-                    {
-                        sig_data_x.StationNameProperty.Add(string.Empty);
-                    }
-                    
-                    if (i + 1 == singledata.DataCollection.Count - 1)
-                        break;
-                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
-                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;                    
-
-                    sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
-                    {
-                        sig_data_x.GapProperty.Add(0);
-                    }
-                    else
-                    {                        
-                        for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
-                        {
-                            parts = cdlxlist[j - 1].Split(':');
-                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));                         
-                        }
-                        sig_data_x.GapProperty.Add(offset);
-                    }
-                }
             }
 
-            SDexportor.ExportDataAsOne(sig_data_s, sig_data_x);
+            catch
+            {
+
+            }
         }
 
         private void ExportSignalDataSparately()
@@ -2554,162 +2641,226 @@ namespace Inter_face.ViewModel
             float offset = 0;
             string[] parts;
 
-            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
-            if (singledata.DataCollection.Count > 1)
+            try
             {
-                for (int i = singledata.DataCollection.IndexOf(
-                    singledata.DataCollection.First(
-                    p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                if (singledata.DataCollection.Count > 1)
                 {
-                    parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
-                    if (parts.Length > 2)
+                    for (int i = singledata.DataCollection.IndexOf(
+                        singledata.DataCollection.First(
+                        p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
                     {
-                        if (!parts[2].Equals(stationame))
+                        parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                        if (parts.Length > 2)
                         {
-                            if (stationame.Equals(string.Empty))
+                            if (!parts[2].Equals(stationame))
                             {
-                                sig_data_s = new SignalExportData();
-                                stationame = parts[2];
-
-                                sig_data_s.StartPosProperty = singledata.DataCollection[i].PositionProperty;
-                            }
-                            else
-                            {
-                                stationame = string.Empty;
-                                sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                                sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                                if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                                if (stationame.Equals(string.Empty))
                                 {
-                                    sig_data_s.StationNameProperty.Add(
-                                        (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                    sig_data_s = new SignalExportData();
+                                    stationame = parts[2];
+
+                                    sig_data_s.StartPosProperty = singledata.DataCollection[i].PositionProperty;
                                 }
                                 else
                                 {
-                                    sig_data_s.StationNameProperty.Add(string.Empty);
+                                    stationame = string.Empty;
+                                    sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                                    sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                                    {
+                                        sig_data_s.StationNameProperty.Add(
+                                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                    }
+                                    else
+                                    {
+                                        sig_data_s.StationNameProperty.Add(string.Empty);
+                                    }
+                                    datas_s.Add(sig_data_s);
+                                    continue;
                                 }
-                                datas_s.Add(sig_data_s);
-                                continue;
                             }
                         }
-                    }
 
-                    sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                    sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+                        sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                        sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
 
-                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                    {
-                        sig_data_s.StationNameProperty.Add(
-                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                    }
-                    else
-                    {
-                        sig_data_s.StationNameProperty.Add(string.Empty);
-                    }
-
-                    if (i + 1 == singledata.DataCollection.Count - 1)
-                        break;
-
-                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
-                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
-
-                    sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
-                    {
-                        sig_data_s.GapProperty.Add(0);
-                    }
-                    else
-                    {
-                        for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
                         {
-                            parts = cdlxlist[j - 1].Split(':');
-                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                            sig_data_s.StationNameProperty.Add(
+                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
                         }
-                        sig_data_s.GapProperty.Add(offset);
+                        else
+                        {
+                            sig_data_s.StationNameProperty.Add(string.Empty);
+                        }
+
+                        if (i + 1 == singledata.DataCollection.Count - 1)
+                            break;
+
+                        currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                        nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
+
+                        sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        {
+                            sig_data_s.GapProperty.Add(0);
+                        }
+                        else
+                        {
+                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            {
+                                parts = cdlxlist[j - 1].Split(':');
+                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                            }
+                            sig_data_s.GapProperty.Add(offset);
+                        }
                     }
+                }
+
+                offset = 0;
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                if (singledata.DataCollection.Count > 1)
+                {
+                    for (int i = singledata.DataCollection.IndexOf(
+                        singledata.DataCollection.First(
+                        p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                    {
+                        parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                        if (parts.Length > 2)
+                        {
+                            if (!parts[2].Equals(stationame))
+                            {
+                                if (stationame.Equals(string.Empty))
+                                {
+                                    sig_data_x = new SignalExportData();
+                                    stationame = parts[2];
+
+                                    sig_data_x.StartPosProperty = singledata.DataCollection[i].PositionProperty;
+                                }
+                                else
+                                {
+                                    stationame = string.Empty;
+                                    sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                                    sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                                    {
+                                        sig_data_x.StationNameProperty.Add(
+                                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                    }
+                                    else
+                                    {
+                                        sig_data_x.StationNameProperty.Add(string.Empty);
+                                    }
+                                    datas_x.Add(sig_data_x);
+                                    continue;
+                                }
+                            }
+                        }
+
+                        sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
+                        sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+
+                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                        {
+                            sig_data_x.StationNameProperty.Add(
+                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                        }
+                        else
+                        {
+                            sig_data_x.StationNameProperty.Add(string.Empty);
+                        }
+
+                        if (i + 1 == singledata.DataCollection.Count - 1)
+                            break;
+
+                        currentqj = singledata.DataCollection[i + 1] as StationDataMode;
+                        nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
+
+                        sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
+
+                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        {
+                            sig_data_x.GapProperty.Add(0);
+                        }
+                        else
+                        {
+                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            {
+                                parts = cdlxlist[j - 1].Split(':');
+                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                            }
+                            sig_data_x.GapProperty.Add(offset);
+                        }
+                    }
+                }
+
+                sfwindow = new SaveFileDialog();
+                //sfwindow.CheckFileExists = true;
+                sfwindow.AddExtension = true;
+                sfwindow.Title = "保存文件";
+                sfwindow.Filter = "xls files (*.xls)|*.xls|All files (*.*)|*.*";
+                if (sfwindow.ShowDialog() == true)
+                {
+                    SDexportor.ExportDataSeparately(datas_s, datas_x, sfwindow.FileName);
                 }
             }
 
-            offset = 0;
+            catch
+            {
+
+            }
+        }
+
+        private void SaveXhData()
+        {
+            ISingleDataViewModel singledata;
+            List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
+            List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
+            string[] parts;
+
             singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
-            if (singledata.DataCollection.Count > 1)
+            foreach (StationDataMode item in singledata.DataCollection.ToArray())
             {
-                for (int i = singledata.DataCollection.IndexOf(
-                    singledata.DataCollection.First(
-                    p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                parts = item.StationNameProperty.Split(':');
+                if (!parts[0].StartsWith("Q"))
                 {
-                    parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
-                    if (parts.Length > 2)
+                    xhs.Add(new ChangeToTxt.CheZhanOutputData()
                     {
-                        if (!parts[2].Equals(stationame))
-                        {
-                            if (stationame.Equals(string.Empty))
-                            {
-                                sig_data_x = new SignalExportData();
-                                stationame = parts[2];
-
-                                sig_data_x.StartPosProperty = singledata.DataCollection[i].PositionProperty;
-                            }
-                            else
-                            {
-                                stationame = string.Empty;
-                                sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                                sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                                if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                                {
-                                    sig_data_x.StationNameProperty.Add(
-                                        (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                                }
-                                else
-                                {
-                                    sig_data_x.StationNameProperty.Add(string.Empty);
-                                }
-                                datas_x.Add(sig_data_x);
-                                continue;
-                            }
-                        }
-                    }
-
-                    sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                    sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                    {
-                        sig_data_x.StationNameProperty.Add(
-                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                    }
-                    else
-                    {
-                        sig_data_x.StationNameProperty.Add(string.Empty);
-                    }
-
-                    if (i + 1 == singledata.DataCollection.Count - 1)
-                        break;
-
-                    currentqj = singledata.DataCollection[i + 1] as StationDataMode;
-                    nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
-
-                    sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                    if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
-                    {
-                        sig_data_x.GapProperty.Add(0);
-                    }
-                    else
-                    {
-                        for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
-                        {
-                            parts = cdlxlist[j - 1].Split(':');
-                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                        }
-                        sig_data_x.GapProperty.Add(offset);
-                    }
+                        Bjlx = parts[0],
+                        Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
+                        Gh = item.HatProperty,
+                        Glb = item.PositionProperty.ToString("F3"),
+                        Index = string.Empty,
+                        Ldh = item.SectionNumProperty.ToString(),
+                        Zjfx = "1"
+                    });
                 }
             }
 
-            SDexportor.ExportDataSeparately(datas_s, datas_x);
+            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+            foreach (StationDataMode item in singledata.DataCollection.ToArray())
+            {
+                parts = item.StationNameProperty.Split(':');
+                if (!parts[0].StartsWith("Q"))
+                {
+                    xhx.Add(new ChangeToTxt.CheZhanOutputData()
+                    {
+                        Bjlx = parts[0],
+                        Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
+                        Gh = item.HatProperty,
+                        Glb = item.PositionProperty.ToString("F3"),
+                        Index = string.Empty,
+                        Ldh = item.SectionNumProperty.ToString(),
+                        Zjfx = "1"
+                    });
+                }
+            }
+
+            GDoper.SaveXhData(xhs, xhx);
         }
 
         #region Commands
@@ -3080,7 +3231,23 @@ namespace Inter_face.ViewModel
                                           }));
             }
         }
-       
+        private RelayCommand _savexhdataCommand;
+
+        /// <summary>
+        /// Gets the SaveXhDataCommand.
+        /// </summary>
+        public RelayCommand SaveXhDataCommand
+        {
+            get
+            {
+                return _savexhdataCommand
+                    ?? (_savexhdataCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              SaveXhData();
+                                          }));
+            }
+        }
         #endregion
 
         [Serializable]

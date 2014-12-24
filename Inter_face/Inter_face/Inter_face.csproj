@@ -150,6 +150,7 @@
     <Compile Include="Coverters\PathDetailConverter.cs" />
     <Compile Include="Coverters\PosToPart1LenConverter.cs" />
     <Compile Include="Coverters\PosToPart2LenConverter.cs" />
+    <Compile Include="Coverters\StationDataToBoolenConverter.cs" />
     <Compile Include="Coverters\StringToIntConverter.cs" />
     <Compile Include="Coverters\ValueToLengthConverter.cs" />
     <Compile Include="DataType.cs" />
@@ -374,7 +375,14 @@
   <ItemGroup>
     <Resource Include="icons\rule.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="icons\singledown.png" />
+    <Resource Include="icons\singleup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\exportsignaldata.png" />
+    <Resource Include="icons\stationsigle.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
