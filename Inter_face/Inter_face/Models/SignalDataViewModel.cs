@@ -128,7 +128,7 @@ namespace Inter_face.Models
                 RaisePropertyChanging(SectionNumPropertyName);
                 _sectionnumProperty = value;
                 if (secNumbers != null)
-                    SelectedIndex = secNumbers.IndexOf(int.Parse(_sectionnumProperty));
+                    SelectedIndex = secNumbers.IndexOf(int.Parse(_sectionnumProperty == null ? "0" : _sectionnumProperty));
                 RaisePropertyChanged(SectionNumPropertyName);
             }
         }
@@ -271,12 +271,18 @@ namespace Inter_face.Models
         private void OutSectionumChanged()
         {
             int sec = int.Parse(SectionNum);
-            Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
+            if (sec > CdlInfoProperty.Count)
+                Guanhao = CdlInfoProperty[sec - 2].Split(':')[1].Split('+')[0];
+            else
+                Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
         }
         private void InSectionumChanged()
         {
             int sec = int.Parse(SectionNum);
-            Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
+            if (sec > CdlInfoProperty.Count)
+                Guanhao = CdlInfoProperty[sec - 2].Split(':')[1].Split('+')[0];
+            else
+                Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
         }
 
     }

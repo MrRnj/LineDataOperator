@@ -131,3 +131,11 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\joindata.application
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\joindata.exe
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\joindata.pdb
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ModifyCdldataWindow.g.cs
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ModifyCdldataWindow.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ACdlWindow.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ACdlWindow.g.cs
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\LdhInfoWindow.g.cs
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\LdhInfoWindow.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ProcessWindow.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ProcessWindow.g.cs

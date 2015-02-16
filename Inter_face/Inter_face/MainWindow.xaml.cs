@@ -42,6 +42,7 @@ namespace Inter_face
         List<ExtractData.ChangeToTxt.QuxianOutputData> qxs;
         List<ExtractData.ChangeToTxt.CheZhanOutputData> bjx;
         List<ExtractData.ChangeToTxt.CheZhanOutputData> bjs;
+        
 
         OpenFileDialog openacessfile;
         SaveFileDialog savetxtfile;
@@ -57,11 +58,26 @@ namespace Inter_face
             InitializeComponent();
             openacessfile = new OpenFileDialog();
             initialWorkbooks();
+            
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p => 
             {
                 AddInfobox(p, string.Empty, string.Empty, 0, "1");
             });
+
+            
         }
+
+        private void sendDispatcher()
+        {
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<System.Windows.Threading.Dispatcher>
+                (this.Dispatcher, "Dispatcher");
+        }
+
+        private void RibbonWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            sendDispatcher();
+        }
+
 
         private void initialWorkbooks()
         {
@@ -1043,8 +1059,7 @@ namespace Inter_face
                     loadaopdata(filepath);
                 }
             }
-        }
-
+        }       
         
     }
 

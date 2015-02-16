@@ -8,7 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/exportsignaldata.png")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/stationsigle.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/savexh.png")]
 
 

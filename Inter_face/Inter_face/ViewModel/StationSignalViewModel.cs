@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.IO;
+using System.Windows.Forms;
 
 namespace Inter_face.ViewModel
 {
@@ -30,7 +31,7 @@ namespace Inter_face.ViewModel
                 (p) => 
                 {
                     cdlist = p;
-                    for (int i = 0; i < p.Count; i++)
+                    for (int i = 0; i <= p.Count; i++)
                     {
                         SectionNum.Add(i + 1);
                     }
@@ -93,8 +94,11 @@ namespace Inter_face.ViewModel
                     }
                 });
         }
+
         private List<StationDataMode> exchangeddatas;
         private List<string> cdlist;
+        private LdhInfoWindow liwindow;
+        private string errorMsg;
         /// <summary>
         /// The <see cref="SectionNum" /> property's name.
         /// </summary>
@@ -211,7 +215,8 @@ namespace Inter_face.ViewModel
                         {
                             inneritem.PositionProperty = float.Parse(item.InSignalProperty.PartImenber.ToString() + "." + (item.InSignalProperty.PartII).ToString());
                         }
-                        inneritem.SectionNumProperty = int.Parse(item.InSignalProperty.SectionNum);
+                        inneritem.SectionNumProperty = item.InSignalProperty.SectionNum == null ?
+                            -1 : int.Parse(item.InSignalProperty.SectionNum);
                         inneritem.StationNameProperty = 
                             string.Format("{0}:{1}:{2}:{3}:{4}", 
                             parts[0], item.InSignalProperty.Mark, parts[2], parts[3], parts[4]);                        
@@ -221,7 +226,8 @@ namespace Inter_face.ViewModel
                         inneritem.PositionProperty = item.OutSignalProperty.PartImenber == -1 || item.OutSignalProperty.PartII == -1 ?
                             -1 :
                            float.Parse(item.OutSignalProperty.PartImenber.ToString() + "." + (item.OutSignalProperty.PartII).ToString());
-                        inneritem.SectionNumProperty = int.Parse(item.OutSignalProperty.SectionNum);
+                        inneritem.SectionNumProperty = item.OutSignalProperty.SectionNum == null ?
+                            -1 : int.Parse(item.OutSignalProperty.SectionNum);
                         inneritem.StationNameProperty =
                             string.Format("{0}:{1}:{2}:{3}:{4}",
                             parts[0], item.OutSignalProperty.Mark, parts[2], parts[3], parts[4]);
@@ -229,6 +235,92 @@ namespace Inter_face.ViewModel
                 }                
             }
             MessengerInstance.Send<List<StationDataMode>>(exchangeddatas, "UpdataStationSignal");
+        }
+
+        private void ShowLdh()
+        {
+            liwindow = new LdhInfoWindow();
+            MessengerInstance.Send<string[]>(cdlist.ToArray(), "showldh");
+
+            liwindow.ShowInTaskbar = false; 
+            liwindow.Show();
+        }
+
+        private bool CheckCdlInfo()
+        {            
+
+            foreach (StationSignaleDataModel item in StationSignalCollection)
+            {
+                if (CheckSingleCdlinfo(item.InSignalProperty))
+                {
+                    if (!CheckSingleCdlinfo(item.OutSignalProperty))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }                
+            }
+
+            return true;
+        }
+
+        private bool CheckSingleCdlinfo(SignalDataViewModel sdvm)
+        {
+            string[] parts;
+            float position;
+            int secnumber;
+            errorMsg = string.Empty;
+
+            if (sdvm.PartImenber != -1 || sdvm.PartII != -1)
+            {
+                position = sdvm.PartImenber * 1000 + sdvm.PartII;
+                secnumber = int.Parse(sdvm.SectionNum);
+                if (secnumber == 1)
+                {
+                    parts = cdlist[0].Split(':');
+                    if (position > float.Parse(parts[0].Split('+')[1]))
+                    {
+                        errorMsg = string.Format("错误：{0} {1}+{2} 路段号设置错误，请改正！",
+                            sdvm.Guanhao, sdvm.PartImenber,
+                            sdvm.PartII);
+                        return false;
+                    }
+                }
+                else if (secnumber == cdlist.Count() + 1)
+                {
+                    parts = cdlist[secnumber - 2].Split(':');
+                    if (position < float.Parse(parts[1].Split('+')[1]))
+                    {
+                        errorMsg = string.Format("错误：坐标 {0} {1}+{2} 路段号设置错误，请改正！",
+                            sdvm.Guanhao, sdvm.PartImenber,
+                            sdvm.PartII);
+                        return false;
+                    }
+                }
+                else
+                {
+                    parts = cdlist[secnumber - 1].Split(':');
+                    if (position > float.Parse(parts[0].Split('+')[1]))
+                    {
+                        errorMsg = string.Format("错误：坐标 {0} {1}+{2} 路段号设置错误，请改正！",
+                            sdvm.Guanhao, sdvm.PartImenber,
+                            sdvm.PartII);
+                        return false;
+                    }
+                    parts = cdlist[secnumber - 2].Split(':');
+                    if (position < float.Parse(parts[1].Split('+')[1]))
+                    {
+                        errorMsg = string.Format("错误：坐标 {0} {1}+{2} 路段号设置错误，请改正！",
+                             sdvm.Guanhao, sdvm.PartImenber,
+                             sdvm.PartII);
+                        return false;
+                    }
+                }
+            }
+            return true;    
         }
 
         private RelayCommand _UpdataCommand;
@@ -244,9 +336,32 @@ namespace Inter_face.ViewModel
                     ?? (_UpdataCommand = new RelayCommand(
                                           () =>
                                           {
-                                              UpDataStationSignals();
+                                              if (CheckCdlInfo())
+                                                  UpDataStationSignals();
+                                              else
+                                              {
+                                                  MessageBox.Show(errorMsg, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                              }
                                           }));
             }
         }
+
+        private RelayCommand _showldhCommand;
+
+        /// <summary>
+        /// Gets the ShowLdhCommand.
+        /// </summary>
+        public RelayCommand ShowLdhCommand
+        {
+            get
+            {
+                return _showldhCommand
+                    ?? (_showldhCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              ShowLdh();
+                                          }));
+            }
+        }        
     }
 }

@@ -122,8 +122,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ACdlWindow.xaml.cs">
+      <DependentUpon>ACdlWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Coverters\ActrueLengthToShowLengthConverter.cs" />
     <Compile Include="Coverters\AdjustLengthConverter.cs" />
+    <Compile Include="Coverters\ClddataToShowStyleConverter.cs" />
     <Compile Include="Coverters\DatasCollectionToVisibilityConverter.cs" />
     <Compile Include="Coverters\DmToKeyConverter.cs" />
     <Compile Include="Coverters\DmToLcConverter.cs" />
@@ -145,6 +149,9 @@
     <Compile Include="Coverters\IDatamodelToAliConverter.cs" />
     <Compile Include="Coverters\IDatamodelToToolTipConverter.cs" />
     <Compile Include="Coverters\IDMToDMConverter.cs" />
+    <Compile Include="Coverters\IntToBoolenConverter.cs" />
+    <Compile Include="Coverters\intTocursorstyleConverter.cs" />
+    <Compile Include="Coverters\IntToUnBoolenConverter.cs" />
     <Compile Include="Coverters\LenToPart1Converter.cs" />
     <Compile Include="Coverters\LenToPart2Converter.cs" />
     <Compile Include="Coverters\PathDetailConverter.cs" />
@@ -154,8 +161,16 @@
     <Compile Include="Coverters\StringToIntConverter.cs" />
     <Compile Include="Coverters\ValueToLengthConverter.cs" />
     <Compile Include="DataType.cs" />
+    <Compile Include="Models\LdhinfoModel.cs" />
     <Compile Include="Models\SignalDataViewModel.cs" />
     <Compile Include="Models\StationDataMode.cs" />
+    <Compile Include="ModifyCdldataWindow.xaml.cs">
+      <DependentUpon>ModifyCdldataWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\AcdlViewModel.cs" />
+    <Compile Include="ViewModel\ModifyCdlViewModel.cs" />
+    <Compile Include="ViewModel\ProcessViewModel.cs" />
+    <Compile Include="ViewModel\ShowLdhViewModel.cs" />
     <Compile Include="ViewModel\StationSignaleDataModel.cs" />
     <Compile Include="ModifyQujianWindow.xaml.cs">
       <DependentUpon>ModifyQujianWindow.xaml</DependentUpon>
@@ -180,9 +195,19 @@
     <Compile Include="Views\DivSpinner.xaml.cs">
       <DependentUpon>DivSpinner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\LdhInfoWindow.xaml.cs">
+      <DependentUpon>LdhInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProcessWindow.xaml.cs">
+      <DependentUpon>ProcessWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\StationSignalWindow.xaml.cs">
       <DependentUpon>StationSignalWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="ACdlWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -195,6 +220,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ModifyCdldataWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ModifyQujianWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -212,6 +241,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DivSpinner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\LdhInfoWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProcessWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -382,6 +419,19 @@
   <ItemGroup>
     <Resource Include="icons\exportsignaldata.png" />
     <Resource Include="icons\stationsigle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\cdl.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\Automatic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\downway.png" />
+    <Resource Include="icons\upway.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\SaveXH.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -9,9 +9,12 @@
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
     xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="Inter_face.MainWindow"
         Title="数据转换" FontSize="18" mc:Ignorable="d" 
-                     Height="640" Width="933" WindowState="Maximized" Icon="icons/title.png"
+                     Height="640" Width="933" WindowState="Maximized" Icon="icons/title.png" Loaded="RibbonWindow_Loaded"
                      >
     <Fluent:RibbonWindow.Resources>        
+    	<Inter_face_Coverters:IntToUnBoolenConverter x:Key="IntToUnBoolenConverter"/>        
+    	<Inter_face_Coverters:IntToBoolenConverter x:Key="IntToBoolenConverter"/>        
+    	<Inter_face_Coverters:intTocursorstyleConverter x:Key="intTocursorstyleConverter"/>        
     	<Inter_face_Coverters:StationDataToBoolenConverter x:Key="StationDataToBoolenConverter"/>        
     	<Inter_face_Coverters:IDatamodelToAliConverter x:Key="IDatamodelToAliConverter"/>        
     	<Inter_face_Coverters:DmToShowDetailUpConverter x:Key="DmToShowDetailUpConverter"/>        
@@ -36,7 +39,7 @@
     	<Inter_face_Coverters:ActrueLengthToShowLengthConverter x:Key="ActrueLengthToShowLengthConverter"/>
     	<Inter_face_Coverters:IDMToDMConverter x:Key="IDMToDMConverter"/>         
     	<vm:ViewModelLocator x:Key="Locator"/>
-        <Image x:Key="accessicon" Source="icons/Access.png" Stretch="Fill"/>
+    	<Image x:Key="accessicon" Source="icons/Access.png" Stretch="Fill"/>
     	<Image x:Key="lbopicon" Source="icons/openBop.png" Stretch="Fill"/>
     	<Image x:Key="laopicon" Source="icons/openAop.png" Stretch="Fill"/>
     	<Image x:Key="saopicon" Source="icons/saveAop.png" Stretch="Fill"/>
@@ -59,11 +62,16 @@
     	<Image x:Key="stationicon" Source="icons/station.png" Stretch="Fill"/>
     	<Image x:Key="lineicon" Source="icons/Line.png" Stretch="Fill"/>
     	<Image x:Key="ruleicon" Source="icons/rule.png" Stretch="Fill"/>
-        <Image x:Key="signalupicon" Source="icons/singleup.png" Stretch="Fill"/>
-        <Image x:Key="signaldownicon" Source="icons/singledown.png" Stretch="Fill"/>
-        <Image x:Key="stationsignalicon" Source="icons/stationsigle.png" Stretch="Fill"/>
-        <Image x:Key="exportsignaldataicon" Source="icons/exportsignaldata.png" Stretch="Fill"/>
-        <ToolTip x:Key="NewSheetTip">
+    	<Image x:Key="signalupicon" Source="icons/singleup.png" Stretch="Fill"/>
+    	<Image x:Key="signaldownicon" Source="icons/singledown.png" Stretch="Fill"/>
+    	<Image x:Key="stationsignalicon" Source="icons/stationsigle.png" Stretch="Fill"/>
+    	<Image x:Key="exportsignaldataicon" Source="icons/exportsignaldata.png" Stretch="Fill"/>
+        <Image x:Key="checkcdl" Source="icons/cdl.png" Stretch="Fill"/>
+        <Image x:Key="AutoCheck" Source="icons/Automatic.png" Stretch="Fill"/>
+        <Image x:Key="Upway" Source="icons/upway.png" Stretch="Fill"/>
+        <Image x:Key="Downway" Source="icons/downway.png" Stretch="Fill"/>
+        <Image x:Key="SaveXH" Source="icons/SaveXH.png" Stretch="Fill"/>
+    	<ToolTip x:Key="NewSheetTip">
     		<Grid>
     			<Grid.RowDefinitions>
     				<RowDefinition Height="25"/>
@@ -221,6 +229,9 @@
     		</Setter>
     	</Style>
     </Fluent:RibbonWindow.Resources>
+	<Fluent:RibbonWindow.Cursor>
+		<Binding Converter="{StaticResource intTocursorstyleConverter}" Path="DatasCollectionProperty.Cursor"/>
+	</Fluent:RibbonWindow.Cursor>
     <Fluent:RibbonWindow.DataContext>
         <Binding Path="Main" Source="{StaticResource Locator}"/>
     </Fluent:RibbonWindow.DataContext>
@@ -256,11 +267,15 @@
 					<Fluent:Button x:Name="openqxfile" Header="打开曲线文件" LargeIcon="{StaticResource quxianicon}" Click="openqxfile_Click"/>
 					<Fluent:Button x:Name="openbjfile" Header="打开标记文件" LargeIcon="{StaticResource biaojiicon}" Click="openbjfile_Click"/>
 				</Fluent:RibbonGroupBox>
-				<Fluent:RibbonGroupBox Header="检查文件数据">
-					<Fluent:Button x:Name="checkdatasign" Header="检查数据标记" LargeIcon="{StaticResource Checkdatasignicon}" Click="checkdatasign_Click"/>
-					<Fluent:Button x:Name="checklogic" Header="检查数据逻辑" LargeIcon="{StaticResource checklogicicon}" Click="checklogic_Click"/>
+				<Fluent:RibbonGroupBox Header="准备数据">					
+					<Fluent:Button x:Name="modifycdldata" Header="核对长短链" LargeIcon="{DynamicResource checkcdl}" Command="{Binding DatasCollectionProperty.ModifycdlDataCommand, Mode=OneWay}"/>
+					<Fluent:Button x:Name="checkdatasign" Header="检查读取标记" LargeIcon="{StaticResource Checkdatasignicon}" Click="checkdatasign_Click"/>					
 				</Fluent:RibbonGroupBox>
-				<Fluent:RibbonGroupBox Header="打开合并文件">
+                <Fluent:RibbonGroupBox Header="调整数据">
+                    <Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/>                   
+                    <Fluent:Button x:Name="checklogic" Header="检查数据逻辑" LargeIcon="{StaticResource checklogicicon}" Click="checklogic_Click"/>
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox Header="打开合并文件">
 					<Fluent:Button x:Name="opentemppdfile" Header="打开坡度文件" LargeIcon="{StaticResource podulargeicon}" Click="opentemppdfile_Click"/>
 					<Fluent:Button x:Name="opentempqxfile" Header="打开曲线文件" LargeIcon="{StaticResource quxianlargeicon}" Click="opentempqxfile_Click"/>
 					<Fluent:Button x:Name="opentempbjfile" Header="打开标记文件" LargeIcon="{StaticResource biaojilargeicon}" Click="opentempbjfile_Click"/>
@@ -277,18 +292,22 @@
 				</Fluent:RibbonGroupBox>
 			</Fluent:RibbonTabItem>
 			<Fluent:RibbonTabItem x:Name="ShowDataRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:LayoutOverrides="Height" Header="数据显示" IsSelected="True">
-				<Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
-					<Fluent:ToggleButton x:Name="loadxhdataButton" Header="读入信号机" LargeIcon="{DynamicResource signaldownicon}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}"/>
-					<Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="读入信号机上" LargeIcon="{DynamicResource signalupicon}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
-                    <Fluent:Button x:Name="ModifyStationsignalButton" Header="进出站信号机" d:LayoutOverrides="Height" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}" LargeIcon="{DynamicResource stationsignalicon}"/>
-                    <Fluent:Button x:Name="ExportSigDataButton" Header="输出信号机" Height="Auto" Command="{Binding DatasCollectionProperty.ExportSignalDataSeparatelyCommand, Mode=OneWay}" LargeIcon="{DynamicResource exportsignaldataicon}"/>      	
-				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox x:Name="LineDataRibbonGroupBox" Header="线路数据">
 					<Fluent:ToggleButton x:Name="LoadPDToggleButton" Content="线路数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsPoduLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding DatasCollectionProperty.LoadPoduDataCommand, Mode=OneWay}" ToolTip="显示坡度数据" Header="线路数据" LargeIcon="{DynamicResource lineicon}" Margin="6,0"/>
 					<Fluent:ToggleButton x:Name="LoadQXToggleButton" Content="曲线数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsQuXianLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadQuXianDataCommand, Mode=OneWay}" ToolTip="显示曲线" Header="曲线数据" LargeIcon="{DynamicResource curveicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
 					<Fluent:ToggleButton x:Name="LoadCZToggleButton" Content="车站数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsCheZhanLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadStationCommand, Mode=OneWay}" ToolTip="显示车站数据" Header="车站数据" LargeIcon="{DynamicResource stationicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
 					<Fluent:ToggleButton x:Name="PositionToggleButton" Content="里程数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsLiChengLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" Command="{Binding DatasCollectionProperty.LoadPositionCommand, Mode=OneWay}" LargeIcon="{DynamicResource ruleicon}" Header="里程数据" ToolTip="显示里程数据" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
 				</Fluent:RibbonGroupBox>
+				<Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
+					<Fluent:ToggleButton x:Name="loadxhdataButton" Header="载入下行" LargeIcon="{DynamicResource Downway}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}" FontSize="11"/>
+                    <Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="载入上行" LargeIcon="{DynamicResource Upway}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
+                    <Fluent:Button x:Name="ModifyStationsignalButton" Header="修改车站信号机" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}" LargeIcon="{DynamicResource stationsignalicon}" Height="Auto"/>
+                    <Fluent:Button x:Name="SaveStationsignalButton" Header="保存" ToolTip="保存信号机" Command="{Binding DatasCollectionProperty.SaveXhDataCommand, Mode=OneWay}" LargeIcon="{DynamicResource SaveXH}" Height="Auto" IsEnabled="{Binding DatasCollectionProperty.IsXinhaoChanged}"/>					
+					<Fluent:SplitButton x:Name="exportSplitButton" d:LayoutOverrides="Height" LargeIcon="{DynamicResource exportsignaldataicon}" Header="{Binding DatasCollectionProperty.ExportXhText}" Command="{Binding DatasCollectionProperty.ExportSignalDataCommand, Mode=OneWay}">
+						<Fluent:MenuItem Header="分页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.ManyClickCommand, Mode=OneWay}"/>
+						<Fluent:MenuItem Header="单页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToUnBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.SingleClickCommand, Mode=OneWay}"/>
+					</Fluent:SplitButton>      	
+				</Fluent:RibbonGroupBox>				
 			</Fluent:RibbonTabItem>	
 			<Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}">
 				<Fluent:RibbonGroupBox x:Name="DetailRibbonGroupBox" d:LayoutOverrides="Height" Header="基本信息" Width="159">

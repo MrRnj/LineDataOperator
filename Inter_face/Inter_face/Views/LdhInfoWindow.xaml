@@ -1,0 +1,31 @@
+﻿<Window
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:Inter_face.ViewModel"
+	xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight"
+	x:Class="Inter_face.LdhInfoWindow"
+	x:Name="ldhinfoWindow"
+	Title="LdhInfoWindow"
+	Width="817" Height="384" WindowStyle="ToolWindow">
+    <Window.Resources>
+        <vm:ShowLdhViewModel x:Key="ShowLdhViewModel"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Mode="OneWay" Source="{StaticResource ShowLdhViewModel}"/>
+    </Window.DataContext>
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="Closing">
+			<Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding UnregMsgCommand, Mode=OneWay}"/>
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
+	<Grid x:Name="LayoutRoot">
+		<ListView x:Name="ldhinfoListView" Margin="4" ItemsSource="{Binding LdhInfoProperty}" FontSize="18.667">
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="范围" DisplayMemberBinding="{Binding RangeProperty}"/>
+					<GridViewColumn Header="路段号" DisplayMemberBinding="{Binding LdhProperty}"/>
+				</GridView>
+			</ListView.View>
+		</ListView>
+	</Grid>
+</Window>

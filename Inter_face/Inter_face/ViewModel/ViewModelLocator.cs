@@ -44,6 +44,7 @@ namespace Inter_face.ViewModel
 
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MoveXinhaoFormViewModel>();
+            SimpleIoc.Default.Register<ModifyCdlViewModel>();
         }
 
         public MainViewModel Main
@@ -59,6 +60,14 @@ namespace Inter_face.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<MoveXinhaoFormViewModel>();
+            }
+        }
+
+        public ModifyCdlViewModel ModifyCdlForm
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<ModifyCdlViewModel>();
             }
         }
         

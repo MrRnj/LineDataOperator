@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\App.xaml
-71564119650
+11-454927899
 
-58-1593851853
+711525098002
 20710138716
-MainWindow.xaml;ModifyQujianWindow.xaml;MoveXinhaoWindow.xaml;ProcessForm.xaml;ShowInfoBox.xaml;Views\DivSpinner.xaml;Views\StationSignalWindow.xaml;
+ACdlWindow.xaml;MainWindow.xaml;ModifyCdldataWindow.xaml;ModifyQujianWindow.xaml;MoveXinhaoWindow.xaml;ProcessForm.xaml;ShowInfoBox.xaml;Views\DivSpinner.xaml;Views\LdhInfoWindow.xaml;Views\ProcessWindow.xaml;Views\StationSignalWindow.xaml;
 
-False
+True
 
