@@ -12,7 +12,7 @@
     	<vm:ModifyCdlViewModel x:Key="ModifycdlViewModelDataSource"/>
     	<DataTemplate x:Key="CdlDataTemplate">
     		<Grid x:Name="grid" Height="50">
-    			<TextBox x:Name="CdlDataTextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Converter={StaticResource ClddataToShowStyleConverter}, Mode=OneWay}" VerticalAlignment="Center" FontSize="18.667" BorderBrush="{x:Null}" IsReadOnly="True"/>
+    			<TextBox x:Name="CdlDataTextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Converter={StaticResource ClddataToShowStyleConverter}, Mode=OneWay}" VerticalAlignment="Center" FontSize="18.667" BorderBrush="{x:Null}" IsReadOnly="True" Background="#00000000"/>
     		</Grid>
     	</DataTemplate>
     </Window.Resources>
@@ -26,19 +26,19 @@
 	</i:Interaction.Triggers>
 	<Grid x:Name="LayoutRoot">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="0.689*"/>
-			<ColumnDefinition Width="0.011*"/>
+			<ColumnDefinition Width="0.7*"/>
+			<ColumnDefinition Width="5"/>
 			<ColumnDefinition Width="0.3*"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="30"/>
-			<RowDefinition Height="0.1*"/>
-			<RowDefinition Height="0.1*"/>
-			<RowDefinition Height="0.1*"/>
-			<RowDefinition Height="0.1*"/>
-			<RowDefinition Height="100"/>			
-			<RowDefinition Height="0.1*"/>
-			<RowDefinition Height="0.1*"/>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="*"/>			
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="50"/>
 		</Grid.RowDefinitions>
 		<ListBox x:Name="cdllistbox" Margin="8,8,2.7,8" Grid.Row="1" Grid.RowSpan="7" ItemsSource="{Binding CdlCollectionProperty}" SelectedIndex="{Binding SeletedItem, Mode=TwoWay}" ItemTemplate="{DynamicResource CdlDataTemplate}"/>
 		<Button x:Name="UpButton" Content="上移" Grid.Column="2" Margin="8" Grid.Row="1" Command="{Binding UpcdlDataCommand, Mode=OneWay}"/>

@@ -11,8 +11,8 @@ using System.Windows;
 [assembly: AssemblyDescription("实现运输专业软件数据间的相互转换")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("运输所211")]
-[assembly: AssemblyProduct("任南杰")]
-[assembly: AssemblyCopyright("Copyright ©  2012")]
+[assembly: AssemblyProduct("R")]
+[assembly: AssemblyCopyright("R Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,6 +51,6 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.5.0.0")]
-[assembly: AssemblyFileVersion("1.5.0.0")]
+[assembly: AssemblyVersion("1.9.0.0")]
+[assembly: AssemblyFileVersion("1.9.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("zh-Hans")]

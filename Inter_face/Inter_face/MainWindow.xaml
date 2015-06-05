@@ -71,6 +71,7 @@
         <Image x:Key="Upway" Source="icons/upway.png" Stretch="Fill"/>
         <Image x:Key="Downway" Source="icons/downway.png" Stretch="Fill"/>
         <Image x:Key="SaveXH" Source="icons/SaveXH.png" Stretch="Fill"/>
+		<Image x:Key="ExportToSvg" Source="icons/exportopng.png" Stretch="Fill"/>
     	<ToolTip x:Key="NewSheetTip">
     		<Grid>
     			<Grid.RowDefinitions>
@@ -129,6 +130,16 @@
     			</Grid.RowDefinitions>
     			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="保存处理后的数据"/></TextBlock>
     			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="保存处理后的原始数据"/></TextBlock>
+    		</Grid>
+    	</ToolTip>
+		<ToolTip x:Key="ExportToSvgTip">
+    		<Grid>
+    			<Grid.RowDefinitions>
+    				<RowDefinition Height="25"/>
+    				<RowDefinition Height="60"/>
+    			</Grid.RowDefinitions>
+    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="输出数据图形"/></TextBlock>
+    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="将处理后的数据输出为图形"/></TextBlock>
     		</Grid>
     	</ToolTip>
     	<DataTemplate x:Key="DetailDataTemplate">
@@ -229,6 +240,11 @@
     		</Setter>
     	</Style>
     </Fluent:RibbonWindow.Resources>
+	<i:Interaction.Triggers>
+		<i:EventTrigger EventName="Closing">
+			<Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding DatasCollectionProperty.DisposeCommand, Mode=OneWay}"/>
+		</i:EventTrigger>
+	</i:Interaction.Triggers>
 	<Fluent:RibbonWindow.Cursor>
 		<Binding Converter="{StaticResource intTocursorstyleConverter}" Path="DatasCollectionProperty.Cursor"/>
 	</Fluent:RibbonWindow.Cursor>
@@ -259,7 +275,15 @@
 				<Fluent:RibbonGroupBox Header="保存数据">
 					<Fluent:Button x:Name="SaveSourcedata" Click="SaveSourcedata_Click"  Header="保存原始数据" LargeIcon="{StaticResource sbopicon}" ToolTip="{StaticResource SaveResourceTip}"/>
 					<Fluent:Button x:Name="SaveOpdata" Click="SaveOpdata_Click"  Header="保存处理后数据" LargeIcon="{StaticResource saopicon}" ToolTip="{StaticResource SaveOperatedTip}"/>
+					<Fluent:Button x:Name="ExportToSvg" Header="输出数据" LargeIcon="{StaticResource ExportToSvg}" ToolTip="{DynamicResource ExportToSvgTip}">
+						<i:Interaction.Triggers>
+							<i:EventTrigger EventName="Click">
+								<Custom:EventToCommand x:Name="ClickEventToCommand" Command="{Binding DatasCollectionProperty.ExportToSvgCommand, Mode=OneWay}"/>
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</Fluent:Button>
 				</Fluent:RibbonGroupBox>
+				
 			</Fluent:RibbonTabItem>
 			<Fluent:RibbonTabItem Header="数据处理" IsSelected="True">
 				<Fluent:RibbonGroupBox Header="打开原始文件">
@@ -267,12 +291,12 @@
 					<Fluent:Button x:Name="openqxfile" Header="打开曲线文件" LargeIcon="{StaticResource quxianicon}" Click="openqxfile_Click"/>
 					<Fluent:Button x:Name="openbjfile" Header="打开标记文件" LargeIcon="{StaticResource biaojiicon}" Click="openbjfile_Click"/>
 				</Fluent:RibbonGroupBox>
-				<Fluent:RibbonGroupBox Header="准备数据">					
+				<Fluent:RibbonGroupBox Header="调整数据">					
 					<Fluent:Button x:Name="modifycdldata" Header="核对长短链" LargeIcon="{DynamicResource checkcdl}" Command="{Binding DatasCollectionProperty.ModifycdlDataCommand, Mode=OneWay}"/>
-					<Fluent:Button x:Name="checkdatasign" Header="检查读取标记" LargeIcon="{StaticResource Checkdatasignicon}" Click="checkdatasign_Click"/>					
+					<Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/> 					
 				</Fluent:RibbonGroupBox>
-                <Fluent:RibbonGroupBox Header="调整数据">
-                    <Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/>                   
+                <Fluent:RibbonGroupBox Header="检查数据">
+                	<Fluent:Button x:Name="checkdatasign" Header="检查读取标记" LargeIcon="{StaticResource Checkdatasignicon}" Click="checkdatasign_Click"/>
                     <Fluent:Button x:Name="checklogic" Header="检查数据逻辑" LargeIcon="{StaticResource checklogicicon}" Click="checklogic_Click"/>
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox Header="打开合并文件">

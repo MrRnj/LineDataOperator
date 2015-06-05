@@ -898,6 +898,10 @@ namespace Inter_face.ViewModel
                     //MessengerInstance.Send<int>(50, "processes");
                     //MessengerInstance.Send<string>("开始生成坡度图形", "msg");
                     cdlxlist = pdxlist.TakeWhile(p => p.Cdl != "+:+").Select(q => q.Cdl).ToList();
+                    if (cdlxlist.Count == 0)
+                    {
+                        cdlxlist.Add("0+0:0+0");
+                    }
                     part = (int)(pdxlist.Count() / 5);  
                   
 
@@ -3077,12 +3081,12 @@ namespace Inter_face.ViewModel
 
             catch (System.InvalidOperationException ioe)
             {
-
+                MessengerInstance.Send<string>("上下行信号机数据不完整", "ReadDataError");
             }
 
             catch
             {
-
+                MessengerInstance.Send<string>("输出信号机数据出错", "ReadDataError");
             }
         }
 
@@ -3270,9 +3274,14 @@ namespace Inter_face.ViewModel
                 }
             }
 
+            catch (System.InvalidOperationException ioe)
+            {
+                MessengerInstance.Send<string>("上下行信号机数据不完整", "ReadDataError");
+            }
+
             catch
             {
-
+                MessengerInstance.Send<string>("输出信号机数据出错", "ReadDataError");
             }
         }
 
@@ -3283,46 +3292,66 @@ namespace Inter_face.ViewModel
             List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
             string[] parts;
 
-            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
-            foreach (StationDataMode item in singledata.DataCollection.ToArray())
+            try
             {
-                parts = item.StationNameProperty.Split(':');
-                if (!parts[0].StartsWith("Q"))
+                
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
-                    xhs.Add(new ChangeToTxt.CheZhanOutputData()
+                    parts = item.StationNameProperty.Split(':');
+                    if (!parts[0].StartsWith("Q"))
                     {
-                        Bjlx = parts[0],
-                        Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
-                        Gh = item.HatProperty,
-                        Glb = item.PositionProperty.ToString("F3"),
-                        Index = string.Empty,
-                        Ldh = item.SectionNumProperty.ToString(),
-                        Zjfx = "1"
-                    });
+                        xhs.Add(new ChangeToTxt.CheZhanOutputData()
+                        {
+                            Bjlx = parts[0],
+                            Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
+                            Gh = item.HatProperty,
+                            Glb = item.PositionProperty.ToString("F3"),
+                            Index = string.Empty,
+                            Ldh = item.SectionNumProperty.ToString(),
+                            Zjfx = "1"
+                        });
+                    }
                 }
+                //Doper.SaveXhData(xhs, xhx);
+                IsXinhaoChanged = false;
             }
 
-            singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
-            foreach (StationDataMode item in singledata.DataCollection.ToArray())
+            catch
             {
-                parts = item.StationNameProperty.Split(':');
-                if (!parts[0].StartsWith("Q"))
-                {
-                    xhx.Add(new ChangeToTxt.CheZhanOutputData()
-                    {
-                        Bjlx = parts[0],
-                        Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
-                        Gh = item.HatProperty,
-                        Glb = item.PositionProperty.ToString("F3"),
-                        Index = string.Empty,
-                        Ldh = item.SectionNumProperty.ToString(),
-                        Zjfx = "1"
-                    });
-                }
+                MessengerInstance.Send<string>("保存上行信号机数据出错", "ReadDataError");
             }
 
-            GDoper.SaveXhData(xhs, xhx);
-            IsXinhaoChanged = false;
+            try
+            {
+                
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                {
+                    parts = item.StationNameProperty.Split(':');
+                    if (!parts[0].StartsWith("Q"))
+                    {
+                        xhx.Add(new ChangeToTxt.CheZhanOutputData()
+                        {
+                            Bjlx = parts[0],
+                            Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
+                            Gh = item.HatProperty,
+                            Glb = item.PositionProperty.ToString("F3"),
+                            Index = string.Empty,
+                            Ldh = item.SectionNumProperty.ToString(),
+                            Zjfx = "1"
+                        });
+                    }
+                }
+
+                GDoper.SaveXhData(xhs, xhx);
+                IsXinhaoChanged = false;
+            }
+
+            catch 
+            {
+                MessengerInstance.Send<string>("保存下行信号机数据出错", "ReadDataError");
+            }
         }
 
         private void ModifyCdldata()
@@ -3333,9 +3362,18 @@ namespace Inter_face.ViewModel
 
         private void Autofit()
         {
-            string[] cdldata = GDoper.GetCdlData(Path.Combine(Environment.CurrentDirectory, @"excelmodels\接坡面数据.xlsx"));
-           
-            ABoper.Autofit(cdldata);
+            Cursor = 1;
+            try
+            {
+                string[] cdldata = GDoper.GetCdlData(Path.Combine(Environment.CurrentDirectory, @"excelmodels\接坡面数据.xlsx"));
+                ABoper.Autofit(cdldata);
+                MessengerInstance.Send<string>("自动调整完成！", "ReadDataRight");
+            }
+            catch
+            {
+                MessengerInstance.Send<string>("自动调整出错！", "ReadDataError");
+            }
+            Cursor = 0;
         }
 
         private void SingleClick()
@@ -3346,6 +3384,186 @@ namespace Inter_face.ViewModel
         private void ManyClick()
         {
             exPortTypeIndex = 0;
+        }
+
+        private void Dispose()
+        {
+            GDoper.Dispose();
+            SDexportor.Dispose();
+            ABoper.Dispose();
+        }
+
+        private void ExportToSvg()
+        {
+            ExportToSVG ets = new ExportToSVG();
+            List<LineData> ld = new List<LineData>();
+            List<CurveData> cd = new List<CurveData>();
+            List<LineData> posd = new List<LineData>();
+            List<StationData> sd = new List<StationData>();
+            List<SignalData> sds = new List<SignalData>();
+            List<SignalData> sdx = new List<SignalData>();
+
+            sfwindow = new SaveFileDialog();
+            //sfwindow.CheckFileExists = true;
+            sfwindow.AddExtension = true;
+            sfwindow.Title = "输出图形";
+            sfwindow.Filter = "svg files (*.svg)|*.svg|All files (*.*)|*.*";
+            if (sfwindow.ShowDialog() == true)
+            {
+                Cursor = 1;
+                try
+                {
+                    ets.CreatSvg(sfwindow.FileName);
+                    ISingleDataViewModel pddata = _datascollection.SingleOrDefault<ISingleDataViewModel>(p => p.TypeNameProperty.Equals("坡度"));
+                    if (pddata != null)
+                    {
+                        if (pddata.ShowDataProperty)
+                        {
+                            foreach (LineDataModel item in pddata.DataCollection.Select(q => q as LineDataModel))
+                            {
+                                ld.Add(new LineData()
+                                {
+                                    AngleProperty = item.AngleProperty,
+                                    EndPositionProperty = item.EndPositionProperty,
+                                    HatProperty = item.HatProperty,
+                                    HeightProperty = item.HeightProperty,
+                                    LengthProperty = item.LengthProperty,
+                                    PathDataProperty = item.PathDataProperty,
+                                    PositionProperty = item.PositionProperty,
+                                    RadioProperty = item.RadioProperty,
+                                    ScaleProperty = item.ScaleProperty,
+                                    SectionNumProperty = item.SectionNumProperty
+                                });
+                            }
+                            ets.ExportLineData(ld, "green", "3", 200, 100);
+                        }
+                    }
+
+
+                    ISingleDataViewModel qxdata = _datascollection.SingleOrDefault<ISingleDataViewModel>(p => p.TypeNameProperty.Equals("曲线"));
+                    if (qxdata != null)
+                    {
+                        if (qxdata.ShowDataProperty)
+                        {
+                            foreach (LineDataModel item in qxdata.DataCollection.Select(q => q as LineDataModel))
+                            {
+                                cd.Add(new CurveData()
+                                {
+                                    AngleProperty = item.AngleProperty,
+                                    EndPositionProperty = item.EndPositionProperty,
+                                    HatProperty = item.HatProperty,
+                                    HeightProperty = item.HeightProperty,
+                                    LengthProperty = item.LengthProperty,
+                                    PathDataProperty = item.PathDataProperty,
+                                    PositionProperty = item.PositionProperty,
+                                    RadioProperty = item.RadioProperty,
+                                    ScaleProperty = item.ScaleProperty,
+                                    SectionNumProperty = item.SectionNumProperty
+                                });
+                            }
+                            ets.ExportCurveData(cd, "green", "3", 270, 100);
+                        }
+                    }
+
+                    ISingleDataViewModel lcdata = _datascollection.SingleOrDefault<ISingleDataViewModel>(p => p.TypeNameProperty.Equals("里程"));
+                    if (lcdata != null)
+                    {
+                        if (lcdata.ShowDataProperty)
+                        {
+                            foreach (StationDataMode item in lcdata.DataCollection.Select(q => q as StationDataMode))
+                            {
+                                posd.Add(new LineData()
+                                {
+                                    AngleProperty = 0,
+                                    EndPositionProperty = 0,
+                                    HatProperty = item.HatProperty,
+                                    HeightProperty = 0,
+                                    LengthProperty = item.LengthProperty,
+                                    PathDataProperty = string.Empty,
+                                    PositionProperty = item.PositionProperty,
+                                    RadioProperty = 0,
+                                    ScaleProperty = item.ScaleProperty,
+                                    SectionNumProperty = item.SectionNumProperty
+                                });
+                            }
+                            ets.ExportPosData(posd, "black", "3", 360, 100);
+                        }
+                    }
+
+                    ISingleDataViewModel czdata = _datascollection.SingleOrDefault<ISingleDataViewModel>(p => p.TypeNameProperty.Equals("车站"));
+                    if (czdata != null)
+                    {
+                        if (czdata.ShowDataProperty)
+                        {
+                            foreach (StationDataMode item in czdata.DataCollection.Select(q => q as StationDataMode))
+                            {
+                                sd.Add(new StationData()
+                                {
+                                    HatProperty = item.HatProperty,
+                                    LengthProperty = item.LengthProperty,
+                                    PathDataProperty = item.PathDataProperty,
+                                    PositionProperty = item.PositionProperty,
+                                    ScaleProperty = item.ScaleProperty,
+                                    SectionNumProperty = item.SectionNumProperty,
+                                    StationNameProperty = item.StationNameProperty
+                                });
+                            }
+                            ets.ExportStationData(sd, "black", "2", 15, 100, 100);
+                        }
+                    }
+
+                    ISingleDataViewModel xhsdata = _datascollection.SingleOrDefault<ISingleDataViewModel>(p => p.TypeNameProperty.Equals("信号机(S)"));
+                    if (xhsdata != null)
+                    {
+                        if (xhsdata.ShowDataProperty)
+                        {
+                            foreach (StationDataMode item in xhsdata.DataCollection.Select(q => q as StationDataMode))
+                            {
+                                sds.Add(new SignalData()
+                                {
+                                    HatProperty = item.HatProperty,
+                                    LengthProperty = item.LengthProperty,
+                                    PathDataProperty = item.PathDataProperty,
+                                    PositionProperty = item.PositionProperty,
+                                    ScaleProperty = item.ScaleProperty,
+                                    SectionNumProperty = item.SectionNumProperty,
+                                    StationNameProperty = item.StationNameProperty
+                                });
+                            }
+                            ets.ExportSignalData(sds, 0, 420, 100);
+                        }
+                    }
+
+                    ISingleDataViewModel xhxdata = _datascollection.SingleOrDefault<ISingleDataViewModel>(p => p.TypeNameProperty.Equals("信号机(X)"));
+                    if (xhxdata != null)
+                    {
+                        if (xhxdata.ShowDataProperty)
+                        {
+                            foreach (StationDataMode item in xhxdata.DataCollection.Select(q => q as StationDataMode))
+                            {
+                                sdx.Add(new SignalData()
+                                {
+                                    HatProperty = item.HatProperty,
+                                    LengthProperty = item.LengthProperty,
+                                    PathDataProperty = item.PathDataProperty,
+                                    PositionProperty = item.PositionProperty,
+                                    ScaleProperty = item.ScaleProperty,
+                                    SectionNumProperty = item.SectionNumProperty,
+                                    StationNameProperty = item.StationNameProperty
+                                });
+                            }
+                            ets.ExportSignalData(sdx, 1, 480, 100);
+                        }
+                    }
+                    ets.SaveSvg();
+                    Cursor = 0;
+                    MessengerInstance.Send<string>("输出图形完成！", "ReadDataRight");
+                }
+                catch
+                {
+                    MessengerInstance.Send<string>("输出图形出错！", "ReadDataError");
+                }
+            }
         }
 
         #region Commands
@@ -3813,6 +4031,42 @@ namespace Inter_face.ViewModel
                                           () =>
                                           {
                                               ManyClick();
+                                          }));
+            }
+        }
+
+        private RelayCommand _disposeCommand;
+
+        /// <summary>
+        /// Gets the DisposeCommand.
+        /// </summary>
+        public RelayCommand DisposeCommand
+        {
+            get
+            {
+                return _disposeCommand
+                    ?? (_disposeCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              Dispose();
+                                          }));
+            }
+        }
+
+        private RelayCommand _exporttosvgCommand;
+
+        /// <summary>
+        /// Gets the ExportToSvgCommand.
+        /// </summary>
+        public RelayCommand ExportToSvgCommand
+        {
+            get
+            {
+                return _exporttosvgCommand
+                    ?? (_exporttosvgCommand = new RelayCommand(
+                                          () =>
+                                          {
+                                              ExportToSvg();
                                           }));
             }
         }

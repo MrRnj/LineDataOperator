@@ -64,7 +64,10 @@ namespace Inter_face
                 AddInfobox(p, string.Empty, string.Empty, 0, "1");
             });
 
-            
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataRight", p =>
+            {
+                AddInfobox(p, string.Empty, string.Empty, 0, "0");
+            });
         }
 
         private void sendDispatcher()
@@ -1263,6 +1266,13 @@ namespace Inter_face
             csds = new CheckSheetDataSign();
             rsi = new ReadSheetInfo();
             ecd = new ExChangeDir(pdtempfilepath, qxtempfilepath, bjtemptfilepath);
+            WorkSheetBase.Dispose();
+            bool adjust = true;
+
+            if (System.Windows.MessageBox.Show("是否自动调整坡度数据？", "提示", MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.No)
+            {
+                adjust = false;
+            }
 
             try
             {
@@ -1296,7 +1306,7 @@ namespace Inter_face
 
                 try
                 {
-                    if (!csds.CheckPdBook(pdfilepath)) 
+                    if (!csds.CheckPdBook(pdfilepath))
                     {
                         throw new System.Exception("检查坡度文件所注标记出错");
                     }
@@ -1322,7 +1332,7 @@ namespace Inter_face
 
                 try
                 {
-                    if (!csds.CheckQxBook(qxfilepath)) 
+                    if (!csds.CheckQxBook(qxfilepath))
                     {
                         throw new System.Exception("检查曲线文件所注标记出错");
                     }
@@ -1353,7 +1363,10 @@ namespace Inter_face
 
                 OnChecksignChanged(this, new ChecksignChangedEventArgs("正在合并坡度文件"));
                 pddata = rsi.GetPdInfo(pdfilepath, last_star_pos);
-                MergeSheet.MergePd(pdtempfilepath, pddata);
+                if (!MergeSheet.MergePd(pdtempfilepath, pddata, pdfilepath, adjust))
+                {
+                    System.Windows.MessageBox.Show("出错了");
+                }
                 ecd.GetPd_list(ref pdx, ref pds);
 
                 OnChecksignChanged(this, new ChecksignChangedEventArgs("正在合并曲线文件"));

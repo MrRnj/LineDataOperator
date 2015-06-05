@@ -123,7 +123,11 @@ namespace Inter_face.ViewModel
         public void Insertcdldata(string content)
         {
             if (!CdlCollection.Contains(content))
-                CdlCollectionProperty.Add(content);
+            {
+                int index = SeletedItem;
+                CdlCollectionProperty.Insert(index, content);
+                SeletedItem = index;
+            }                
         }
 
         private RelayCommand _upcdldataCommand;
