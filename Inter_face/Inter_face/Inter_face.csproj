@@ -163,6 +163,7 @@
     <Compile Include="Coverters\StringToIntConverter.cs" />
     <Compile Include="Coverters\ValueToLengthConverter.cs" />
     <Compile Include="DataType.cs" />
+    <Compile Include="Models\DianFXneededInfosMode.cs" />
     <Compile Include="Models\LdhinfoModel.cs" />
     <Compile Include="Models\SignalDataViewModel.cs" />
     <Compile Include="Models\StationDataMode.cs" />
@@ -171,6 +172,7 @@
     </Compile>
     <Compile Include="ViewModel\AcdlViewModel.cs" />
     <Compile Include="ViewModel\ModifyCdlViewModel.cs" />
+    <Compile Include="ViewModel\ModifyFilePosViewModel.cs" />
     <Compile Include="ViewModel\ProcessViewModel.cs" />
     <Compile Include="ViewModel\ShowLdhViewModel.cs" />
     <Compile Include="ViewModel\StationSignaleDataModel.cs" />
@@ -193,12 +195,19 @@
     <Compile Include="ViewModel\MoveXinhaoFormViewModel.cs" />
     <Compile Include="ViewModel\SingleDataViewModel.cs" />
     <Compile Include="ViewModel\StationSignalViewModel.cs" />
+    <Compile Include="ViewModel\UpdataDianFXViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="Views\DianFXWindow.xaml.cs">
+      <DependentUpon>DianFXWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DivSpinner.xaml.cs">
       <DependentUpon>DivSpinner.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LdhInfoWindow.xaml.cs">
       <DependentUpon>LdhInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ModifyFilenamesWindow.xaml.cs">
+      <DependentUpon>ModifyFilenamesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProcessWindow.xaml.cs">
       <DependentUpon>ProcessWindow.xaml</DependentUpon>
@@ -242,11 +251,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\DianFXWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\DivSpinner.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\LdhInfoWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ModifyFilenamesWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

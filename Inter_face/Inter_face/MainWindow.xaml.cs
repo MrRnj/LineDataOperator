@@ -48,6 +48,7 @@ namespace Inter_face
         SaveFileDialog savetxtfile;
         CheckDatasign cds;
         CheckDataLogic cdl;
+        ModifyFilenamesWindow modifyfilenameswindow;
         ExtractData.WorkSheetBase worksheetbase;
         int maxprocessbarvalue = 0;
         //string result;
@@ -58,8 +59,8 @@ namespace Inter_face
             InitializeComponent();
             openacessfile = new OpenFileDialog();
             initialWorkbooks();
-            
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p => 
+
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p =>
             {
                 AddInfobox(p, string.Empty, string.Empty, 0, "1");
             });
@@ -68,6 +69,34 @@ namespace Inter_face
             {
                 AddInfobox(p, string.Empty, string.Empty, 0, "0");
             });
+
+            Messenger.Default.Register<string[]>(this, "sendFilenames", (p)
+                =>
+                {
+                    if (modifyfilenameswindow != null)
+                    {
+                        modifyfilenameswindow.Close();
+                    }
+
+                    if (p.Length != 0)
+                    {
+                        FillExcel fe = new FillExcel(pdfilepath, qxfilepath, bjfilepath);
+                        fe.DatapathChanged += new FillExcel.DatapathChangedEvent(fe_DatapathChanged);
+                        fe.Loaderror += new FillExcel.LoaderrorEventhandler(fe_Loaderror);
+
+                        fe.datapathes = p;
+
+                        maxprocessbarvalue = 3 * p.Length * 10;
+                        this.ProgressBar.Maximum = maxprocessbarvalue;
+                        this.ProgressBar.Value = 0;
+                        this.ProgressBar.Visibility = Visibility.Visible;
+
+                        this.loadformdatabase.IsEnabled = false;
+
+                        Thread fethread = new Thread(new ThreadStart(fe.FillData));
+                        fethread.Start();
+                    }
+                });
         }
 
         private void sendDispatcher()
@@ -108,10 +137,6 @@ namespace Inter_face
             IniSheets.MakeCleanBooks(pdfilepath, qxfilepath, bjfilepath, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
             this.ProcessLabel.Content = "工作表初始化完成";
 
-            FillExcel fe = new FillExcel(pdfilepath, qxfilepath, bjfilepath);
-            fe.DatapathChanged += new FillExcel.DatapathChangedEvent(fe_DatapathChanged);
-            fe.Loaderror += new FillExcel.LoaderrorEventhandler(fe_Loaderror);
-
             openacessfile.Filter = "access files (*.mdb)|*.mdb|All files (*.*)|*.*";
             openacessfile.FilterIndex = 1;
             openacessfile.Multiselect = true;
@@ -119,18 +144,16 @@ namespace Inter_face
             if (openacessfile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string[] datapathes = openacessfile.FileNames;
-                fe.datapathes = datapathes;
-
-                maxprocessbarvalue = 3 * datapathes.Length * 10;
-                this.ProgressBar.Maximum = maxprocessbarvalue;
-                this.ProgressBar.Value = 0;
-                this.ProgressBar.Visibility = Visibility.Visible;
-
-                this.loadformdatabase.IsEnabled = false;
-
-                Thread fethread = new Thread(new ThreadStart(fe.FillData));
-                fethread.Start();
-
+                if (datapathes.Length > 1)
+                {
+                    modifyfilenameswindow = new ModifyFilenamesWindow();
+                    Messenger.Default.Send<string[]>(datapathes, "ModifyFilePos");                    
+                    modifyfilenameswindow.ShowDialog();
+                }
+                else
+                {
+                    Messenger.Default.Send<string[]>(datapathes, "sendFilenames");
+                }
             }
 
         }
@@ -962,21 +985,16 @@ namespace Inter_face
                 IniSheets.MakeCleanBooks(pdfilepath, qxfilepath, bjfilepath, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
                 this.ProcessLabel.Content = "工作表初始化完成";
 
-                FillExcel fe = new FillExcel(pdfilepath, qxfilepath, bjfilepath);
-                fe.DatapathChanged += new FillExcel.DatapathChangedEvent(fe_DatapathChanged);
-                fe.Loaderror += new FillExcel.LoaderrorEventhandler(fe_Loaderror);
-
-                fe.datapathes = filepathes;               
-
-                maxprocessbarvalue = 3 * filepathes.Length * 10;
-                this.ProgressBar.Maximum = maxprocessbarvalue;
-                this.ProgressBar.Value = 0;
-                this.ProgressBar.Visibility = Visibility.Visible;
-
-                this.loadformdatabase.IsEnabled = false;
-
-                Thread fethread = new Thread(new ThreadStart(fe.FillData));
-                fethread.Start();
+                if (filepathes.Length > 1)
+                {
+                    modifyfilenameswindow = new ModifyFilenamesWindow();
+                    Messenger.Default.Send<string[]>(filepathes, "ModifyFilePos");                    
+                    modifyfilenameswindow.ShowDialog();
+                }
+                else
+                {
+                    Messenger.Default.Send<string[]>(filepathes, "sendFilenames");
+                }
             }
         }
 
@@ -1090,7 +1108,7 @@ namespace Inter_face
         public void FillData()
         {
             try
-            {
+            {                
                 ffs.FillBj(datapathes);
                 ffs.FillPd(datapathes);
                 ffs.FillQx(datapathes);               

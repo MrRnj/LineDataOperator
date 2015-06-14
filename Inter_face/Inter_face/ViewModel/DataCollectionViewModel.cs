@@ -850,6 +850,13 @@ namespace Inter_face.ViewModel
                     UpdataStationSignals(p);
                     Swindow.Close();
                 });
+            MessengerInstance.Register<StationDataMode>(this, "UpdataDianfx", 
+                p => 
+                {
+                    string[] infos = p.StationNameProperty.Split(':');
+                    InsertDianFXx(string.Format("{0}:{1}:{2}",
+                        infos[2].Split('+')[0], infos[3].Split('+')[0], infos[4].Split('+')[0]), p);
+                });
         }
 
         void _datascollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -2466,12 +2473,17 @@ namespace Inter_face.ViewModel
             }
             else
             {
-                if (-offset >= (preqj.LengthProperty * ScaleProperty + 200))
+                float additionlen = 200;
+                if (prexh.StationNameProperty.Split(':')[0].Equals("3"))
+                {
+                    additionlen = prexh.LengthProperty;
+                }
+                if (-offset >= (preqj.LengthProperty * ScaleProperty + additionlen))
                 {
                     throw new InvalidDataException("偏移过长");
                 }
 
-                for (int i = sdm.SectionNumProperty; i > prexh.SectionNumProperty; i--)
+                for (int i = sdm.SectionNumProperty; i > preqj.SectionNumProperty; i--)
                 {
                     parts = cdlxlist[i - 2].Split(':');
 
@@ -2732,6 +2744,220 @@ namespace Inter_face.ViewModel
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// type:dfxname:leftsecnum + pos:middlesecnum + pos:rightsecnum + pos:len
+        /// </summary>       
+        private void InsertDianFXx(string ghs, StationDataMode DianFXinfo)
+        {
+            ISingleDataViewModel singledata;
+            DianFXinfo.ScaleProperty = ScaleProperty;
+
+            if (!SeletedXinhaoS)
+            {
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                DianFXinfo.Type = DataType.Single;
+            }
+            else
+            {
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                DianFXinfo.Type = DataType.SingleS;
+            }
+                
+            float offset = 0;            
+            float len = 0;
+            string[] parts = { };
+            string[] dfxinfos = DianFXinfo.StationNameProperty.Split(':');
+
+            StationDataMode newqj = null;
+            StationDataMode currentsdm = null;
+            StationDataMode nextsdm = null;            
+            string[] ghlist = ghs.Split(':');
+            int secnum = int.Parse(ghlist[0]);
+            int currentsdmidex = 0;
+            string identy = DianFXinfo.StationNameProperty;
+            float pos = float.Parse(dfxinfos[1].Split('+')[1]);
+
+            if (singledata.DataCollection.Count != 0)
+            {
+                for (int i = 0; i < singledata.DataCollection.Count; i++)
+                {
+                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Equals(identy))
+                    {
+                        currentsdm = singledata.DataCollection[i] as StationDataMode;
+                        if (i == singledata.DataCollection.Count - 1)
+                            nextsdm = currentsdm;
+                        else
+                            nextsdm = singledata.DataCollection[i + 1] as StationDataMode;
+                        currentsdmidex = i;
+                        break;
+                    }
+                }
+
+                if (currentsdm.SectionNumProperty != int.Parse(ghlist[0]))
+                {
+                    for (int j = currentsdm.SectionNumProperty; j < int.Parse(ghlist[0]); j++)
+                    {
+                        parts = cdlxlist[j - 1].Split(':');
+                        offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                    }
+                }
+                else
+                {
+                    if (currentsdm.SectionNumProperty > cdlxlist.Count())
+                        parts = cdlxlist[currentsdm.SectionNumProperty - 2].Split(':');
+                    else
+                        parts = cdlxlist[currentsdm.SectionNumProperty - 1].Split(':');
+                    offset = 0;
+                }
+
+                if ((currentsdm.PositionProperty +
+                        (currentsdm.LengthProperty * ScaleProperty + 200) / 1000 + offset / 1000) > pos)
+                {
+                    offset = 0;
+                    if (pos * 1000 > float.Parse(parts[0].Split('+')[1]))
+                    {
+                        for (int j = currentsdm.SectionNumProperty; j < int.Parse(ghlist[0]); j++)
+                        {
+                            parts = cdlxlist[j - 1].Split(':');
+                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                        }
+
+                        len = (currentsdm.LengthProperty * ScaleProperty) / ScaleProperty -
+                         ((pos - currentsdm.PositionProperty) * 1000 - offset - 200) / ScaleProperty;
+                        currentsdm.LengthProperty = ((pos - currentsdm.PositionProperty) * 1000 - offset - 200) / ScaleProperty;
+                    }
+                    else
+                    {
+                        len = (currentsdm.LengthProperty * ScaleProperty) / ScaleProperty -
+                       ((pos - currentsdm.PositionProperty) * 1000 - 200) / ScaleProperty;
+                        currentsdm.LengthProperty = ((pos - currentsdm.PositionProperty) * 1000 - 200) / ScaleProperty;
+                    }
+
+                }
+
+                newqj = new StationDataMode()
+                 {
+                     HatProperty = DianFXinfo.HatProperty,
+                     LengthProperty = len - float.Parse(dfxinfos[5]) / ScaleProperty,
+                     PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L50,0",
+                     PositionProperty = float.Parse(dfxinfos[4].Split('+')[1]),
+                     ScaleProperty = ScaleProperty,
+                     SectionNumProperty = int.Parse(dfxinfos[4].Split('+')[0]),
+                     SelectedProperty = false,
+                     StationNameProperty = "Q" + int.Parse(dfxinfos[4].Split('+')[0]) + "+" + DianFXinfo.StationNameProperty,
+                     Type = DataType.Single
+                 };
+
+                singledata.DataCollection.RemoveAt(currentsdmidex);
+                singledata.DataCollection.Insert(currentsdmidex, currentsdm);
+
+                singledata.DataCollection.Insert(currentsdmidex + 1, DianFXinfo);
+                singledata.DataCollection.Insert(currentsdmidex + 2, newqj);
+            }
+        }
+
+        private void beginInsertDianfx()
+        {
+            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            float startpos = sdm.PositionProperty;
+            int startsecnum = sdm.SectionNumProperty;
+
+            float endpos = 0;
+            int endsecnum = 0;
+            int index = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+            StationDataMode nextsdm = CurrentDatasProperty.DataCollection[index + 1] as StationDataMode;
+            if (nextsdm.StationNameProperty.StartsWith("3"))
+            {
+                endpos = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[1]);
+                endsecnum = int.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
+            }
+            else
+            {
+                endpos = nextsdm.PositionProperty;
+                endsecnum = nextsdm.SectionNumProperty;
+            }
+
+            string dfxinfosstring = string.Format("{0}:{1}:{2}+{3}:{4}+{5}:{6}+{7}:{8}", "3", "无名",
+                startsecnum.ToString(), startpos.ToString("F3"),
+                startsecnum.ToString(), startpos.ToString("F3"),
+                startsecnum.ToString(), startpos.ToString("F3"),
+                sdm.LengthProperty.ToString("F3")
+                );
+            MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
+            {
+                CdlListProperty = cdlslist,
+                DfxInfosProperty = dfxinfosstring,
+                LeftPosProperty = string.Format("{0}+{1}", startsecnum.ToString(), startpos.ToString("F3")),
+                RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3"))
+            },
+            "DfxInputInfos");
+
+        }
+
+        private void beginModifyDianfx()
+        {
+            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            int index = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+
+            StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 1] as StationDataMode;
+            float startpos = presdm.PositionProperty;
+            int startsecnum = presdm.SectionNumProperty;
+
+            float endpos = 0;
+            int endsecnum = 0;
+            StationDataMode nextsdm = CurrentDatasProperty.DataCollection[index + 1] as StationDataMode;
+            if (nextsdm.StationNameProperty.StartsWith("3"))
+            {
+                endpos = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[1]);
+                endsecnum = int.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
+            }
+            else
+            {
+                endpos = nextsdm.PositionProperty;
+                endsecnum = nextsdm.SectionNumProperty;
+            }
+
+            string[] parts = sdm.StationNameProperty.Split(':');
+            string dfxinfosstring = string.Format("{0}:{1}:{2}+{3}:{4}+{5}:{6}+{7}:{8}", "3", parts[1],
+               parts[2].Split('+')[0], parts[2].Split('+')[0],
+               sdm.SectionNumProperty.ToString(), sdm.PositionProperty.ToString("F3"),
+               parts[4].Split('+')[0], parts[4].Split('+')[0],
+               sdm.LengthProperty.ToString("F3")
+               );
+            MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
+            {
+                CdlListProperty = cdlslist,
+                DfxInfosProperty = dfxinfosstring,
+                LeftPosProperty = string.Format("{0}+{1}",startsecnum.ToString(),startpos.ToString("F3")),
+                RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3"))
+            },
+            "DfxInputInfos");
+        }
+        
+        private void DeleteDianFXx(string taken) 
+        {
+            ISingleDataViewModel singledata;
+            string[] dfxinfos = taken.Split(':');
+            if (!SeletedXinhaoS)
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+            else
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+            StationDataMode sdm = (StationDataMode)singledata.DataCollection.
+                Single(q => ((StationDataMode)q).StationNameProperty.Equals(taken));
+
+            int index = singledata.DataCollection.IndexOf(sdm);
+
+            StationDataMode preqj = singledata.DataCollection[index - 1] as StationDataMode;
+            StationDataMode currentqj = singledata.DataCollection[index + 1] as StationDataMode;
+
+            preqj.LengthProperty = preqj.LengthProperty + currentqj.LengthProperty + float.Parse(dfxinfos[5]) / ScaleProperty;
+
+            singledata.DataCollection.RemoveAt(index - 1);
+            singledata.DataCollection.Insert(index - 1, preqj);
+            singledata.DataCollection.RemoveAt(index);
+            singledata.DataCollection.RemoveAt(index);
         }
 
         private void InsertXinhaoS(float position, int secnum, string singletype,StationDataMode stationsignalinfo)
@@ -3843,7 +4069,12 @@ namespace Inter_face.ViewModel
                                               else
                                               {
                                                   nextsdm = CurrentDatasProperty.DataCollection[index + 2] as StationDataMode;
-                                                  newposition = nextsdm.PositionProperty;
+                                                  if (nextsdm.StationNameProperty.StartsWith("3"))
+                                                  {
+                                                      newposition = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[1]);
+                                                  }
+                                                  else
+                                                      newposition = nextsdm.PositionProperty;
                                               }
                                               StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 1] as StationDataMode;
 
