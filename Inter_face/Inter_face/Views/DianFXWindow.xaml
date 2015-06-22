@@ -1,10 +1,71 @@
 ﻿<Window
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
+    xmlns:vm="clr-namespace:Inter_face.ViewModel"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d"
 	x:Class="Inter_face.DianFXWindow"
 	x:Name="Window"
 	Title="DianFXWindow"
-	Width="640" Height="326">
+	Width="752.5" Height="190">
 
-	<Grid x:Name="LayoutRoot"/>
+	<Window.Resources>
+		<vm:UpdataDianFXViewModel x:Key="UpdataDianFXViewModelDataSource" d:IsDataSource="True"/>
+	</Window.Resources>
+	<Window.DataContext>
+		<Binding Mode="OneWay" Source="{StaticResource UpdataDianFXViewModelDataSource}"/>
+	</Window.DataContext>
+
+	<Grid x:Name="LayoutRoot">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="20"/>
+			<ColumnDefinition Width="0.3*"/>
+			<ColumnDefinition Width="0.125*"/>
+			<ColumnDefinition Width="0.05*"/>
+			<ColumnDefinition Width="0.125*"/>
+			<ColumnDefinition Width="0.15*"/>
+			<ColumnDefinition Width="0.15*"/>
+			<ColumnDefinition Width="20"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="40"/>
+		</Grid.RowDefinitions>
+		<Canvas x:Name="StartCanvas"/>
+		<Grid Grid.ColumnSpan="8" Margin="0" Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="0.1*"/>
+				<ColumnDefinition Width="0.2*"/>
+				<ColumnDefinition Width="0.1*"/>
+				<ColumnDefinition Width="0.2*"/>
+				<ColumnDefinition Width="0.1*"/>
+				<ColumnDefinition Width="0.2*"/>
+				<ColumnDefinition Width="0.1*"/>
+			</Grid.ColumnDefinitions>
+			<Grid Grid.Column="3">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="0.3*"/>
+					<ColumnDefinition Width="0.3*"/>
+					<ColumnDefinition Width="0.1*"/>
+					<ColumnDefinition Width="0.3*"/>
+				</Grid.ColumnDefinitions>
+				<TextBox x:Name="PartITextBox" Grid.Column="1" Margin="0,15" TextWrapping="Wrap" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Text="{Binding PartI, Mode=TwoWay}" FontSize="16" BorderBrush="#FF0AF718"/>
+				<TextBox x:Name="PartIITextBox" Grid.Column="3" Margin="0,15" TextWrapping="Wrap" Text="{Binding PartII, Mode=TwoWay}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="16" BorderBrush="#FF0AF718"/>
+				<TextBlock x:Name="PlusTextBlock" Grid.Column="2" Margin="0,21.75,0,15.75" TextWrapping="Wrap" Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18.667"/>
+				<TextBlock x:Name="HatTextBlock" Margin="0,1" TextWrapping="Wrap" Text="{Binding Hat}" VerticalAlignment="Center" TextAlignment="Center" FontSize="16"/>
+			</Grid>
+			<TextBlock x:Name="StartTextBlock" Margin="0,8" TextWrapping="Wrap" Text="{Binding StartShowPos}" TextAlignment="Center" FontSize="13.333"/>
+			<TextBlock x:Name="StartDisTextBlock" Grid.Column="1" Margin="41.1,8,36.2,8" TextWrapping="Wrap" Width="70" HorizontalAlignment="Center" Text="{Binding StartDis}" TextAlignment="Center" FontSize="16"/>
+			<TextBlock x:Name="LeftEdgeTextBlock" Grid.Column="2" Margin="0,8" TextWrapping="Wrap" TextAlignment="Center" Text="{Binding LeftEdgePos}" FontSize="13.333"/>
+			<TextBlock x:Name="RightEdgeTextBlock" Grid.Column="4" Margin="0,8" TextWrapping="Wrap" TextAlignment="Center" Text="{Binding RightEdgePos}" FontSize="13.333"/>
+			<TextBlock x:Name="EndTextBlock" Margin="0,8" Grid.Column="6" TextWrapping="Wrap" Text="{Binding EndShowPos}" TextAlignment="Center" FontSize="13.333"/>
+			<TextBlock x:Name="EndDisTextBlock" Grid.Column="5" Margin="41.1,8,36.2,8" TextWrapping="Wrap" Width="70" HorizontalAlignment="Center" Text="{Binding Enddis}" TextAlignment="Center" FontSize="16"/>
+		</Grid>
+		<Button x:Name="OkButton" Content="确定" Grid.Column="4" Margin="4" Grid.Row="2" Command="{Binding CommitCommand, Mode=OneWay}"/>
+		<Button x:Name="CancelButton" Content="取消" Grid.Column="5" Margin="10,4" Grid.Row="2"/>
+		<TextBox x:Name="LeftEdgeDisTextBox" Grid.Column="2" Margin="4,8,4,0" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{Binding LeftDis, Mode=TwoWay}" VerticalAlignment="Bottom" Width="50" Height="21.8366666666667" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" BorderBrush="#FF0AF718"/>
+		<TextBox x:Name="RightEdgeDisTextBox" Grid.Column="4" Margin="4,8,4,0" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{Binding RightDis, Mode=TwoWay}" VerticalAlignment="Bottom" Width="50" Height="21.8366666666667" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" BorderBrush="#FF0AF718"/>
+		<TextBox x:Name="NameTextBox" Grid.Column="1" Margin="4" Grid.Row="2" TextWrapping="Wrap" BorderBrush="#FF0AF718"/>		
+	</Grid>
 </Window>

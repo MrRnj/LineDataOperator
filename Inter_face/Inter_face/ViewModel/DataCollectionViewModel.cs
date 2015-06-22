@@ -58,6 +58,7 @@ namespace Inter_face.ViewModel
         SaveFileDialog sfwindow;
         ModifyCdldataWindow mcdwindown;
         ShowProcessBar showprocesbar;
+        DianFXWindow dianfxwindow;
 
         System.Windows.Threading.Dispatcher dispatcher;
 
@@ -2885,6 +2886,10 @@ namespace Inter_face.ViewModel
                 startsecnum.ToString(), startpos.ToString("F3"),
                 sdm.LengthProperty.ToString("F3")
                 );
+
+            if (dianfxwindow == null)
+                dianfxwindow = new DianFXWindow();
+
             MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
             {
                 CdlListProperty = cdlslist,
@@ -2893,7 +2898,8 @@ namespace Inter_face.ViewModel
                 RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3"))
             },
             "DfxInputInfos");
-
+            
+            dianfxwindow.ShowDialog();
         }
 
         private void beginModifyDianfx()
@@ -4299,6 +4305,24 @@ namespace Inter_face.ViewModel
                                           {
                                               ExportToSvg();
                                           }));
+            }
+        }
+
+        private RelayCommand _beginInsertDianfxCommand;
+
+        /// <summary>
+        /// Gets the BeginInsertDianFXCommand.
+        /// </summary>
+        public RelayCommand BeginInsertDianFXCommand
+        {
+            get
+            {
+                return _beginInsertDianfxCommand
+                    ?? (_beginInsertDianfxCommand = new RelayCommand(
+                    () =>
+                    {
+                        beginInsertDianfx();
+                    }));
             }
         }
         #endregion

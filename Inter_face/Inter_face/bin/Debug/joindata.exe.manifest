@@ -120,14 +120,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="414720">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="420352">
       <assemblyIdentity name="joindata" version="1.9.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>Hhfi4pZw/zkvuAPGDR6kfKdSArA=</dsig:DigestValue>
+        <dsig:DigestValue>hVnoqv24EyLZ3I2x8YNfqb0WOzM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -140,6 +140,18 @@
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
         <dsig:DigestValue>oIuZKmjNEkOjMitTwhhYTjjVzAY=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Microsoft.Expression.Drawing.dll" size="122880">
+      <assemblyIdentity name="Microsoft.Expression.Drawing" version="4.0.0.0" publicKeyToken="31BF3856AD364E35" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>monVFGRvTLfi0IGwKZMU7eY5w0A=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

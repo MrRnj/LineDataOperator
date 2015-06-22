@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using Inter_face.Models;
 using System.Collections.Generic;
 
@@ -662,6 +663,24 @@ namespace Inter_face.ViewModel
             };
 
             MessengerInstance.Send<StationDataMode>(dianfxdata, "UpdataDianfx");
+        }
+
+        private RelayCommand _commitCommand;
+
+        /// <summary>
+        /// Gets the CommitCommand.
+        /// </summary>
+        public RelayCommand CommitCommand
+        {
+            get
+            {
+                return _commitCommand
+                    ?? (_commitCommand = new RelayCommand(
+                    () =>
+                    {
+                        commit();
+                    }));
+            }
         }
     }
 }
