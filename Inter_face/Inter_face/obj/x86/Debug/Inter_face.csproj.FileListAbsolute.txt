@@ -146,3 +146,4 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ModifyFilenamesWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Expression.Drawing.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Expression.Drawing.xml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Inter_face.csprojResolveAssemblyReference.cache

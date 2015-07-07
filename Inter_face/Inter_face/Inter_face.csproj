@@ -157,6 +157,7 @@
     <Compile Include="Coverters\IntToUnBoolenConverter.cs" />
     <Compile Include="Coverters\LenToPart1Converter.cs" />
     <Compile Include="Coverters\LenToPart2Converter.cs" />
+    <Compile Include="Coverters\PartIntConverter.cs" />
     <Compile Include="Coverters\PathDetailConverter.cs" />
     <Compile Include="Coverters\PosToPart1LenConverter.cs" />
     <Compile Include="Coverters\PosToPart2LenConverter.cs" />

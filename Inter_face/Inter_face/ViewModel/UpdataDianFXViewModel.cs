@@ -16,17 +16,18 @@ namespace Inter_face.ViewModel
         /// <summary>
         /// Initializes a new instance of the UpdataDianFXViewModel class.
         /// </summary>
-        private float startpos;
+        private decimal startpos;
         private int startSecnum;
-        private float endpos;
+        private decimal endpos;
         private int endSecnum;
-        private float leftedgepos;
+        private decimal leftedgepos;
         private int leftedgeSecnum;
-        private float rightedgepos;
+        private decimal rightedgepos;
         private int rightedgeSecnum;
-        private float middlepos;
+        private decimal middlepos;
         private int middleSecnum;
         private List<string> cdl;
+        private bool isrefreshData = true;
 
         /// <summary>
         /// The <see cref="Name" /> property's name.
@@ -181,13 +182,13 @@ namespace Inter_face.ViewModel
         /// </summary>
         public const string LeftDisPropertyName = "LeftDis";
 
-        private float _leftdisProperty = 0;
+        private decimal _leftdisProperty = 0;
 
         /// <summary>
         /// Sets and gets the LeftDis property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public float LeftDis
+        public decimal LeftDis
         {
             get
             {
@@ -202,7 +203,8 @@ namespace Inter_face.ViewModel
                 }
 
                 _leftdisProperty = value;
-                refreshData();
+                if (isrefreshData)
+                    refreshData();
                 RaisePropertyChanged(LeftDisPropertyName);
             }
         }
@@ -212,13 +214,13 @@ namespace Inter_face.ViewModel
         /// </summary>
         public const string RightDisPropertyName = "RightDis";
 
-        private float _rightdisProperty = 0;
+        private decimal _rightdisProperty = 0;
 
         /// <summary>
         /// Sets and gets the RightDis property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
-        public float RightDis
+        public decimal RightDis
         {
             get
             {
@@ -233,7 +235,8 @@ namespace Inter_face.ViewModel
                 }
 
                 _rightdisProperty = value;
-                refreshData();
+                if (isrefreshData)
+                    refreshData();
                 RaisePropertyChanged(RightDisPropertyName);
             }
         }
@@ -327,7 +330,8 @@ namespace Inter_face.ViewModel
                     value = 0;
                 }
                 _partiProperty = value;
-                refreshData();
+                if (isrefreshData)
+                    refreshData();
                 RaisePropertyChanged(PartIPropertyName);
             }
         }
@@ -362,7 +366,8 @@ namespace Inter_face.ViewModel
                     value = 0;
                 }
                 _partiiProperty = value;
-                refreshData();
+                if (isrefreshData)
+                    refreshData();
                 RaisePropertyChanged(PartIIPropertyName);
             }
         }
@@ -401,23 +406,27 @@ namespace Inter_face.ViewModel
             MessengerInstance.Register<DianFXneededInfosMode>(this, "DfxInputInfos",
                 p =>
                 {
+                    isrefreshData = false;
+                    
                     string[] infos = p.DfxInfosProperty.Split(':');
                     cdl = p.CdlListProperty;
 
-                    startpos = float.Parse(p.LeftPosProperty.Split('+')[1]);
+                    startpos = decimal.Parse(p.LeftPosProperty.Split('+')[1]);
                     startSecnum = int.Parse(p.LeftPosProperty.Split('+')[0]);
 
-                    endpos = float.Parse(p.RightPosProperty.Split('+')[1]);
+                    endpos = decimal.Parse(p.RightPosProperty.Split('+')[1]);
                     endSecnum = int.Parse(p.RightPosProperty.Split('+')[0]);
 
-                    middlepos = float.Parse(infos[3].Split('+')[1]);
+                    middlepos = decimal.Parse(infos[3].Split('+')[1]);
                     middleSecnum = int.Parse(infos[3].Split('+')[0]);
 
-                    leftedgepos = float.Parse(infos[2].Split('+')[1]);
+                    leftedgepos = decimal.Parse(infos[2].Split('+')[1]);
                     leftedgeSecnum = int.Parse(infos[2].Split('+')[0]);
+                    LeftEdgePos = formatShowpos(leftedgepos, leftedgeSecnum);
 
-                    rightedgepos = float.Parse(infos[4].Split('+')[1]);
+                    rightedgepos = decimal.Parse(infos[4].Split('+')[1]);                    
                     rightedgeSecnum = int.Parse(infos[4].Split('+')[0]);
+                    RightEdgePos = formatShowpos(rightedgepos, rightedgeSecnum);
 
                     StartShowPos = formatShowpos(startpos, startSecnum);
                     EndShowPos = formatShowpos(endpos, endSecnum);
@@ -433,10 +442,12 @@ namespace Inter_face.ViewModel
                     PartII = int.Parse(middlepos.ToString("F3").Split('.')[1]);
 
                     Name = infos[1];
+
+                    isrefreshData = true;
                 });
         }
 
-        private float getDis(float fstPos, int fstSecnum, float secPos, int secSecnum)
+        private decimal getDis(decimal fstPos, int fstSecnum, decimal secPos, int secSecnum)
         {
             float offset = 0;
             string[] parts = { };
@@ -450,19 +461,19 @@ namespace Inter_face.ViewModel
                 }
             }
 
-            return secPos - fstPos - offset;
+            return (secPos - fstPos) * 1000 - (decimal)offset;
         }
 
         private void refreshData()
         {
-            middlepos = (PartI * 1000 + PartII) / 1000;
+            middlepos = (decimal)(PartI * 1000 + PartII) / 1000;
             middleSecnum = getSecnum(middlepos);
             if (middleSecnum != 0)
             {
                 Hat = getHat(middleSecnum);
 
-                leftedgepos = (float)offsetPosBackword(middlepos, LeftDis, ref leftedgeSecnum);
-                rightedgepos = (float)offsetPosForword(middlepos, RightDis, ref rightedgeSecnum);
+                leftedgepos = (decimal)offsetPosBackword(middlepos, LeftDis, ref leftedgeSecnum);
+                rightedgepos = (decimal)offsetPosForword(middlepos, RightDis, ref rightedgeSecnum);
                 LeftEdgePos = formatShowpos(leftedgepos, leftedgeSecnum);
                 RightEdgePos = formatShowpos(rightedgepos, rightedgeSecnum);
 
@@ -471,7 +482,7 @@ namespace Inter_face.ViewModel
             }
 
         }
-        private string formatShowpos(float pos, int Secnum)
+        private string formatShowpos(decimal pos, int Secnum)
         {
             string posInstring = pos.ToString("F3");
             string part1 = posInstring.Split('.')[0];
@@ -502,11 +513,11 @@ namespace Inter_face.ViewModel
             }
         }
 
-        private int getSecnum(float pos)
+        private int getSecnum(decimal pos)
         {
-            float usedPos = pos * 1000;
+            decimal usedPos = pos * 1000;
             int sec = 0;
-            int matchedtimes = 0;
+            //int matchedtimes = 0;
             string[] parts = { };
 
             for (int i = startSecnum; i <= endSecnum; i++)
@@ -514,42 +525,42 @@ namespace Inter_face.ViewModel
                 if (i == cdl.Count)
                 {
                     parts = cdl[i - 2].Split(':');
-                    if ((decimal)usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
+                    if (usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
                     {
                         sec = i;
-                        matchedtimes++;
+                        break;
                     }
-                    else if (decimal.Parse(parts[0].Split('+')[1]) - (decimal)usedPos >= 0.0009m)
+                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos >= 0.0009m)
                     {
                         sec = i - 1;
-                        matchedtimes++;
+                        break;
                     }
                 }
                 else
                 {
                     parts = cdl[i - 1].Split(':');
-                    if ((decimal)usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
+                    if (usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
                     {
                         sec = i + 1;
-                        matchedtimes++;
+                        continue;
                     }
-                    else if (decimal.Parse(parts[0].Split('+')[1]) - (decimal)usedPos >= 0.0009m)
+                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos >= 0.0009m)
                     {
                         sec = i;
-                        matchedtimes++;
+                        break;
                     }
                 }
             }
 
-            return matchedtimes > 1 ? 0 : sec;
+            return sec;
         }
 
-        private decimal offsetPosForword(float middlepos, float dis, ref int secnum)
+        private decimal offsetPosForword(decimal middlepos, decimal dis, ref int secnum)
         {
             float offset = 0;
             string[] parts = { };
             secnum = middleSecnum;
-            float realdis = getDis(endpos, endSecnum, middlepos, middleSecnum);
+            decimal realdis = getDis(endpos, endSecnum, middlepos, middleSecnum);
             if (realdis < dis)
             {
                 dis = realdis;
@@ -566,7 +577,7 @@ namespace Inter_face.ViewModel
                 {
                     parts = cdl[middleSecnum - 1].Split(':');
                 }
-                float limitdis = float.Parse(parts[0].Split('+')[1]) - middlepos;
+                decimal limitdis = decimal.Parse(parts[0].Split('+')[1]) - middlepos;
 
                 for (int i = middleSecnum; i < endSecnum; i++)
                 {
@@ -578,7 +589,7 @@ namespace Inter_face.ViewModel
                     {
                         secnum += 1;
                         offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                        float lastpos = float.Parse(parts[1].Split('+')[1]);
+                        decimal lastpos = decimal.Parse(parts[1].Split('+')[1]);
                         if ((i + 1) == cdl.Count)
                         {
                             parts = cdl[i - 1].Split(':');
@@ -587,7 +598,7 @@ namespace Inter_face.ViewModel
                         {
                             parts = cdl[i].Split(':');
                         }
-                        limitdis += (float.Parse(parts[0].Split('+')[1]) - lastpos);
+                        limitdis += (decimal.Parse(parts[0].Split('+')[1]) - lastpos);
                     }
                 }
             }
@@ -595,12 +606,12 @@ namespace Inter_face.ViewModel
             return (decimal)middlepos + (decimal)dis + (decimal)offset;
         }
 
-        private decimal offsetPosBackword(float middlepos, float dis, ref int secnum)
+        private decimal offsetPosBackword(decimal middlepos, decimal dis, ref int secnum)
         {
             float offset = 0;
             string[] parts = { };
             secnum = middleSecnum;
-            float realdis = getDis(middlepos, middleSecnum, startpos, startSecnum);
+            decimal realdis = getDis(middlepos, middleSecnum, startpos, startSecnum);
             if (realdis < dis)
             {
                 dis = realdis;
@@ -617,11 +628,11 @@ namespace Inter_face.ViewModel
                 {
                     parts = cdl[middleSecnum - 1].Split(':');
                 }
-                float limitdis = middlepos - float.Parse(parts[1].Split('+')[1]);
+                decimal limitdis = middlepos - decimal.Parse(parts[1].Split('+')[1]);
 
                 for (int i = middleSecnum; i > startSecnum; i--)
                 {
-                    if (limitdis - dis >= 0)
+                    if (limitdis - (decimal)dis >= 0)
                     {
                         break;
                     }
@@ -629,9 +640,9 @@ namespace Inter_face.ViewModel
                     {
                         secnum -= 1;
                         offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                        float lastpos = float.Parse(parts[0].Split('+')[1]);
+                        decimal lastpos = decimal.Parse(parts[0].Split('+')[1]);
                         parts = cdl[i - 2].Split(':');
-                        limitdis += (float.Parse(parts[1].Split('+')[1]) - lastpos);
+                        limitdis += (decimal.Parse(parts[1].Split('+')[1]) - lastpos);
                     }
                 }
             }
@@ -644,9 +655,9 @@ namespace Inter_face.ViewModel
             StationDataMode dianfxdata = new StationDataMode()
             {
                 HatProperty = Hat,
-                LengthProperty = LeftDis + RightDis,
+                LengthProperty = (float)(LeftDis + RightDis),
                 PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L50,0",
-                PositionProperty = middlepos,
+                PositionProperty = (float)middlepos,
                 ScaleProperty = 10,
                 SectionNumProperty = middleSecnum,
                 SelectedProperty = false,

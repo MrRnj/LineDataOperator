@@ -2880,25 +2880,24 @@ namespace Inter_face.ViewModel
                 endsecnum = nextsdm.SectionNumProperty;
             }
 
+            dianfxwindow = new DianFXWindow();
+
             string dfxinfosstring = string.Format("{0}:{1}:{2}+{3}:{4}+{5}:{6}+{7}:{8}", "3", "无名",
                 startsecnum.ToString(), startpos.ToString("F3"),
                 startsecnum.ToString(), startpos.ToString("F3"),
                 startsecnum.ToString(), startpos.ToString("F3"),
                 sdm.LengthProperty.ToString("F3")
-                );
-
-            if (dianfxwindow == null)
-                dianfxwindow = new DianFXWindow();
+                );            
 
             MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
             {
-                CdlListProperty = cdlslist,
+                CdlListProperty = cdlxlist,
                 DfxInfosProperty = dfxinfosstring,
                 LeftPosProperty = string.Format("{0}+{1}", startsecnum.ToString(), startpos.ToString("F3")),
                 RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3"))
             },
             "DfxInputInfos");
-            
+
             dianfxwindow.ShowDialog();
         }
 
@@ -2934,7 +2933,7 @@ namespace Inter_face.ViewModel
                );
             MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
             {
-                CdlListProperty = cdlslist,
+                CdlListProperty = cdlxlist,
                 DfxInfosProperty = dfxinfosstring,
                 LeftPosProperty = string.Format("{0}+{1}",startsecnum.ToString(),startpos.ToString("F3")),
                 RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3"))
@@ -3601,6 +3600,12 @@ namespace Inter_face.ViewModel
                 ABoper.Autofit(cdldata);
                 MessengerInstance.Send<string>("自动调整完成！", "ReadDataRight");
             }
+
+            catch (ExtractData.AutoBuildOperator.ErrorPosException epe)
+            {
+                MessengerInstance.Send<string>(epe.Message, "ReadDataError");
+            }
+
             catch
             {
                 MessengerInstance.Send<string>("自动调整出错！", "ReadDataError");

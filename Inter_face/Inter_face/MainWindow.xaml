@@ -394,7 +394,7 @@
 						</Fluent:TextBox>
 						<Fluent:Spinner x:Name="DivSpinner" Minimum="1" HorizontalAlignment="Right" Height="22" Margin="0,-22.005,34.887,0" VerticalAlignment="Top" Width="53.243" Value="{Binding DatasCollectionProperty.DivParts, Mode=TwoWay}" d:LayoutOverrides="VerticalAlignment"/>
 						<Fluent:Button x:Name="DivButton" Content="Button" Size="Small" RenderTransformOrigin="0.5,0.455" Margin="-18,-21.833,0,0" VerticalAlignment="Top" Command="{Binding DatasCollectionProperty.AddXinhaoCommand, Mode=OneWay}"/>
-						<Fluent:Button x:Name="InsertButton" Content="插入" Height="Auto" Size="Middle" HorizontalAlignment="Right" Margin="0,-19.5,-182,19.5" Width="52" d:LayoutOverrides="Width" Command="{Binding DatasCollectionProperty.InsertXinhaoCommand, Mode=OneWay}"/>					
+						<Fluent:Button x:Name="InsertButton" Content="插入" Height="Auto" Size="Middle" HorizontalAlignment="Right" Margin="0,-19.5,-182,19.5" Width="52" d:LayoutOverrides="Width" Command="{Binding DatasCollectionProperty.BeginInsertDianFXCommand, Mode=OneWay}"/>					
 					</Fluent:RibbonToolBar>
 				</Fluent:RibbonGroupBox>				
 			</Fluent:RibbonTabItem>
