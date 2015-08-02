@@ -50,6 +50,7 @@ namespace Inter_face
         CheckDataLogic cdl;
         ModifyFilenamesWindow modifyfilenameswindow;
         ExtractData.WorkSheetBase worksheetbase;
+        ExtractData.GraphyDataOper gdo;
         int maxprocessbarvalue = 0;
         //string result;
        // ProcessForm pf;
@@ -63,6 +64,14 @@ namespace Inter_face
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p =>
             {
                 AddInfobox(p, string.Empty, string.Empty, 0, "1");
+            });
+
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataErrorWithOperate", p =>
+            {
+                string msg = p.Split('|')[0];
+                string[] moreinfo = p.Split('|')[1].Split('*');
+
+                AddInfobox(msg, moreinfo[2], moreinfo[1], int.Parse(moreinfo[0]), "1");
             });
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataRight", p =>
@@ -126,8 +135,12 @@ namespace Inter_face
             qxfilepath = ReadSettings.GetQxfilepath();
             qxtempfilepath = ReadSettings.GetQxtempfilepath();
             bjfilepath = ReadSettings.GetBjfilepath();
-            bjtemptfilepath = ReadSettings.GetBjtempfilepath();    
-            
+            bjtemptfilepath = ReadSettings.GetBjtempfilepath();
+            gdo = GraphyDataOper.CreatOper(pdtempfilepath,
+                bjtemptfilepath,
+                qxtempfilepath,
+                ReadSettings.GetXhDatafilepath());
+            Messenger.Default.Send<ExtractData.GraphyDataOper>(gdo, "gdo");
             
         }
 
@@ -191,11 +204,12 @@ namespace Inter_face
         #region opensourcesheet
         private void openpdfile_Click(object sender, RoutedEventArgs e)
         {
-            worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
+            //worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
 
             try
             {
-                worksheetbase.OpenWorkBook(pdfilepath);
+               // worksheetbase.OpenWorkBook(pdfilepath);
+                gdo.OpenWorkBook(pdfilepath);
             }
 
             catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
@@ -222,11 +236,12 @@ namespace Inter_face
 
         private void openqxfile_Click(object sender, RoutedEventArgs e)
         {
-            worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
+            //worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
 
             try
             {                
-                worksheetbase.OpenWorkBook(qxfilepath);
+                //worksheetbase.OpenWorkBook(qxfilepath);
+                gdo.OpenWorkBook(qxfilepath);
             }
 
             catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
@@ -253,11 +268,12 @@ namespace Inter_face
 
         private void openbjfile_Click(object sender, RoutedEventArgs e)
         {
-            worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
+           // worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
 
             try
             {                
-                worksheetbase.OpenWorkBook(bjfilepath);
+               // worksheetbase.OpenWorkBook(bjfilepath);
+                gdo.OpenWorkBook(bjfilepath);
             }
 
             catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
@@ -286,11 +302,12 @@ namespace Inter_face
         #region openmergesheet
         private void opentemppdfile_Click(object sender, RoutedEventArgs e)
         {
-            worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
+            //worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
 
             try
             {
-                worksheetbase.OpenWorkBook(pdtempfilepath);
+                //worksheetbase.OpenWorkBook(pdtempfilepath);
+                gdo.OpenWorkBook(pdtempfilepath);
             }
 
             catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
@@ -307,11 +324,12 @@ namespace Inter_face
 
         private void opentempqxfile_Click(object sender, RoutedEventArgs e)
         {
-            worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
+           // worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
 
                 try
                 {
-                    worksheetbase.OpenWorkBook(qxtempfilepath);
+                    //worksheetbase.OpenWorkBook(qxtempfilepath);
+                    gdo.OpenWorkBook(qxtempfilepath);
                 }
 
                 catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
@@ -327,12 +345,12 @@ namespace Inter_face
 
         private void opentempbjfile_Click(object sender, RoutedEventArgs e)
         {
-            worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
-
+           // worksheetbase = ExtractData.WorkSheetBase.CreatSingleBase();
 
             try
             {
-                worksheetbase.OpenWorkBook(bjtemptfilepath);
+                //worksheetbase.OpenWorkBook(bjtemptfilepath);
+                gdo.OpenWorkBook(bjtemptfilepath);
             }
 
             catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
@@ -567,11 +585,19 @@ namespace Inter_face
         void sib_ContentbuttonClick(object sender, ShowInfoBox.ContentbuttonClickEventArgs e)
         {
             try
-            {
-                ExtractData.OpenErrorSheet.Opensheet(e.FilePath, e.Position, e.Rowindex);
+            {                
+                gdo.OpenErrorWorksheet(e.FilePath, e.Position, e.Rowindex);
             }
 
-            catch { }
+            catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "出错了！", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch 
+            {
+                System.Windows.MessageBox.Show("打开错误文件出错！", "错误", MessageBoxButton.OK);
+            }
         }
 
         #endregion
@@ -678,6 +704,11 @@ namespace Inter_face
             catch (ExtractData.ChangeToExcel.OnlyoneWorksheetException ex)
             {
                 System.Windows.MessageBox.Show(ex.Message, "出错了！", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch
+            {
+                AddInfobox("输出数据出错", string.Empty, string.Empty, 0, "1");
             }
         }
 
@@ -1120,6 +1151,16 @@ namespace Inter_face
             }
 
             catch (InvalidOperationException ex)
+            {
+                OnLoaderror(null, new LoaderrorEventArgs(ex.Message));
+            }
+
+            catch (System.Runtime.InteropServices.COMException ce)
+            {
+                OnLoaderror(null, new LoaderrorEventArgs(ce.Message));
+            }
+
+            catch(System.Exception ex)
             {
                 OnLoaderror(null, new LoaderrorEventArgs(ex.Message));
             }
@@ -1569,13 +1610,12 @@ namespace Inter_face
 
             catch (ExtractData.ChangeToExcel.OnlyoneWorksheetException ex)
             {
-                throw new ExtractData.ChangeToExcel.OnlyoneWorksheetException(ex.Message);
+                System.Windows.MessageBox.Show(ex.Message, "出错了！", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            finally 
+            catch
             {
-                if (cte != null)
-                    cte.Dispose();
+                System.Windows.MessageBox.Show("输出数据出错！", "出错了！", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

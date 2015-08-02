@@ -67,13 +67,14 @@ namespace Inter_face.ViewModel
         public ModifyCdlViewModel()
         {
             CdlCollectionProperty = new ObservableCollection<string>();
-            string _currentdir = Environment.CurrentDirectory;
+           /* string _currentdir = Environment.CurrentDirectory;
             gdo = GraphyDataOper.CreatOper(Path.Combine(_currentdir, @"excelmodels\接坡面数据_Single.xlsx"),
                 Path.Combine(_currentdir, @"excelmodels\接标记数据_single.xlsx"),
                 Path.Combine(_currentdir, @"excelmodels\接曲线数据_single.xlsx"),
-                Path.Combine(_currentdir, @"excelmodels\信号机数据_single.xlsx"));
+                Path.Combine(_currentdir, @"excelmodels\信号机数据_single.xlsx"));*/
 
             MessengerInstance.Register<string>(this, "cdl", P => { Insertcdldata(P); });
+            MessengerInstance.Register<ExtractData.GraphyDataOper>(this, "gdoInWindow", p => { gdo = p; });
         }
 
         public void Loadcdldata()
@@ -91,8 +92,15 @@ namespace Inter_face.ViewModel
 
         public void Savecdldata()
         {
-            gdo.SaveCdlData(CdlCollectionProperty.ToArray(),
-                Path.Combine(Environment.CurrentDirectory, @"excelmodels\接坡面数据.xlsx"));
+            try
+            {
+                gdo.SaveCdlData(CdlCollectionProperty.ToArray(),
+                    Path.Combine(Environment.CurrentDirectory, @"excelmodels\接坡面数据.xlsx"));
+            }
+            catch (System.Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "出错", System.Windows.MessageBoxButton.OK);
+            }
         }
 
         public void Deletecdldata()

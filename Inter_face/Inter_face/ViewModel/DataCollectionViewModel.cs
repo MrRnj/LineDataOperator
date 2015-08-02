@@ -37,6 +37,7 @@ namespace Inter_face.ViewModel
         private GraphyDataOper GDoper;
         private SignalDataExportor SDexportor;
         private AutoBuildOperator ABoper;
+        private GraphyDataOper gdo;
         List<ExtractData.ChangeToTxt.PoduOutputData> pdxlist;
         List<ExtractData.ChangeToTxt.PoduOutputData> pdslist;
 
@@ -719,6 +720,7 @@ namespace Inter_face.ViewModel
             SDexportor = SignalDataExportor.CreatOper(_XHEPath);
             _DataBin = new List<ISingleDataViewModel>();
 
+            MessengerInstance.Register<GraphyDataOper>(this, "gdo", p => { gdo = p; });
             MessengerInstance.Register<System.Windows.Threading.Dispatcher>(this, "Dispatcher", p => { dispatcher = p; });
 
             MessengerInstance.Register<ISingleDataViewModel>(this, "DisapearData",
@@ -2063,6 +2065,7 @@ namespace Inter_face.ViewModel
                             });
 
                             step = 1;
+                            starter = -1;
                             continue;
                         }
                         
@@ -3588,29 +3591,49 @@ namespace Inter_face.ViewModel
         private void ModifyCdldata()
         {
             mcdwindown = new ModifyCdldataWindow();
+            MessengerInstance.Send<GraphyDataOper>(gdo, "gdoInWindow");
             mcdwindown.ShowDialog();
         }
 
         private void Autofit()
         {
             Cursor = 1;
-            try
-            {
-                string[] cdldata = GDoper.GetCdlData(Path.Combine(Environment.CurrentDirectory, @"excelmodels\接坡面数据.xlsx"));
-                ABoper.Autofit(cdldata);
-                MessengerInstance.Send<string>("自动调整完成！", "ReadDataRight");
-            }
 
-            catch (ExtractData.AutoBuildOperator.ErrorPosException epe)
+            if (gdo.WorkbookCountProperty == 0)
             {
-                MessengerInstance.Send<string>(epe.Message, "ReadDataError");
-            }
+                try
+                {
+                    string[] cdldata = GDoper.GetCdlData(Path.Combine(Environment.CurrentDirectory, @"excelmodels\接坡面数据.xlsx"));
+                    System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+                    ABoper.Autofit(cdldata);
+                    watch.Stop();
+                    MessengerInstance.Send<string>(string.Format("自动调整完成！\r\n共用时{0}秒",
+                        watch.Elapsed.Seconds.ToString()), "ReadDataRight");
+                }
 
-            catch
-            {
-                MessengerInstance.Send<string>("自动调整出错！", "ReadDataError");
+                catch (ExtractData.AutoBuildOperator.ErrorPosException epe)
+                {
+                    MessengerInstance.Send<string>(
+                        string.Format("{0}|{1}", epe.Message, epe.ErrorPosMessageProperty), "ReadDataErrorWithOperate");
+                }
+
+                catch (ExtractData.AutoBuildOperator.ErrorMatchException eme)
+                {
+                    MessengerInstance.Send<string>(
+                        string.Format("{0}|{1}", eme.Message, eme.ErrorPosMessageProperty), "ReadDataErrorWithOperate");
+                }
+
+                catch
+                {
+                    MessengerInstance.Send<string>("自动调整出错！", "ReadDataError");
+                }
+                Cursor = 0;
             }
-            Cursor = 0;
+            else
+            {
+                Cursor = 0;
+                MessengerInstance.Send<string>("请关闭所有相关工作表再进行自动调整！", "ReadDataError");
+            }
         }
 
         private void SingleClick()
