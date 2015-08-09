@@ -39,6 +39,14 @@ namespace Inter_face.Models
         {
             get { return rightpos; }
             set { rightpos = value; }
-        }       
+        }
+        private bool isUpdataVar;
+
+        public bool IsUpdataProperty
+        {
+            get { return isUpdataVar; }
+            set { isUpdataVar = value; }
+        }
+
     }
 }

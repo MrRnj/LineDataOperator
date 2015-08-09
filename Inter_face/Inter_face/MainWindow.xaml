@@ -161,10 +161,10 @@
     			</Grid.ToolTip>
     			<Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
     				<Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
-    					<Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Round" />               
+    					<Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />               
     				</Canvas>
     			</Viewbox>        		
-    			<Path Data="M0.5,0.3 L0,49" Margin="0" Stretch="Fill" Stroke="Gray" Grid.Column="0" HorizontalAlignment="Left" Width="1" Fill="Black" Opacity="{Binding Converter={StaticResource DmToVisibilityConverter}, Mode=OneTime}" StrokeDashCap="Round" StrokeThickness="3" Grid.RowSpan="3" Visibility="Visible">
+    			<Path Data="M0.5,0.3 L0,49" Margin="0" Stretch="Fill" Stroke="Gray" Grid.Column="0" HorizontalAlignment="Left" Width="1" Fill="Black" Opacity="{Binding Converter={StaticResource DmToVisibilityConverter}, Mode=OneTime}" StrokeDashCap="Square" StrokeThickness="3" Grid.RowSpan="3" Visibility="Visible">
     				<Path.RenderTransform>
     					<TransformGroup>
     						<ScaleTransform/>
@@ -293,7 +293,8 @@
 				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox Header="调整数据">					
 					<Fluent:Button x:Name="modifycdldata" Header="核对长短链" LargeIcon="{DynamicResource checkcdl}" Command="{Binding DatasCollectionProperty.ModifycdlDataCommand, Mode=OneWay}"/>
-					<Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/> 					
+					<Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/> 
+					<Fluent:ToggleButton x:Name="showcdldata" Header="显示路段分布" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.LoadLdhCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsLdhMapLoadedProperty, Mode=TwoWay}"/> 					
 				</Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox Header="检查数据">
                 	<Fluent:Button x:Name="checkdatasign" Header="检查读取标记" LargeIcon="{StaticResource Checkdatasignicon}" Click="checkdatasign_Click"/>
@@ -350,7 +351,9 @@
 								<Fluent:RibbonToolBarRow>
 									<Fluent:RibbonToolBarControlDefinition Target="TypeComboBox"/>									
 								</Fluent:RibbonToolBarRow>
-								<Fluent:RibbonToolBarRow>
+								<Fluent:RibbonToolBarRow>									
+									<Fluent:RibbonToolBarControlDefinition Target="ModifyDFXButton"/>
+									<Fluent:RibbonToolBarControlDefinition Target="DeleteDFXButton"/>
 									<Fluent:RibbonToolBarControlDefinition Target="DeleteButton"/>									
 								</Fluent:RibbonToolBarRow>
 							</Fluent:RibbonToolBarLayoutDefinition>							
@@ -360,8 +363,10 @@
 						<Fluent:ComboBox x:Name="TypeComboBox" IsReadOnly="True" Width="62" Margin="-16,-6.5,-94,6.5">
 							<ComboBoxItem Content="通过信号机"/>
 							<ComboBoxItem Content="进出站信号机"/>
-						</Fluent:ComboBox>												
-						<Fluent:Button x:Name="DeleteButton" Content="删除" Height="20" Width="40" Margin="-15.25,-9,69.75,-0.5" HorizontalAlignment="Stretch" Command="{Binding DatasCollectionProperty.RemoveXinHaoCommand, Mode=OneWay}"/>
+						</Fluent:ComboBox>						
+						<Fluent:Button x:Name="ModifyDFXButton" Content="修改电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-11,0,0" ToolTip="修改电分相" Command="{Binding DatasCollectionProperty.BeginModifyDFXCommand, Mode=OneWay}"/>
+						<Fluent:Button x:Name="DeleteDFXButton" Content="删除电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-11,0,0" Command="{Binding DatasCollectionProperty.DeleteDFXCommand, Mode=OneWay}" ToolTip="删除电分相"/>											
+						<Fluent:Button x:Name="DeleteButton" Content="删除信号机" Height="20" Margin="0,-11,0,0" HorizontalAlignment="Right" Command="{Binding DatasCollectionProperty.RemoveXinHaoCommand, Mode=OneWay}" ToolTip="删除信号机"/>
 					</Fluent:RibbonToolBar>
 				</Fluent:RibbonGroupBox>
 			</Fluent:RibbonTabItem>
@@ -379,9 +384,10 @@
 									<Fluent:RibbonToolBarControlDefinition Target="DivSpinner"/>
 									<Fluent:RibbonToolBarControlDefinition Target="DivButton"/>
 								</Fluent:RibbonToolBarRow>
-								<Fluent:RibbonToolBarRow>
-									<Fluent:RibbonToolBarControlDefinition Target="InsertButton"/>									
-								</Fluent:RibbonToolBarRow>								
+								<Fluent:RibbonToolBarRow>								
+                                    <Fluent:RibbonToolBarControlDefinition Target="InsertButton"/>
+									<Fluent:RibbonToolBarControlDefinition Target="InsertDFXButton"/>
+                                </Fluent:RibbonToolBarRow>								
 							</Fluent:RibbonToolBarLayoutDefinition>							
 						</Fluent:RibbonToolBar.LayoutDefinitions>
 						<Fluent:TextBox x:Name="PartLengthTextBox" BorderThickness="129,0,0,0" Header="分段长：" MinWidth="100" Height="22" Margin="0,-22,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="100" d:LayoutOverrides="VerticalAlignment">
@@ -393,8 +399,9 @@
 							</Fluent:TextBox.Text>
 						</Fluent:TextBox>
 						<Fluent:Spinner x:Name="DivSpinner" Minimum="1" HorizontalAlignment="Right" Height="22" Margin="0,-22.005,34.887,0" VerticalAlignment="Top" Width="53.243" Value="{Binding DatasCollectionProperty.DivParts, Mode=TwoWay}" d:LayoutOverrides="VerticalAlignment"/>
-						<Fluent:Button x:Name="DivButton" Content="Button" Size="Small" RenderTransformOrigin="0.5,0.455" Margin="-18,-21.833,0,0" VerticalAlignment="Top" Command="{Binding DatasCollectionProperty.AddXinhaoCommand, Mode=OneWay}"/>
-						<Fluent:Button x:Name="InsertButton" Content="插入" Height="Auto" Size="Middle" HorizontalAlignment="Right" Margin="0,-19.5,-182,19.5" Width="52" d:LayoutOverrides="Width" Command="{Binding DatasCollectionProperty.BeginInsertDianFXCommand, Mode=OneWay}"/>					
+						<Fluent:Button x:Name="DivButton" Content="Button" Size="Small" RenderTransformOrigin="0.5,0.455" Margin="-18,-21.833,0,0" VerticalAlignment="Top" Command="{Binding DatasCollectionProperty.AddXinhaoCommand, Mode=OneWay}"/>					   
+						<Fluent:Button x:Name="InsertButton" Content="插入信号机" Height="Auto" Size="Middle" HorizontalAlignment="Right" Command="{Binding DatasCollectionProperty.InsertXinhaoCommand, Mode=OneWay}" Margin="0,-20,0,0" ToolTip="插入信号机"/>
+						<Fluent:Button x:Name="InsertDFXButton" Content="插入电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-20,0,0" Command="{Binding DatasCollectionProperty.BeginInsertDianFXCommand, Mode=OneWay}" ToolTip="插入电分相"/>
 					</Fluent:RibbonToolBar>
 				</Fluent:RibbonGroupBox>				
 			</Fluent:RibbonTabItem>

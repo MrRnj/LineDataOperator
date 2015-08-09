@@ -240,6 +240,7 @@ namespace Inter_face.Models
         private float _lengthProperty = 0;
 
         /// <summary>
+        /// 几何长度，UI长度
         /// Sets and gets the LengthProperty property.
         /// Changes to that property's value raise the PropertyChanged event. 
         /// </summary>
@@ -260,6 +261,37 @@ namespace Inter_face.Models
                 RaisePropertyChanging(LengthPropertyPropertyName);
                 _lengthProperty = value;
                 RaisePropertyChanged(LengthPropertyPropertyName);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="RealLength" /> property's name.
+        /// </summary>
+        public const string RealLengthPropertyName = "RealLength";
+
+        private float _reallengthProperty = 0;
+
+        /// <summary>
+        /// 实际长度
+        /// Sets and gets the RealLength property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public float RealLength
+        {
+            get
+            {
+                return _reallengthProperty;
+            }
+
+            set
+            {
+                if (_reallengthProperty == value)
+                {
+                    return;
+                }
+
+                _reallengthProperty = value;
+                RaisePropertyChanged(RealLengthPropertyName);
             }
         }
     }

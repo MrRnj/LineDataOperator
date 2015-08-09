@@ -28,6 +28,7 @@ namespace Inter_face.ViewModel
         private int middleSecnum;
         private List<string> cdl;
         private bool isrefreshData = true;
+        private bool isupdata;
 
         /// <summary>
         /// The <see cref="Name" /> property's name.
@@ -417,25 +418,25 @@ namespace Inter_face.ViewModel
                     endpos = decimal.Parse(p.RightPosProperty.Split('+')[1]);
                     endSecnum = int.Parse(p.RightPosProperty.Split('+')[0]);
 
-                    middlepos = decimal.Parse(infos[3].Split('+')[1]);
-                    middleSecnum = int.Parse(infos[3].Split('+')[0]);
+                    middlepos = decimal.Parse(infos[3].Split('+')[0]);
+                    middleSecnum = int.Parse(infos[3].Split('+')[1]);
 
-                    leftedgepos = decimal.Parse(infos[2].Split('+')[1]);
-                    leftedgeSecnum = int.Parse(infos[2].Split('+')[0]);
+                    leftedgepos = decimal.Parse(infos[2].Split('+')[0]);
+                    leftedgeSecnum = int.Parse(infos[2].Split('+')[1]);
                     LeftEdgePos = formatShowpos(leftedgepos, leftedgeSecnum);
 
-                    rightedgepos = decimal.Parse(infos[4].Split('+')[1]);                    
-                    rightedgeSecnum = int.Parse(infos[4].Split('+')[0]);
+                    rightedgepos = decimal.Parse(infos[4].Split('+')[0]);                    
+                    rightedgeSecnum = int.Parse(infos[4].Split('+')[1]);
                     RightEdgePos = formatShowpos(rightedgepos, rightedgeSecnum);
 
                     StartShowPos = formatShowpos(startpos, startSecnum);
                     EndShowPos = formatShowpos(endpos, endSecnum);
 
-                    StartDis = getDis(leftedgepos, leftedgeSecnum, startpos, startSecnum).ToString("F3");
+                    StartDis = getDis(startpos, startSecnum, leftedgepos, leftedgeSecnum).ToString("F3");
                     Enddis = getDis(rightedgepos, rightedgeSecnum, endpos, endSecnum).ToString("F3");
 
-                    LeftDis = getDis(middlepos, middleSecnum, leftedgepos, leftedgeSecnum);
-                    RightDis = getDis(rightedgepos, rightedgeSecnum, middlepos, middleSecnum);
+                    LeftDis = getDis(leftedgepos, leftedgeSecnum, middlepos, middleSecnum);
+                    RightDis = getDis(middlepos, middleSecnum, rightedgepos, rightedgeSecnum);
 
                     Hat = getHat(middleSecnum);
                     PartI = int.Parse(middlepos.ToString("F3").Split('.')[0]);
@@ -444,6 +445,7 @@ namespace Inter_face.ViewModel
                     Name = infos[1];
 
                     isrefreshData = true;
+                    isupdata = p.IsUpdataProperty;
                 });
         }
 
@@ -477,8 +479,8 @@ namespace Inter_face.ViewModel
                 LeftEdgePos = formatShowpos(leftedgepos, leftedgeSecnum);
                 RightEdgePos = formatShowpos(rightedgepos, rightedgeSecnum);
 
-                StartDis = getDis(leftedgepos, leftedgeSecnum, startpos, startSecnum).ToString("F0");
-                Enddis = getDis(endpos, endSecnum, rightedgepos, rightedgeSecnum).ToString("F0");
+                StartDis = getDis(startpos, startSecnum, leftedgepos, leftedgeSecnum).ToString("F0");
+                Enddis = getDis(rightedgepos, rightedgeSecnum, endpos, endSecnum).ToString("F0");
             }
 
         }
@@ -560,10 +562,10 @@ namespace Inter_face.ViewModel
             float offset = 0;
             string[] parts = { };
             secnum = middleSecnum;
-            decimal realdis = getDis(endpos, endSecnum, middlepos, middleSecnum);
+            decimal realdis = getDis(middlepos, middleSecnum, endpos, endSecnum);
             if (realdis < dis)
             {
-                dis = realdis;
+                dis = realdis;               
                 secnum = endSecnum;
             }
             else
@@ -603,7 +605,8 @@ namespace Inter_face.ViewModel
                 }
             }
 
-            return (decimal)middlepos + (decimal)dis + (decimal)offset;
+            RightDis = dis;
+            return middlepos + dis / 1000 + (decimal)(offset / 1000);
         }
 
         private decimal offsetPosBackword(decimal middlepos, decimal dis, ref int secnum)
@@ -611,43 +614,39 @@ namespace Inter_face.ViewModel
             float offset = 0;
             string[] parts = { };
             secnum = middleSecnum;
-            decimal realdis = getDis(middlepos, middleSecnum, startpos, startSecnum);
+            decimal realdis = getDis(startpos, startSecnum, middlepos, middleSecnum);
             if (realdis < dis)
             {
-                dis = realdis;
+                dis = realdis;                
                 secnum = startSecnum;
             }
             else
             {
                 offset = 0;
-                if (middleSecnum == cdl.Count)
+                if (middleSecnum != 1)
                 {
                     parts = cdl[middleSecnum - 2].Split(':');
-                }
-                else
-                {
-                    parts = cdl[middleSecnum - 1].Split(':');
-                }
-                decimal limitdis = middlepos - decimal.Parse(parts[1].Split('+')[1]);
+                    decimal limitdis = middlepos * 1000 - decimal.Parse(parts[1].Split('+')[1]);
 
-                for (int i = middleSecnum; i > startSecnum; i--)
-                {
-                    if (limitdis - (decimal)dis >= 0)
+                    for (int i = middleSecnum; i > startSecnum; i--)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        secnum -= 1;
-                        offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                        decimal lastpos = decimal.Parse(parts[0].Split('+')[1]);
-                        parts = cdl[i - 2].Split(':');
-                        limitdis += (decimal.Parse(parts[1].Split('+')[1]) - lastpos);
+                        if (limitdis - (decimal)dis >= 0)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            secnum -= 1;
+                            offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                            decimal lastpos = decimal.Parse(parts[0].Split('+')[1]);
+                            parts = cdl[i - 2].Split(':');
+                            limitdis += (decimal.Parse(parts[1].Split('+')[1]) - lastpos);
+                        }
                     }
                 }
             }
-
-            return (decimal)middlepos - (decimal)dis - (decimal)offset;
+            LeftDis = dis;
+            return middlepos - dis / 1000 - (decimal)(offset / 1000);
         }
 
         private void commit()
@@ -656,8 +655,9 @@ namespace Inter_face.ViewModel
             {
                 HatProperty = Hat,
                 LengthProperty = (float)(LeftDis + RightDis),
+                RealLength = (float)(LeftDis + RightDis),
                 PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L50,0",
-                PositionProperty = (float)middlepos,
+                PositionProperty = (float)leftedgepos,
                 ScaleProperty = 10,
                 SectionNumProperty = middleSecnum,
                 SelectedProperty = false,
@@ -673,7 +673,10 @@ namespace Inter_face.ViewModel
                 Type = DataType.Single
             };
 
-            MessengerInstance.Send<StationDataMode>(dianfxdata, "UpdataDianfx");
+            if (!isupdata)
+                MessengerInstance.Send<StationDataMode>(dianfxdata, "InsertDianfx");
+            else
+                MessengerInstance.Send<StationDataMode>(dianfxdata, "UpdataDianfx");
         }
 
         private RelayCommand _commitCommand;

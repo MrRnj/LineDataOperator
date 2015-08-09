@@ -19,7 +19,7 @@ namespace Inter_face.Coverters
                     return (sdm.LengthProperty * sdm.ScaleProperty).ToString();
                 else
                 {
-                    return (sdm.LengthProperty * sdm.ScaleProperty + 200).ToString();
+                    return (sdm.RealLength * sdm.ScaleProperty).ToString();
                 }
             }
         }

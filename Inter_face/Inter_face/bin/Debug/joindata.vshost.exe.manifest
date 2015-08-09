@@ -120,14 +120,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="422912">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="431104">
       <assemblyIdentity name="joindata" version="1.9.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>ikixs8Y7a5aD76FgOjiiHGQhm3k=</dsig:DigestValue>
+        <dsig:DigestValue>I20OzVXUqqG6Qyuo2Jzhi7fzOHE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

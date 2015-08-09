@@ -44,7 +44,8 @@ namespace Inter_face.Coverters
                          datas = ldm.PathDataProperty.Split(':');
                         break; 
                     case DataType.Break:
-                        datas = "1:1 0:#00DC5625:#FF35F30E:M0,0 L500,0".Split(':');
+                        sdm = (StationDataMode)idm;
+                        datas = sdm.PathDataProperty.Split(':');
                         break;
                     case DataType.Position:
                         sdm = (StationDataMode)idm;

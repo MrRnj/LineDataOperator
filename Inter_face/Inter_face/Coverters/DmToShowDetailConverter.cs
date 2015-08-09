@@ -23,14 +23,14 @@ namespace Inter_face.Coverters
                         {
                             signalmode = (StationDataMode)idm;
                             if (signalmode.StationNameProperty.StartsWith("Q"))
-                                return (idm.LengthProperty * idm.ScaleProperty + 200).ToString("F0");
+                                return (signalmode.RealLength * idm.ScaleProperty).ToString("F0");
                             return string.Empty;
                         }
                     case DataType.Station:
                         {
                             signalmode = (StationDataMode)idm;
                             if (signalmode.StationNameProperty.Equals("区间"))
-                                return (idm.LengthProperty * idm.ScaleProperty + 100).ToString("F3");
+                                return (signalmode.RealLength * idm.ScaleProperty).ToString("F3");
                             return string.Empty;
                         }
                     case DataType.Bridge:
@@ -42,7 +42,7 @@ namespace Inter_face.Coverters
                     case DataType.Quxian:
                         return (idm.LengthProperty * idm.ScaleProperty).ToString("F0");
                     case DataType.Break:
-                        return string.Empty;
+                        return idm.SectionNumProperty.ToString();
                     case DataType.Position:
                         return string.Format("{0} {1}", idm.HatProperty, idm.PositionProperty.ToString("F0"));
                     default:

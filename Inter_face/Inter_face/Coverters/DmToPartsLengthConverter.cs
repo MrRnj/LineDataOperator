@@ -26,7 +26,7 @@ namespace Inter_face.Coverters
                         return (sdm.LengthProperty * sdm.ScaleProperty / div).ToString();
                     else
                     {
-                        return ((sdm.LengthProperty * sdm.ScaleProperty + 200) / div).ToString();
+                        return ((sdm.RealLength * sdm.ScaleProperty) / div).ToString();
                     }
                 }
             }
