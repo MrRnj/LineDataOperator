@@ -2,245 +2,267 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent" 
-                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                     xmlns:vm="clr-namespace:Inter_face.ViewModel"
-    xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
-    xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="Inter_face.MainWindow"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Inter_face.ViewModel"
+        xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
+        xmlns:Backup="clr-namespace:Inter_face.BackUps"
+        xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="Inter_face.MainWindow"
         Title="数据转换" FontSize="18" mc:Ignorable="d" 
                      Height="640" Width="933" WindowState="Maximized" Icon="icons/title.png" Loaded="RibbonWindow_Loaded"
                      >
-    <Fluent:RibbonWindow.Resources>        
-    	<Inter_face_Coverters:IntToUnBoolenConverter x:Key="IntToUnBoolenConverter"/>        
-    	<Inter_face_Coverters:IntToBoolenConverter x:Key="IntToBoolenConverter"/>        
-    	<Inter_face_Coverters:intTocursorstyleConverter x:Key="intTocursorstyleConverter"/>        
-    	<Inter_face_Coverters:StationDataToBoolenConverter x:Key="StationDataToBoolenConverter"/>        
-    	<Inter_face_Coverters:IDatamodelToAliConverter x:Key="IDatamodelToAliConverter"/>        
-    	<Inter_face_Coverters:DmToShowDetailUpConverter x:Key="DmToShowDetailUpConverter"/>        
-    	<Inter_face_Coverters:DmToPartsLengthConverter x:Key="DmToPartsLengthConverter"/>        
-    	<Inter_face_Coverters:DmToLengthConverter x:Key="DmToLengthConverter"/>        
-    	<Inter_face_Coverters:DmToQjvisibilityConverter x:Key="DmToQjvisibilityConverter"/>        
-    	<Inter_face_Coverters:DmToXhSelectedConverter x:Key="DmToXhSelectedConverter"/>        
-    	<Inter_face_Coverters:StringToIntConverter x:Key="StringToIntConverter"/>        
-    	<Inter_face_Coverters:DmToTypeConverter x:Key="DmToTypeConverter"/>        
-    	<Inter_face_Coverters:DmToKeyConverter x:Key="DmToKeyConverter"/>        
-    	<Inter_face_Coverters:DmToLdhConverter x:Key="DmToLdhConverter"/>        
-    	<Inter_face_Coverters:DmToLcConverter x:Key="DmToLcConverter"/>        
-    	<Inter_face_Coverters:DmToXhvisibilityConverter x:Key="DmToXhvisibilityConverter"/>        
-    	<Inter_face_Coverters:DatasCollectionToVisibilityConverter x:Key="DatasCollectionToVisibilityConverter"/>	
-    	<Inter_face_Coverters:DmToShowDetailConverter x:Key="DmToShowDetailConverter"/>
-    	<Inter_face_Coverters:AdjustLengthConverter x:Key="AdjustLengthConverter"/>
-    	<Inter_face_Coverters:DmToPositionConverter x:Key="DmToPositionConverter"/>
-    	<Inter_face_Coverters:DmToVisibilityConverter x:Key="DmToVisibilityConverter"/>
-    	<Inter_face_Coverters:DmToStretchConverter x:Key="DmToStretchConverter"/>
-    	<Inter_face_Coverters:IDatamodelToToolTipConverter x:Key="IDatamodelToToolTipConverter"/>
-    	<Inter_face_Coverters:DmToPathDataConverter x:Key="DmToPathDataConverter"/>
-    	<Inter_face_Coverters:ActrueLengthToShowLengthConverter x:Key="ActrueLengthToShowLengthConverter"/>
-    	<Inter_face_Coverters:IDMToDMConverter x:Key="IDMToDMConverter"/>         
-    	<vm:ViewModelLocator x:Key="Locator"/>
-    	<Image x:Key="accessicon" Source="icons/Access.png" Stretch="Fill"/>
-    	<Image x:Key="lbopicon" Source="icons/openBop.png" Stretch="Fill"/>
-    	<Image x:Key="laopicon" Source="icons/openAop.png" Stretch="Fill"/>
-    	<Image x:Key="saopicon" Source="icons/saveAop.png" Stretch="Fill"/>
-    	<Image x:Key="sbopicon" Source="icons/saveBop.png" Stretch="Fill" ImageFailed="Image_ImageFailed" />
-    	<Image x:Key="poduicon" Source="icons/podu.png" Stretch="Fill" />
-    	<Image x:Key="podulargeicon" Source="icons/podu_l.png" Stretch="Fill" />
-    	<Image x:Key="quxianicon" Source="icons/quxian.png" Stretch="Fill"/>
-    	<Image x:Key="quxianlargeicon" Source="icons/quxian_l.png" Stretch="Fill"/>
-    	<Image x:Key="biaojiicon" Source="icons/biaoji.png" Stretch="Fill"/>
-    	<Image x:Key="biaojilargeicon" Source="icons/biaoji_l.png" Stretch="Fill"/>
-    	<Image x:Key="Checkdatasignicon" Source="icons/Checkdatasign.png" Stretch="Fill"/>
-    	<Image x:Key="checklogicicon" Source="icons/checklogic.png" Stretch="Fill"/>
-    	<Image x:Key="upicon" Source="icons/up.png" Stretch="Fill"/>
-    	<Image x:Key="downicon" Source="icons/down.png" Stretch="Fill"/>
-    	<Image x:Key="bothicon" Source="icons/both.png" Stretch="Fill"/>
-    	<Image x:Key="resulticon" Source="icons/outputresult.png" Stretch="Fill"/>
-    	<Image x:Key="titleicon" Source="icons/title.png" Stretch="Fill"/>
-    	<Image x:Key="newworkicon" Source="icons/newwork.png" Stretch="Fill"/>
-    	<Image x:Key="curveicon" Source="icons/curve.png" Stretch="Fill"/>
-    	<Image x:Key="stationicon" Source="icons/station.png" Stretch="Fill"/>
-    	<Image x:Key="lineicon" Source="icons/Line.png" Stretch="Fill"/>
-    	<Image x:Key="ruleicon" Source="icons/rule.png" Stretch="Fill"/>
-    	<Image x:Key="signalupicon" Source="icons/singleup.png" Stretch="Fill"/>
-    	<Image x:Key="signaldownicon" Source="icons/singledown.png" Stretch="Fill"/>
-    	<Image x:Key="stationsignalicon" Source="icons/stationsigle.png" Stretch="Fill"/>
-    	<Image x:Key="exportsignaldataicon" Source="icons/exportsignaldata.png" Stretch="Fill"/>
+    <Fluent:RibbonWindow.Resources>
+        <Inter_face_Coverters:MovingDistenceStringToIntConverter x:Key="MovingDistenceStringToIntConverter"/>
+        <Inter_face_Coverters:BoolenToVisibilityConverter x:Key="BoolenToVisibilityConverter"/>
+        <Inter_face_Coverters:DmToDfxVisibilityConverter x:Key="DmToDfxVisibilityConverter"/>
+        <Inter_face_Coverters:ISDToSelectionModeConverter x:Key="ISDToSelectionModeConverter"/>
+        <Inter_face_Coverters:IntToUnBoolenConverter x:Key="IntToUnBoolenConverter"/>
+        <Inter_face_Coverters:IntToBoolenConverter x:Key="IntToBoolenConverter"/>
+        <Inter_face_Coverters:intTocursorstyleConverter x:Key="intTocursorstyleConverter"/>
+        <Inter_face_Coverters:StationDataToBoolenConverter x:Key="StationDataToBoolenConverter"/>
+        <Inter_face_Coverters:IDatamodelToAliConverter x:Key="IDatamodelToAliConverter"/>
+        <Inter_face_Coverters:DmToShowDetailUpConverter x:Key="DmToShowDetailUpConverter"/>
+        <Inter_face_Coverters:DmToPartsLengthConverter x:Key="DmToPartsLengthConverter"/>
+        <Inter_face_Coverters:DmToLengthConverter x:Key="DmToLengthConverter"/>
+        <Inter_face_Coverters:DmToQjvisibilityConverter x:Key="DmToQjvisibilityConverter"/>
+        <Inter_face_Coverters:DmToXhSelectedConverter x:Key="DmToXhSelectedConverter"/>
+        <Inter_face_Coverters:StringToIntConverter x:Key="StringToIntConverter"/>
+        <Inter_face_Coverters:DmToTypeConverter x:Key="DmToTypeConverter"/>
+        <Inter_face_Coverters:DmToKeyConverter x:Key="DmToKeyConverter"/>
+        <Inter_face_Coverters:DmToLdhConverter x:Key="DmToLdhConverter"/>
+        <Inter_face_Coverters:DmToLcConverter x:Key="DmToLcConverter"/>
+        <Inter_face_Coverters:DmToXhvisibilityConverter x:Key="DmToXhvisibilityConverter"/>
+        <Inter_face_Coverters:DatasCollectionToVisibilityConverter x:Key="DatasCollectionToVisibilityConverter"/>
+        <Inter_face_Coverters:DmToShowDetailConverter x:Key="DmToShowDetailConverter"/>
+        <Inter_face_Coverters:AdjustLengthConverter x:Key="AdjustLengthConverter"/>
+        <Inter_face_Coverters:DmToPositionConverter x:Key="DmToPositionConverter"/>
+        <Inter_face_Coverters:DmToVisibilityConverter x:Key="DmToVisibilityConverter"/>
+        <Inter_face_Coverters:DmToStretchConverter x:Key="DmToStretchConverter"/>
+        <Inter_face_Coverters:IDatamodelToToolTipConverter x:Key="IDatamodelToToolTipConverter"/>
+        <Inter_face_Coverters:DmToPathDataConverter x:Key="DmToPathDataConverter"/>
+        <Inter_face_Coverters:ActrueLengthToShowLengthConverter x:Key="ActrueLengthToShowLengthConverter"/>
+        <Inter_face_Coverters:IDMToDMConverter x:Key="IDMToDMConverter"/>
+        <vm:ViewModelLocator x:Key="Locator"/>
+        <Image x:Key="accessicon" Source="icons/Access.png" Stretch="Fill"/>
+        <Image x:Key="lbopicon" Source="icons/openBop.png" Stretch="Fill"/>
+        <Image x:Key="laopicon" Source="icons/openAop.png" Stretch="Fill"/>
+        <Image x:Key="saopicon" Source="icons/saveAop.png" Stretch="Fill"/>
+        <Image x:Key="sbopicon" Source="icons/saveBop.png" Stretch="Fill" ImageFailed="Image_ImageFailed" />
+        <Image x:Key="poduicon" Source="icons/podu.png" Stretch="Fill" />
+        <Image x:Key="podulargeicon" Source="icons/podu_l.png" Stretch="Fill" />
+        <Image x:Key="quxianicon" Source="icons/quxian.png" Stretch="Fill"/>
+        <Image x:Key="quxianlargeicon" Source="icons/quxian_l.png" Stretch="Fill"/>
+        <Image x:Key="biaojiicon" Source="icons/biaoji.png" Stretch="Fill"/>
+        <Image x:Key="biaojilargeicon" Source="icons/biaoji_l.png" Stretch="Fill"/>
+        <Image x:Key="Checkdatasignicon" Source="icons/Checkdatasign.png" Stretch="Fill"/>
+        <Image x:Key="checklogicicon" Source="icons/checklogic.png" Stretch="Fill"/>
+        <Image x:Key="upicon" Source="icons/up.png" Stretch="Fill"/>
+        <Image x:Key="downicon" Source="icons/down.png" Stretch="Fill"/>
+        <Image x:Key="bothicon" Source="icons/both.png" Stretch="Fill"/>
+        <Image x:Key="resulticon" Source="icons/outputresult.png" Stretch="Fill"/>
+        <Image x:Key="titleicon" Source="icons/title.png" Stretch="Fill"/>
+        <Image x:Key="newworkicon" Source="icons/newwork.png" Stretch="Fill"/>
+        <Image x:Key="curveicon" Source="icons/curve.png" Stretch="Fill"/>
+        <Image x:Key="stationicon" Source="icons/station.png" Stretch="Fill"/>
+        <Image x:Key="lineicon" Source="icons/Line.png" Stretch="Fill"/>
+        <Image x:Key="ruleicon" Source="icons/rule.png" Stretch="Fill"/>
+        <Image x:Key="signalupicon" Source="icons/singleup.png" Stretch="Fill"/>
+        <Image x:Key="signaldownicon" Source="icons/singledown.png" Stretch="Fill"/>
+        <Image x:Key="stationsignalicon" Source="icons/stationsigle.png" Stretch="Fill"/>
+        <Image x:Key="exportsignaldataicon" Source="icons/exportsignaldata.png" Stretch="Fill"/>
         <Image x:Key="checkcdl" Source="icons/cdl.png" Stretch="Fill"/>
         <Image x:Key="AutoCheck" Source="icons/Automatic.png" Stretch="Fill"/>
         <Image x:Key="Upway" Source="icons/upway.png" Stretch="Fill"/>
         <Image x:Key="Downway" Source="icons/downway.png" Stretch="Fill"/>
         <Image x:Key="SaveXH" Source="icons/SaveXH.png" Stretch="Fill"/>
-		<Image x:Key="ExportToSvg" Source="icons/exportopng.png" Stretch="Fill"/>
-    	<ToolTip x:Key="NewSheetTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="新建数据表"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="建立一个新的数据表"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-    	<ToolTip x:Key="ReadAccessTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="读取Access数据库"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="读取一个或多个Access数据库"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-    	<ToolTip x:Key="ReadResourceTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="读取原始数据"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="读取需用于处理的原始数据"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-    	<ToolTip x:Key="ReadOperatedTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="读取处理后数据"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="读取处理后的原始数据"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-    	<ToolTip x:Key="SaveResourceTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="保存原始数据"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="保存用于处理的原始数据"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-    	<ToolTip x:Key="SaveOperatedTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="保存处理后的数据"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="保存处理后的原始数据"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-		<ToolTip x:Key="ExportToSvgTip">
-    		<Grid>
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="25"/>
-    				<RowDefinition Height="60"/>
-    			</Grid.RowDefinitions>
-    			<TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="输出数据图形"/></TextBlock>
-    			<TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="将处理后的数据输出为图形"/></TextBlock>
-    		</Grid>
-    	</ToolTip>
-    	<DataTemplate x:Key="DetailDataTemplate">
-    		<Grid x:Name="grid" Margin="-1,0">
-    			<Grid.RowDefinitions>
-    				<RowDefinition Height="10"/>
-    				<RowDefinition Height="30"/>
-    				<RowDefinition Height="10"/>
-    			</Grid.RowDefinitions>
-    			<Grid.ColumnDefinitions>
-    				<ColumnDefinition Width="1"/>
-    				<ColumnDefinition Width="*"/>
-    				<ColumnDefinition Width="1"/>
-    			</Grid.ColumnDefinitions>
-    			<Grid.ToolTip>
-    				<StackPanel>
-    					<TextBlock FontSize="12" FontWeight="Bold" Text="{Binding Converter={StaticResource IDatamodelToToolTipConverter}, Mode=OneWay}" LineHeight="13.333"/>
-    				</StackPanel>
-    			</Grid.ToolTip>
-    			<Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
-    				<Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
-    					<Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />               
-    				</Canvas>
-    			</Viewbox>        		
-    			<Path Data="M0.5,0.3 L0,49" Margin="0" Stretch="Fill" Stroke="Gray" Grid.Column="0" HorizontalAlignment="Left" Width="1" Fill="Black" Opacity="{Binding Converter={StaticResource DmToVisibilityConverter}, Mode=OneTime}" StrokeDashCap="Square" StrokeThickness="3" Grid.RowSpan="3" Visibility="Visible">
-    				<Path.RenderTransform>
-    					<TransformGroup>
-    						<ScaleTransform/>
-    						<SkewTransform AngleX="-0.01"/>
-    						<RotateTransform/>
-    						<TranslateTransform X="0.001"/>
-    					</TransformGroup>
-    				</Path.RenderTransform>
-    			</Path>
-    			<TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="{Binding Converter={StaticResource IDatamodelToAliConverter}, Mode=OneWay}" Margin="0" Grid.Row="2" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Top" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailConverter}, Mode=OneWay}"/>
-    			<TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="Center" Margin="0" Grid.Row="0" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Top" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailUpConverter}, Mode=OneWay}" Grid.RowSpan="2"/>
-    		</Grid>
-    	</DataTemplate>
-    	<DataTemplate x:Key="SingleDataTemplate">
-    		<Grid Height="60">
-    			<Grid.ColumnDefinitions>
-    				<ColumnDefinition Width="30"/>
-    				<ColumnDefinition Width="100"/>
-    				<ColumnDefinition Width="*"/>
-    			</Grid.ColumnDefinitions>
-    			<CheckBox x:Name="ShowDataCheckBox" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding ShowDataProperty}">
-    				<CheckBox.RenderTransform>
-    					<TransformGroup>
-    						<ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
-    						<SkewTransform/>
-    						<RotateTransform/>
-    						<TranslateTransform/>
-    					</TransformGroup>
-    				</CheckBox.RenderTransform>
-    				<i:Interaction.Triggers>
-    					<i:EventTrigger EventName="Click">
-    						<Custom:EventToCommand x:Name="CheckChangedEventToCommand" Command="{Binding ShowDataChangedCommand, Mode=OneWay}"/>
-    					</i:EventTrigger>
-    				</i:Interaction.Triggers>
-    			</CheckBox>
-    			<Label x:Name="TypeLabel" Content="{Binding TypeNameProperty}" Grid.Column="1" Margin="4,10" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-    			<ListBox x:Name="DetailListBox" ScrollViewer.CanContentScroll="False" Grid.Column="2" ItemsPanel="{DynamicResource DetailItemsPanelTemplate}" BorderThickness="0" ItemsSource="{Binding DataCollection}" ItemTemplate="{DynamicResource DetailDataTemplate}" FontSize="26.667" FontWeight="Bold" SelectedItem="{Binding CurrentDataProperty}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"/>			
-    		</Grid>
-    	</DataTemplate>
-    	<ItemsPanelTemplate x:Key="DetailItemsPanelTemplate">
-    		<VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" Margin="0"/>
-    	</ItemsPanelTemplate>
-    	<SolidColorBrush x:Key="ListBorder" Color="#828790"/>		
-    	<Style x:Key="DetailListBoxStyle" TargetType="{x:Type ListBox}">
-    		<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
-    		<Setter Property="BorderBrush" Value="{StaticResource ListBorder}"/>
-    		<Setter Property="BorderThickness" Value="1"/>
-    		<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-    		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-    		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-    		<Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
-    		<Setter Property="ScrollViewer.PanningMode" Value="Both"/>
-    		<Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-    		<Setter Property="VerticalContentAlignment" Value="Center"/>
-    		<Setter Property="Template">
-    			<Setter.Value>
-    				<ControlTemplate TargetType="{x:Type ListBox}">
-    					<Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="true">
-    						<ScrollViewer Focusable="false">
-    							<ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-    						</ScrollViewer>
-    					</Border>
-    					<ControlTemplate.Triggers>
-    						<Trigger Property="IsEnabled" Value="false">
-    							<Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-    						</Trigger>
-    						<Trigger Property="IsGrouping" Value="true">
-    							<Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
-    						</Trigger>
-    					</ControlTemplate.Triggers>
-    				</ControlTemplate>
-    			</Setter.Value>
-    		</Setter>
-    	</Style>
+        <Image x:Key="ExportToSvg" Source="icons/exportopng.png" Stretch="Fill"/>
+        <Image x:Key="Sections" Source="icons/fenduan.png" Stretch="Fill"/>
+		<Image x:Key="ModifyDianfx" Source="icons/ModifyDianfx.png" Stretch="Fill"/>
+		<Image x:Key="Modifysig" Source="icons/Modifysig.png" Stretch="Fill"/>
+		<Image x:Key="DeleteDfx" Source="icons/DeleteDfx.png" Stretch="Fill"/>
+		<Image x:Key="DeleteSig" Source="icons/deleteSig.net.png" Stretch="Fill"/>
+		<Image x:Key="moveSig" Source="icons/moveSig.png" Stretch="Fill"/>
+		<Image x:Key="confirmdiv" Source="icons/confirmdiv.png" Stretch="Fill"/>
+		<Image x:Key="InsertDfx" Source="icons/InsertDfx.png" Stretch="Fill"/>
+		<Image x:Key="InsertSig" Source="icons/InsertSig.png" Stretch="Fill"/>
+		<Image x:Key="saveother" Source="icons/saveother.png" Stretch="Fill"/>
+		<Image x:Key="opensignals" Source="icons/opensignals.png" Stretch="Fill"/>
+        <ToolTip x:Key="NewSheetTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="新建数据表"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="建立一个新的数据表"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <ToolTip x:Key="ReadAccessTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="读取Access数据库"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="读取一个或多个Access数据库"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <ToolTip x:Key="ReadResourceTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="读取原始数据"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="读取需用于处理的原始数据"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <ToolTip x:Key="ReadOperatedTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="读取处理后数据"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="读取处理后的原始数据"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <ToolTip x:Key="SaveResourceTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="保存原始数据"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="保存用于处理的原始数据"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <ToolTip x:Key="SaveOperatedTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="保存处理后的数据"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="保存处理后的原始数据"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <ToolTip x:Key="ExportToSvgTip">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="60"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" HorizontalAlignment="Left"  FontSize="12" FontWeight="ExtraBold"><Run Text="输出数据图形"/></TextBlock>
+                <TextBlock Grid.Row="1" VerticalAlignment="Top"  FontSize="15" Margin="5"><Run Text="将处理后的数据输出为图形"/></TextBlock>
+            </Grid>
+        </ToolTip>
+        <DataTemplate x:Key="DetailDataTemplate">
+            <Grid x:Name="grid" Margin="-1,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                </Grid.ColumnDefinitions>
+                <Grid.ToolTip>
+                    <StackPanel>
+                        <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding Converter={StaticResource IDatamodelToToolTipConverter}, Mode=OneWay}" LineHeight="13.333"/>
+                    </StackPanel>
+                </Grid.ToolTip>
+                <Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
+                    <Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
+                        <Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />
+                    </Canvas>
+                </Viewbox>
+                <Path Data="M0.5,0.3 L0,49" Margin="0" Stretch="Fill" Stroke="Gray" Grid.Column="0" HorizontalAlignment="Left" Width="1" Fill="Black" Opacity="{Binding Converter={StaticResource DmToVisibilityConverter}, Mode=OneTime}" StrokeDashCap="Square" StrokeThickness="3" Grid.RowSpan="3" Visibility="Visible">
+                    <Path.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="-0.01"/>
+                            <RotateTransform/>
+                            <TranslateTransform X="0.001"/>
+                        </TransformGroup>
+                    </Path.RenderTransform>
+                </Path>
+                <TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="{Binding Converter={StaticResource IDatamodelToAliConverter}, Mode=OneWay}" Margin="0" Grid.Row="2" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Top" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailConverter}, Mode=OneWay}"/>
+                <TextBlock Grid.ColumnSpan="3" Grid.Column="0" HorizontalAlignment="Center" Margin="0" Grid.Row="0" TextWrapping="Wrap" FontSize="9.333" VerticalAlignment="Top" Height="10" Text="{Binding Converter={StaticResource DmToShowDetailUpConverter}, Mode=OneWay}" Grid.RowSpan="2"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="SingleDataTemplate">
+            <Grid Height="60">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox x:Name="ShowDataCheckBox" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding ShowDataProperty}">
+                    <CheckBox.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </CheckBox.RenderTransform>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Custom:EventToCommand x:Name="CheckChangedEventToCommand" Command="{Binding ShowDataChangedCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </CheckBox>
+                <Label x:Name="TypeLabel" Content="{Binding TypeNameProperty}" Grid.Column="1" Margin="4,10" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <ListBox x:Name="DetailListBox" ScrollViewer.CanContentScroll="False" Grid.Column="2" ItemsPanel="{DynamicResource DetailItemsPanelTemplate}" BorderThickness="0" ItemsSource="{Binding DataCollection}" ItemTemplate="{DynamicResource DetailDataTemplate}" FontSize="26.667" FontWeight="Bold" SelectedItem="{Binding CurrentDataProperty}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" SelectionMode="{Binding TypeNum, Converter={StaticResource ISDToSelectionModeConverter}}" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <Custom:EventToCommand x:Name="SelectionChangedEventToCommand" Command="{Binding SelectionChangedCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ListBox>
+            </Grid>
+        </DataTemplate>
+        <ItemsPanelTemplate x:Key="DetailItemsPanelTemplate">
+            <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" Margin="0"/>
+        </ItemsPanelTemplate>
+        <SolidColorBrush x:Key="ListBorder" Color="#828790"/>
+        <Style x:Key="DetailListBoxStyle" TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ListBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBox}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="true">
+                            <ScrollViewer Focusable="false">
+                                <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </ScrollViewer>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Fluent:RibbonWindow.Resources>
-	<i:Interaction.Triggers>
+    <i:Interaction.Triggers>
 		<i:EventTrigger EventName="Closing">
 			<Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding DatasCollectionProperty.DisposeCommand, Mode=OneWay}"/>
 		</i:EventTrigger>
@@ -291,10 +313,10 @@
 					<Fluent:Button x:Name="openqxfile" Header="打开曲线文件" LargeIcon="{StaticResource quxianicon}" Click="openqxfile_Click"/>
 					<Fluent:Button x:Name="openbjfile" Header="打开标记文件" LargeIcon="{StaticResource biaojiicon}" Click="openbjfile_Click"/>
 				</Fluent:RibbonGroupBox>
-				<Fluent:RibbonGroupBox Header="调整数据">					
-					<Fluent:Button x:Name="modifycdldata" Header="核对长短链" LargeIcon="{DynamicResource checkcdl}" Command="{Binding DatasCollectionProperty.ModifycdlDataCommand, Mode=OneWay}"/>
-					<Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/> 
-					<Fluent:ToggleButton x:Name="showcdldata" Header="显示路段分布" LargeIcon="{DynamicResource AutoCheck}" Command="{Binding DatasCollectionProperty.LoadLdhCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsLdhMapLoadedProperty, Mode=TwoWay}"/> 					
+				<Fluent:RibbonGroupBox Header="调整数据">
+                    <Fluent:Button x:Name="modifycdldata" Header="核对长短链" LargeIcon="{StaticResource checkcdl}" Command="{Binding DatasCollectionProperty.ModifycdlDataCommand, Mode=OneWay}"/>
+                    <Fluent:Button x:Name="autofitcdldata" Header="自动调整" LargeIcon="{StaticResource AutoCheck}" Command="{Binding DatasCollectionProperty.AutoFitCommand, Mode=OneWay}"/>
+                    <Fluent:ToggleButton x:Name="showcdldata" Header="显示路段分布" LargeIcon="{StaticResource Sections}" Command="{Binding DatasCollectionProperty.LoadLdhCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsLdhMapLoadedProperty, Mode=TwoWay}"/> 					
 				</Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox Header="检查数据">
                 	<Fluent:Button x:Name="checkdatasign" Header="检查读取标记" LargeIcon="{StaticResource Checkdatasignicon}" Click="checkdatasign_Click"/>
@@ -318,23 +340,27 @@
 			</Fluent:RibbonTabItem>
 			<Fluent:RibbonTabItem x:Name="ShowDataRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:LayoutOverrides="Height" Header="数据显示" IsSelected="True">
 				<Fluent:RibbonGroupBox x:Name="LineDataRibbonGroupBox" Header="线路数据">
-					<Fluent:ToggleButton x:Name="LoadPDToggleButton" Content="线路数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsPoduLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding DatasCollectionProperty.LoadPoduDataCommand, Mode=OneWay}" ToolTip="显示坡度数据" Header="线路数据" LargeIcon="{DynamicResource lineicon}" Margin="6,0"/>
-					<Fluent:ToggleButton x:Name="LoadQXToggleButton" Content="曲线数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsQuXianLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadQuXianDataCommand, Mode=OneWay}" ToolTip="显示曲线" Header="曲线数据" LargeIcon="{DynamicResource curveicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
-					<Fluent:ToggleButton x:Name="LoadCZToggleButton" Content="车站数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsCheZhanLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadStationCommand, Mode=OneWay}" ToolTip="显示车站数据" Header="车站数据" LargeIcon="{DynamicResource stationicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
-					<Fluent:ToggleButton x:Name="PositionToggleButton" Content="里程数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsLiChengLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" Command="{Binding DatasCollectionProperty.LoadPositionCommand, Mode=OneWay}" LargeIcon="{DynamicResource ruleicon}" Header="里程数据" ToolTip="显示里程数据" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
+                    <Fluent:ToggleButton x:Name="LoadPDToggleButton" Content="线路数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsPoduLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding DatasCollectionProperty.LoadPoduDataCommand, Mode=OneWay}" ToolTip="显示坡度数据" Header="线路数据" LargeIcon="{StaticResource lineicon}" Margin="6,0"/>
+                    <Fluent:ToggleButton x:Name="LoadQXToggleButton" Content="曲线数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsQuXianLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadQuXianDataCommand, Mode=OneWay}" ToolTip="显示曲线" Header="曲线数据" LargeIcon="{StaticResource curveicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
+                    <Fluent:ToggleButton x:Name="LoadCZToggleButton" Content="车站数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsCheZhanLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadStationCommand, Mode=OneWay}" ToolTip="显示车站数据" Header="车站数据" LargeIcon="{StaticResource stationicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
+                    <Fluent:ToggleButton x:Name="PositionToggleButton" Content="里程数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsLiChengLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" Command="{Binding DatasCollectionProperty.LoadPositionCommand, Mode=OneWay}" LargeIcon="{StaticResource ruleicon}" Header="里程数据" ToolTip="显示里程数据" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
 				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
-					<Fluent:ToggleButton x:Name="loadxhdataButton" Header="载入下行" LargeIcon="{DynamicResource Downway}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}" FontSize="11"/>
-                    <Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="载入上行" LargeIcon="{DynamicResource Upway}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
-                    <Fluent:Button x:Name="ModifyStationsignalButton" Header="修改车站信号机" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}" LargeIcon="{DynamicResource stationsignalicon}" Height="Auto"/>
-                    <Fluent:Button x:Name="SaveStationsignalButton" Header="保存" ToolTip="保存信号机" Command="{Binding DatasCollectionProperty.SaveXhDataCommand, Mode=OneWay}" LargeIcon="{DynamicResource SaveXH}" Height="Auto" IsEnabled="{Binding DatasCollectionProperty.IsXinhaoChanged}"/>					
-					<Fluent:SplitButton x:Name="exportSplitButton" d:LayoutOverrides="Height" LargeIcon="{DynamicResource exportsignaldataicon}" Header="{Binding DatasCollectionProperty.ExportXhText}" Command="{Binding DatasCollectionProperty.ExportSignalDataCommand, Mode=OneWay}">
+                    <Fluent:ToggleButton x:Name="loadxhdataButton" Header="载入下行" LargeIcon="{StaticResource Downway}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}" FontSize="11"/>
+                    <Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="载入上行" LargeIcon="{StaticResource Upway}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
+                    <Fluent:Button x:Name="ModifyStationsignalButton" Header="修改车站信号机" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}" LargeIcon="{StaticResource stationsignalicon}" Height="Auto"/>      	
+				</Fluent:RibbonGroupBox>
+				<Fluent:RibbonGroupBox x:Name="signalDataRibbonGroupBox" d:LayoutOverrides="Height" Header="信号机数据操作">					
+					<Fluent:Button x:Name="opensignalButton" Header="打开数据" ToolTip="打开信号机数据" Command="{Binding DatasCollectionProperty.OpenXhDataCommand, Mode=OneWay}" LargeIcon="{DynamicResource opensignals}" Height="Auto" />
+					<Fluent:Button x:Name="SaveStationsignalButton" Header="保存" ToolTip="保存信号机" Command="{Binding DatasCollectionProperty.SaveXhDataCommand, Mode=OneWay}" LargeIcon="{StaticResource SaveXH}" Height="Auto" IsEnabled="{Binding DatasCollectionProperty.IsXinhaoChanged}"/>
+					<Fluent:Button x:Name="SaveothersignalButton" Header="另存" ToolTip="另存" Command="{Binding DatasCollectionProperty.SaveXhdataToAntherFileCommand, Mode=OneWay}" LargeIcon="{DynamicResource saveother}" Height="Auto"/>
+					<Fluent:SplitButton x:Name="exportSplitButton" d:LayoutOverrides="Height" LargeIcon="{StaticResource exportsignaldataicon}" Header="{Binding DatasCollectionProperty.ExportXhText}" Command="{Binding DatasCollectionProperty.ExportSignalDataCommand, Mode=OneWay}">
 						<Fluent:MenuItem Header="分页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.ManyClickCommand, Mode=OneWay}"/>
 						<Fluent:MenuItem Header="单页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToUnBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.SingleClickCommand, Mode=OneWay}"/>
-					</Fluent:SplitButton>      	
+					</Fluent:SplitButton>
 				</Fluent:RibbonGroupBox>				
 			</Fluent:RibbonTabItem>	
-			<Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}">
+			<Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">
 				<Fluent:RibbonGroupBox x:Name="DetailRibbonGroupBox" d:LayoutOverrides="Height" Header="基本信息" Width="159">
 					<Fluent:TextBox x:Name="LiChenTextBox" VerticalContentAlignment="Center" Text="{Binding DatasCollectionProperty.CurrentDatasProperty.CurrentDataProperty, Converter={StaticResource DmToLcConverter}}" Height="20.26" Width="151" IsReadOnly="True" IsUndoEnabled="False" ScrollViewer.VerticalScrollBarVisibility="Hidden" Header="里程："/>
 					<Fluent:TextBox x:Name="LxTextBox" VerticalContentAlignment="Center" Text="{Binding DatasCollectionProperty.CurrentDatasProperty.CurrentDataProperty, Converter={StaticResource DmToTypeConverter}}" Height="20.26" Width="151" IsReadOnly="True" IsUndoEnabled="False" ScrollViewer.VerticalScrollBarVisibility="Hidden" Header="类型："/>
@@ -347,26 +373,17 @@
 								<Fluent:RibbonToolBarRow>
 									<Fluent:RibbonToolBarControlDefinition Target="distenceSpinner"/>
 									<Fluent:RibbonToolBarControlDefinition Target="CommitButton"/>
-								</Fluent:RibbonToolBarRow>
-								<Fluent:RibbonToolBarRow>
-									<Fluent:RibbonToolBarControlDefinition Target="TypeComboBox"/>									
-								</Fluent:RibbonToolBarRow>
+								</Fluent:RibbonToolBarRow>								
 								<Fluent:RibbonToolBarRow>									
-									<Fluent:RibbonToolBarControlDefinition Target="ModifyDFXButton"/>
-									<Fluent:RibbonToolBarControlDefinition Target="DeleteDFXButton"/>
-									<Fluent:RibbonToolBarControlDefinition Target="DeleteButton"/>									
+									<Fluent:RibbonToolBarControlDefinition Target="ModifySignalButton"/>									
+									<Fluent:RibbonToolBarControlDefinition Target="DeleteSignalButton"/>									
 								</Fluent:RibbonToolBarRow>
 							</Fluent:RibbonToolBarLayoutDefinition>							
 						</Fluent:RibbonToolBar.LayoutDefinitions>
-						<Fluent:Spinner x:Name="distenceSpinner" Increment="5" Maximum="5000" Minimum="-5000" Size="Small" d:LayoutOverrides="HorizontalAlignment, Height" Width="55.743" Margin="-16,-3,-49,3" Value="{Binding DatasCollectionProperty.MoveingDistence, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}"/>
-						<Fluent:Button x:Name="CommitButton" Content="Button" Height="Auto" Width="23" Margin="64,-3,-89,3" HorizontalAlignment="Stretch" Command="{Binding DatasCollectionProperty.MoveXinHaoCommand, Mode=OneWay}"/>
-						<Fluent:ComboBox x:Name="TypeComboBox" IsReadOnly="True" Width="62" Margin="-16,-6.5,-94,6.5">
-							<ComboBoxItem Content="通过信号机"/>
-							<ComboBoxItem Content="进出站信号机"/>
-						</Fluent:ComboBox>						
-						<Fluent:Button x:Name="ModifyDFXButton" Content="修改电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-11,0,0" ToolTip="修改电分相" Command="{Binding DatasCollectionProperty.BeginModifyDFXCommand, Mode=OneWay}"/>
-						<Fluent:Button x:Name="DeleteDFXButton" Content="删除电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-11,0,0" Command="{Binding DatasCollectionProperty.DeleteDFXCommand, Mode=OneWay}" ToolTip="删除电分相"/>											
-						<Fluent:Button x:Name="DeleteButton" Content="删除信号机" Height="20" Margin="0,-11,0,0" HorizontalAlignment="Right" Command="{Binding DatasCollectionProperty.RemoveXinHaoCommand, Mode=OneWay}" ToolTip="删除信号机"/>
+						<Fluent:Spinner x:Name="distenceSpinner" Increment="20" Maximum="5000" Minimum="-5000" Size="Small" d:LayoutOverrides="HorizontalAlignment, Height" Width="55.743" Margin="-35,-3,-30,3" Value="{Binding DatasCollectionProperty.MoveingDistence, Converter={StaticResource MovingDistenceStringToIntConverter}, Mode=TwoWay}"/>
+						<Fluent:Button x:Name="CommitButton" Content="Button" Height="Auto" Width="23" Margin="44,-3,-69,3" HorizontalAlignment="Stretch" Command="{Binding DatasCollectionProperty.MoveSignalsCommand, Mode=OneWay}" Icon="{DynamicResource moveSig}"/>												
+						<Fluent:Button x:Name="ModifySignalButton" Content="修改单个信号机" Height="20" Size="Middle" HorizontalAlignment="Left" Margin="-24,-5,0,-6" Command="{Binding DatasCollectionProperty.MoveXinHaoCommand, Mode=OneWay}" ToolTip="修改单个信号机" d:LayoutOverrides="HorizontalAlignment" Icon="{DynamicResource Modifysig}"/>																	
+						<Fluent:Button x:Name="DeleteSignalButton" Content="删除信号机" Height="20" Margin="10,-5,-8,0" HorizontalAlignment="Right" Command="{Binding DatasCollectionProperty.RemoveXinHaoCommand, Mode=OneWay}" ToolTip="删除信号机" Icon="{DynamicResource DeleteSig}"/>
 					</Fluent:RibbonToolBar>
 				</Fluent:RibbonGroupBox>
 			</Fluent:RibbonTabItem>
@@ -398,17 +415,24 @@
 								</MultiBinding>
 							</Fluent:TextBox.Text>
 						</Fluent:TextBox>
-						<Fluent:Spinner x:Name="DivSpinner" Minimum="1" HorizontalAlignment="Right" Height="22" Margin="0,-22.005,34.887,0" VerticalAlignment="Top" Width="53.243" Value="{Binding DatasCollectionProperty.DivParts, Mode=TwoWay}" d:LayoutOverrides="VerticalAlignment"/>
-						<Fluent:Button x:Name="DivButton" Content="Button" Size="Small" RenderTransformOrigin="0.5,0.455" Margin="-18,-21.833,0,0" VerticalAlignment="Top" Command="{Binding DatasCollectionProperty.AddXinhaoCommand, Mode=OneWay}"/>					   
-						<Fluent:Button x:Name="InsertButton" Content="插入信号机" Height="Auto" Size="Middle" HorizontalAlignment="Right" Command="{Binding DatasCollectionProperty.InsertXinhaoCommand, Mode=OneWay}" Margin="0,-20,0,0" ToolTip="插入信号机"/>
-						<Fluent:Button x:Name="InsertDFXButton" Content="插入电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-20,0,0" Command="{Binding DatasCollectionProperty.BeginInsertDianFXCommand, Mode=OneWay}" ToolTip="插入电分相"/>
+						<Fluent:Spinner x:Name="DivSpinner" Minimum="1" HorizontalAlignment="Right" Height="22" Margin="0,-22.005,34.887,0" VerticalAlignment="Top" Width="53.243" Value="{Binding DatasCollectionProperty.DivParts, Mode=TwoWay}" d:LayoutOverrides="VerticalAlignment" Maximum="50"/>
+						<Fluent:Button x:Name="DivButton" Content="Button" Size="Small" RenderTransformOrigin="0.5,0.455" Margin="-18,-21.833,0,0" VerticalAlignment="Top" Command="{Binding DatasCollectionProperty.AddXinhaoCommand, Mode=OneWay}" ToolTip="增加相应数量信号机" Icon="{DynamicResource confirmdiv}"/>					   
+						<Fluent:Button x:Name="InsertButton" Content="插入信号机" Height="Auto" Size="Middle" HorizontalAlignment="Right" Command="{Binding DatasCollectionProperty.InsertXinhaoCommand, Mode=OneWay}" Margin="0,-20,0,0" ToolTip="插入信号机" Icon="{DynamicResource InsertSig}"/>
+						<Fluent:Button x:Name="InsertDFXButton" Content="插入电分相" Height="20" Size="Middle" HorizontalAlignment="Right" Margin="0,-20,0,0" Command="{Binding DatasCollectionProperty.BeginInsertDianFXCommand, Mode=OneWay}" ToolTip="插入电分相" Icon="{DynamicResource InsertDfx}"/>
 					</Fluent:RibbonToolBar>
 				</Fluent:RibbonGroupBox>				
 			</Fluent:RibbonTabItem>
+			<Fluent:RibbonTabItem x:Name="ModifyDfxRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:LayoutOverrides="Height" Header="修改电分相" IsSelected="True" Group="{Binding ElementName=DianFxContextualTabGroup}">
+				<Fluent:RibbonGroupBox x:Name="DfxInfoRibbonGroupBox" Header="电分相数据" Height="Auto" Width="170" FontSize="8">				
+						<Fluent:Button x:Name="ModifyDianfxButton" Content="修改电分相" Size="Large" HorizontalAlignment="Left" Margin="8,4,0,4" ToolTip="修改电分相" d:LayoutOverrides="HorizontalAlignment" Height="Auto" Width="Auto" FontSize="10.667" Command="{Binding DatasCollectionProperty.BeginModifyDFXCommand, Mode=OneWay}" LargeIcon="{DynamicResource ModifyDianfx}" Header="修改电分相"/>
+						<Fluent:Button x:Name="DeleteDianfxButton" Content="删除电分相" Size="Large" HorizontalAlignment="Right" Margin="13,4,0,6" ToolTip="删除电分相" Height="Auto" Width="Auto" FontSize="10.667" Command="{Binding DatasCollectionProperty.DeleteDFXCommand, Mode=OneWay}" LargeIcon="{DynamicResource DeleteDfx}" Header="删除电分相"/>					
+				</Fluent:RibbonGroupBox>
+			</Fluent:RibbonTabItem>
 			<Fluent:Ribbon.ContextualGroups>
-				<Fluent:RibbonContextualTabGroup x:Name="QujianRibbonContextualTabGroup" Header="信号机区间" Background="#FF2F3BF3" BorderBrush="#FF59F323" Visibility="{Binding DatasCollectionProperty.CurrentDatasProperty.CurrentDataProperty, Converter={StaticResource DmToQjvisibilityConverter}}"/>
-				<Fluent:RibbonContextualTabGroup x:Name="XinhaoContextualTabGroup" Header="信号机上下文" Background="#FF10E01D" BorderBrush="#FFD6EB16" Visibility="{Binding DatasCollectionProperty.CurrentDatasProperty.CurrentDataProperty, Converter={StaticResource DmToXhvisibilityConverter}}"/>
-			</Fluent:Ribbon.ContextualGroups>		
+				<Fluent:RibbonContextualTabGroup x:Name="QujianRibbonContextualTabGroup" Header="信号机区间" Background="#FF2F3BF3" BorderBrush="#FF59F323" Visibility="{Binding DatasCollectionProperty.CurrentDatasProperty.IsShowQujian, Converter={StaticResource BoolenToVisibilityConverter}}"/>
+				<Fluent:RibbonContextualTabGroup x:Name="XinhaoContextualTabGroup" Header="信号机上下文" Background="#FF10E01D" BorderBrush="#FFD6EB16" Visibility="{Binding DatasCollectionProperty.CurrentDatasProperty.IsShowSignale, Converter={StaticResource BoolenToVisibilityConverter}}"/>
+                <Fluent:RibbonContextualTabGroup x:Name="DianFxContextualTabGroup" Header="电分相上下文" Background="#FFEF3A9E" BorderBrush="#FFD24FF1" Visibility="{Binding DatasCollectionProperty.CurrentDatasProperty.IsShowDianFX, Converter={StaticResource BoolenToVisibilityConverter}}"/>
+            </Fluent:Ribbon.ContextualGroups>		
         </Fluent:Ribbon>				
         <WrapPanel Grid.Row="1" x:Name="infoboxpanel" Orientation="Horizontal"
     		HorizontalAlignment="Stretch" VerticalAlignment="Top" 

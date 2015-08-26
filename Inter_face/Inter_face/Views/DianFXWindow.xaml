@@ -64,8 +64,8 @@
 			<TextBlock x:Name="EndTextBlock" Margin="0,8" Grid.Column="6" TextWrapping="Wrap" Text="{Binding EndShowPos}" TextAlignment="Center" FontSize="13.333"/>
 			<TextBlock x:Name="EndDisTextBlock" Grid.Column="5" Margin="41.1,8,36.2,8" TextWrapping="Wrap" Width="70" HorizontalAlignment="Center" Text="{Binding Enddis}" TextAlignment="Center" FontSize="16"/>
 		</Grid>
-		<Button x:Name="OkButton" Content="确定" Grid.Column="4" Margin="15,4" Grid.Row="2" Command="{Binding CommitCommand, Mode=OneWay}" Width="100" HorizontalAlignment="Left"/>
-		<Button x:Name="CancelButton" Content="取消" Grid.Column="5" Margin="10,4" Grid.Row="2" Width="100"/>
+		<Button x:Name="OkButton" Content="确定" Grid.Column="5" Margin="66,4.665,0,3.335" Grid.Row="2" Command="{Binding CommitCommand, Mode=OneWay}" Width="100" HorizontalAlignment="Left"/>
+		<Button x:Name="CancelButton" Content="取消" Grid.Column="6" Margin="66,4.665,8,3.335" Grid.Row="2" Width="100"/>
 		<TextBox x:Name="LeftEdgeDisTextBox" Grid.Column="2" Margin="4,8,4,0" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{Binding LeftDis, Converter={StaticResource PartIntConverter}, Mode=TwoWay}" VerticalAlignment="Bottom" Width="50" Height="21.8366666666667" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" BorderBrush="#FF0AF718"/>
 		<TextBox x:Name="RightEdgeDisTextBox" Grid.Column="4" Margin="4,8,4,0" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{Binding RightDis, Converter={StaticResource PartIntConverter}, Mode=TwoWay}" VerticalAlignment="Bottom" Width="50" Height="21.8366666666667" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" BorderBrush="#FF0AF718"/>
 		<TextBox x:Name="NameTextBox" Grid.Column="1" Margin="4" Grid.Row="2" TextWrapping="Wrap" BorderBrush="#FF0AF718" Text="{Binding Name, Mode=TwoWay}"/>		

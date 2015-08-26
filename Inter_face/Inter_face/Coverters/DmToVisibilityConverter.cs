@@ -16,6 +16,7 @@ namespace Inter_face.Coverters
 
                 switch (idm.Type)
                 {
+                    case DataType.SingleS:
                     case DataType.Single:
                         return 1;
                     case DataType.Station:

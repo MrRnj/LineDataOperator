@@ -10,16 +10,18 @@ namespace Inter_face.Coverters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            StationDataMode sdm = value as StationDataMode;
-            if (sdm == null || (sdm.Type != DataType.Single && sdm.Type != DataType.SingleS))
+            IList<IDataModel> sdms = value as IList<IDataModel>;
+            if (sdms == null)
                 return System.Windows.Visibility.Collapsed;
-            else
+            if (sdms.Count == 0)
+                return System.Windows.Visibility.Collapsed;
+           
+            foreach (StationDataMode item in sdms)
             {
-                if (sdm.StationNameProperty.StartsWith("Q"))
+                if (!item.StationNameProperty.StartsWith("2"))
                     return System.Windows.Visibility.Collapsed;
-                else
-                    return System.Windows.Visibility.Visible;
             }
+            return System.Windows.Visibility.Visible;            
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

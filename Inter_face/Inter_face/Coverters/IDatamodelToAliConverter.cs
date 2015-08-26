@@ -16,8 +16,9 @@ namespace Inter_face.Coverters
             {
                 switch (idm.Type)
                 {
+                    case DataType.SingleS:
                     case DataType.Single:
-                        return System.Windows.HorizontalAlignment.Center;
+                        return System.Windows.HorizontalAlignment.Center;                   
                     case DataType.Station:
                         return System.Windows.HorizontalAlignment.Center;
                     case DataType.Bridge:

@@ -128,10 +128,13 @@
     <Compile Include="ACdlWindow.xaml.cs">
       <DependentUpon>ACdlWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BackUps\CustomeSelectionItems.cs" />
     <Compile Include="Coverters\ActrueLengthToShowLengthConverter.cs" />
     <Compile Include="Coverters\AdjustLengthConverter.cs" />
+    <Compile Include="Coverters\BoolenToVisibilityConverter.cs" />
     <Compile Include="Coverters\ClddataToShowStyleConverter.cs" />
     <Compile Include="Coverters\DatasCollectionToVisibilityConverter.cs" />
+    <Compile Include="Coverters\DmToDfxVisibilityConverter.cs" />
     <Compile Include="Coverters\DmToKeyConverter.cs" />
     <Compile Include="Coverters\DmToLcConverter.cs" />
     <Compile Include="Coverters\DmToLdhConverter.cs" />
@@ -155,8 +158,10 @@
     <Compile Include="Coverters\IntToBoolenConverter.cs" />
     <Compile Include="Coverters\intTocursorstyleConverter.cs" />
     <Compile Include="Coverters\IntToUnBoolenConverter.cs" />
+    <Compile Include="Coverters\ISDToSelectionModeConverter.cs" />
     <Compile Include="Coverters\LenToPart1Converter.cs" />
     <Compile Include="Coverters\LenToPart2Converter.cs" />
+    <Compile Include="Coverters\MovingDistenceStringToIntConverter.cs" />
     <Compile Include="Coverters\PartIntConverter.cs" />
     <Compile Include="Coverters\PathDetailConverter.cs" />
     <Compile Include="Coverters\PosToPart1LenConverter.cs" />
@@ -314,6 +319,15 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="icons\confirmdiv.png" />
+    <Resource Include="icons\DeleteDfx.png" />
+    <Resource Include="icons\deleteSig.net.png" />
+    <Resource Include="icons\InsertDfx.png" />
+    <Resource Include="icons\InsertSig.png" />
+    <Resource Include="icons\ModifyDianfx.png" />
+    <Resource Include="icons\Modifysig.png" />
+    <Resource Include="icons\moveSig.png" />
+    <Resource Include="icons\opensignals.png" />
     <Resource Include="icons\podu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -364,6 +378,7 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="icons\saveother.png" />
     <Resource Include="icons\up.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -456,6 +471,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\exportopng.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\fenduan.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

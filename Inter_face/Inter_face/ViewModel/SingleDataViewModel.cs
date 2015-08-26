@@ -1,6 +1,9 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 using Inter_face.Models;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 
 
 namespace Inter_face.ViewModel
@@ -94,8 +97,8 @@ namespace Inter_face.ViewModel
 
             set
             {
-                if (value != null)
-                    MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
+                //if (value != null)
+                   // MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
 
                 if (_CurrentDataProperty == value)
                 {
@@ -170,12 +173,107 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(SelectedIndexPropertyName);
             }
         }
+        
+        private ObservableCollection<IDataModel> selectedItems;
+        public ObservableCollection<IDataModel> SelectedItems
+        {
+            get { return selectedItems; }
+            set { selectedItems = value; }
+        }
+        /// <summary>
+        /// The <see cref="IsShowQujian" /> property's name.
+        /// </summary>
+        public const string IsShowQujianPropertyName = "IsShowQujian";
+
+        private bool _isshowqujianProperty = false;
+
+        /// <summary>
+        /// Sets and gets the IsShowQujian property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsShowQujian
+        {
+            get
+            {
+                return _isshowqujianProperty;
+            }
+
+            set
+            {
+                if (_isshowqujianProperty == value)
+                {
+                    return;
+                }
+
+                _isshowqujianProperty = value;
+                RaisePropertyChanged(IsShowQujianPropertyName);
+            }
+        }
+        /// <summary>
+        /// The <see cref="IsShowSignale" /> property's name.
+        /// </summary>
+        public const string IsShowSignalePropertyName = "IsShowSignale";
+
+        private bool _isshowsignalProperty = false;
+
+        /// <summary>
+        /// Sets and gets the IsShowSignale property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsShowSignale
+        {
+            get
+            {
+                return _isshowsignalProperty;
+            }
+
+            set
+            {
+                if (_isshowsignalProperty == value)
+                {
+                    return;
+                }
+
+                _isshowsignalProperty = value;
+                RaisePropertyChanged(IsShowSignalePropertyName);
+            }
+        }
+        /// <summary>
+        /// The <see cref="IsShowDianFX" /> property's name.
+        /// </summary>
+        public const string IsShowDianFXPropertyName = "IsShowDianFX";
+
+        private bool _isshowdianfxProperty = false;
+
+        /// <summary>
+        /// Sets and gets the IsShowDianFX property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsShowDianFX
+        {
+            get
+            {
+                return _isshowdianfxProperty;
+            }
+
+            set
+            {
+                if (_isshowdianfxProperty == value)
+                {
+                    return;
+                }
+
+                _isshowdianfxProperty = value;
+                RaisePropertyChanged(IsShowDianFXPropertyName);
+            }
+        }
         /// <summary>
         /// Initializes a new instance of the SingleDataViewModel class.
         /// </summary>
         public SingleDataViewModel()
         {
             _datacollection = new ObservableCollection<IDataModel>();
+            selectedItems = new ObservableCollection<IDataModel>();
         }
 
         private int _typenum;
@@ -189,6 +287,66 @@ namespace Inter_face.ViewModel
             {
                 _typenum = value;
             }
+        }
+
+        private bool checkDianfx()
+        {
+            if (TypeNum == (int)DataType.SingleS || TypeNum == (int)DataType.Single)
+            {
+                if (SelectedItems == null)
+                    return false;
+                if (SelectedItems.Count == 0 || SelectedItems.Count > 1)
+                    return false;
+                foreach (StationDataMode item in SelectedItems)
+                {
+                   if (!item.StationNameProperty.StartsWith("3"))
+                        return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool checkQujian()
+        {
+            if (TypeNum == (int)DataType.SingleS || TypeNum == (int)DataType.Single)
+            {
+                if (SelectedItems == null)
+                    return false;
+                if (SelectedItems.Count == 0 || SelectedItems.Count > 1)
+                    return false;
+
+                foreach (StationDataMode item in SelectedItems)
+                {
+                    if (!item.StationNameProperty.StartsWith("Q"))
+                        return false;
+                }
+
+                int index = DataCollection.IndexOf(selectedItems[0]);
+                if (index == 0 || index == DataCollection.Count - 1)
+                    return false;
+                return true;
+            }
+            return false;
+        }
+
+        private bool checkSignal()
+        {
+            if (TypeNum == (int)DataType.SingleS || TypeNum == (int)DataType.Single)
+            {
+                if (SelectedItems == null)
+                    return false;
+                if (SelectedItems.Count == 0)
+                    return false;
+
+                foreach (StationDataMode item in SelectedItems)
+                {
+                    if (!item.StationNameProperty.StartsWith("2"))
+                        return false;
+                }
+                return true;
+            }
+            return false;
         }
 
         private GalaSoft.MvvmLight.Command.RelayCommand _showdatachangedCommand;
@@ -207,6 +365,40 @@ namespace Inter_face.ViewModel
                                               MessengerInstance.Send<ISingleDataViewModel>(this, "DisapearData");
                                           }));
             }
-        }        
+        }
+
+        private RelayCommand<SelectionChangedEventArgs> _selectionChangedCommand;
+
+        /// <summary>
+        /// Gets the SelectionChangedCommand.
+        /// </summary>
+        public RelayCommand<SelectionChangedEventArgs> SelectionChangedCommand
+        {
+            get
+            {
+                return _selectionChangedCommand
+                    ?? (_selectionChangedCommand = new RelayCommand<SelectionChangedEventArgs>(
+                    p =>
+                    {
+                        //SelectedItems.Clear();
+                        foreach (IDataModel item in p.AddedItems)
+                        {
+                            SelectedItems.Add(item);
+                        }
+
+                        foreach (IDataModel item in p.RemovedItems)
+                        {
+                            SelectedItems.Remove(item);
+                        }
+
+                        IsShowSignale = checkSignal();
+                        IsShowQujian = checkQujian();
+                        IsShowDianFX = checkDianfx();
+                        MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");                        
+                    }));
+            }
+        }
+
+        
     }
 }

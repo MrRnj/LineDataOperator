@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Inter_face.Coverters
 {
-    class DmToQjvisibilityConverter : System.Windows.Data.IValueConverter
+    class DmToDfxVisibilityConverter : System.Windows.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -15,10 +15,11 @@ namespace Inter_face.Coverters
                 return System.Windows.Visibility.Collapsed;
             if (sdms.Count == 0 || sdms.Count > 1)
                 return System.Windows.Visibility.Collapsed;
-
             foreach (StationDataMode item in sdms)
             {
-                if(!item.StationNameProperty.StartsWith("Q"))
+                if (item.Type != DataType.Single || item.Type != DataType.SingleS)
+                    return System.Windows.Visibility.Collapsed;
+                else if (!item.StationNameProperty.StartsWith("3"))
                     return System.Windows.Visibility.Collapsed;
             }
             return System.Windows.Visibility.Visible;

@@ -36,6 +36,7 @@ namespace Inter_face.ViewModel
         private string _takenOfcurrentDFX;
         private float _startPos;
         private float _endPos;
+        private string _xhdataPath;
 
         private GraphyDataOper GDoper;
         private SignalDataExportor SDexportor;
@@ -164,7 +165,7 @@ namespace Inter_face.ViewModel
                 }
 
                 RaisePropertyChanging(CountPropertyPropertyName);
-                _countProperty = value;
+                _countProperty = value;               
                 RaisePropertyChanged(CountPropertyPropertyName);
             }
         }
@@ -220,6 +221,7 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(CurrentDatasPropertyPropertyName);
             }
         }
+       
         /// <summary>
         /// The <see cref="IsLdhMapLoadedProperty" /> property's name.
         /// </summary>
@@ -763,6 +765,7 @@ namespace Inter_face.ViewModel
             SDexportor = SignalDataExportor.CreatOper(_XHEPath);
             _DataBin = new List<ISingleDataViewModel>();
             _takenOfcurrentDFX = string.Empty;
+            _xhdataPath = string.Empty;
             _startPos = -1;
             _endPos = -1;           
 
@@ -928,22 +931,20 @@ namespace Inter_face.ViewModel
         {
             if (!IsLdhMapLoadedProperty)
             {
-                removeAdataItem((int)DataType.Break);
+                foreach (ISingleDataViewModel item in _datascollection)
+                {
+                    if (item.TypeNum == (int)DataType.Break)
+                    {
+                        DatasCollection.Remove(item);                       
+                        break;
+                    }
+                }
+                CountProperty = DatasCollection.Count;
                 return;
             }
 
-            SingleDataViewModel sdvm = null;            
-
-            foreach (ISingleDataViewModel Singleitem in _DataBin)
-            {
-                if (Singleitem.TypeNum == (int)DataType.Break)
-                {
-                    sdvm = (SingleDataViewModel)Singleitem;
-                    sdvm.ShowDataProperty = true;
-                    break;
-                }
-            }
-
+            SingleDataViewModel sdvm = null;
+            
             if (sdvm == null)
             {
 
@@ -973,8 +974,10 @@ namespace Inter_face.ViewModel
                                 sdvm.DataCollection.Add(new StationDataMode()
                                 {
                                     HatProperty = parts[0].Split('+')[0],
-                                    LengthProperty = _startPos == -1 ? 1000 / ScaleProperty : (float.Parse(parts[0].Split('+')[1]) - _startPos * 1000) / ScaleProperty,
-                                    RealLength = _startPos == -1 ? 1000 / ScaleProperty : (float.Parse(parts[0].Split('+')[1]) - _startPos * 1000) / ScaleProperty,
+                                    LengthProperty = !isAnyDatashowed() ? 1000 / ScaleProperty :
+                                    (float.Parse(parts[0].Split('+')[1]) - _startPos * 1000) / ScaleProperty,
+                                    RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty :
+                                    (float.Parse(parts[0].Split('+')[1]) - _startPos * 1000) / ScaleProperty,
                                     PositionProperty = _startPos == -1 ? float.Parse(parts[0].Split('+')[1]) / 1000 - 1 : _startPos,
                                     Type = DataType.Break,
                                     SectionNumProperty = ++n,
@@ -992,8 +995,10 @@ namespace Inter_face.ViewModel
                                 sdvm.DataCollection.Add(new StationDataMode()
                                 {
                                     HatProperty = parts[1].Split('+')[0],
-                                    LengthProperty = _endPos == -1 ? 1000 / ScaleProperty : (_endPos * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
-                                    RealLength = _endPos == -1 ? 1000 / ScaleProperty : (_endPos * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
+                                    LengthProperty = !isAnyDatashowed() ? 1000 / ScaleProperty :
+                                    (_endPos * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
+                                    RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty : 
+                                    (_endPos * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
                                     PositionProperty = float.Parse(parts[1].Split('+')[1]) / 1000,
                                     Type = DataType.Break,
                                     SectionNumProperty = ++n,
@@ -1010,8 +1015,10 @@ namespace Inter_face.ViewModel
                             sdvm.DataCollection.Add(new StationDataMode()
                             {
                                 HatProperty = parts[1].Split('+')[0],
-                                LengthProperty = (float.Parse(nextparts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
-                                RealLength = (float.Parse(nextparts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
+                                LengthProperty = !isAnyDatashowed() ? 1000 / ScaleProperty : 
+                                (float.Parse(nextparts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
+                                RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty : 
+                                (float.Parse(nextparts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
                                 PositionProperty = float.Parse(parts[1].Split('+')[1]) / 1000,
                                 Type = DataType.Break,
                                 SectionNumProperty = ++n,
@@ -1063,6 +1070,11 @@ namespace Inter_face.ViewModel
             IsLdhMapLoadedProperty = true;
             CountProperty = DatasCollection.Count;
         }
+        private bool isAnyDatashowed()
+        {
+            return IsPoduLoadedProperty || IsQuXianLoadedProperty || IsCheZhanLoadedProperty || IsLiChengLoadedProperty
+                   || IsXinhaoSLoaded || IsXinhaoSLoaded;
+        }
         public void LoadPoduXData()
         {
             if (!IsPoduLoadedProperty)
@@ -1084,31 +1096,18 @@ namespace Inter_face.ViewModel
                 }
             }
 
-            if (_startPos == -1)
+            foreach (ISingleDataViewModel item in DatasCollection)
             {
-                foreach (ISingleDataViewModel item in DatasCollection)
+                if (item.TypeNum == (int)DataType.Break)
                 {
-                    if (item.TypeNum == (int)DataType.Break)
-                    {
-                        DatasCollection.Remove(item);
-                        break;
-                    }
+                    DatasCollection.Remove(item);
+                    break;
                 }
-
-                foreach (ISingleDataViewModel Singleitem in _DataBin)
-                {
-                    if (Singleitem.TypeNum == (int)DataType.Break)
-                    {
-                        _DataBin.Remove(Singleitem);
-                        break;
-                    }
-                }
-
-                IsLdhMapLoadedProperty = false;                
             }
+            IsLdhMapLoadedProperty = false;
 
             if (sdvm == null)
-            {    
+            {
 
                 sdvm = new SingleDataViewModel();
                 sdvm.TypeNameProperty = "坡度";
@@ -1137,7 +1136,7 @@ namespace Inter_face.ViewModel
 
                     foreach (ExtractData.ChangeToTxt.PoduOutputData item in pdxlist)
                     {
-                        
+
                         sdvm.DataCollection.Add(new LineDataModel()
                         {
                             HatProperty = item.Gh,
@@ -1167,7 +1166,7 @@ namespace Inter_face.ViewModel
 
                 finally
                 {
-                    
+
                 }
             }
 
@@ -1194,7 +1193,7 @@ namespace Inter_face.ViewModel
 
             IsPoduLoadedProperty = true;
             containpddata = true;
-            CountProperty = DatasCollection.Count;            
+            CountProperty = DatasCollection.Count;
         }
 
         public void LoadQuXianXData()
@@ -1552,6 +1551,7 @@ namespace Inter_face.ViewModel
                     float offset = 0;
                     float len = 0;
                     float pos = 0;
+                    float addingpart = 200;
 
                     if (xhslist.Count == 0)
                     {
@@ -1620,6 +1620,7 @@ namespace Inter_face.ViewModel
                             else
                             {
                                 ChangeToTxt.CheZhanOutputData presdm = xhslist[n - 1];
+                                addingpart = float.Parse(presdm.Bjlx.Equals("3") ? presdm.Bjsj.Split(':')[4] : "200");
                                 //len = (float)(float.Parse(item.Glb) - float.Parse(presdm.Glb) - 0.2) * 1000 / ScaleProperty;
                                 pos = float.Parse(presdm.Glb);
 
@@ -1630,14 +1631,14 @@ namespace Inter_face.ViewModel
                                     m++;
                                 }
 
-                                len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000 - 200 - offset)
+                                len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000 - offset - addingpart)
                                         / ScaleProperty;
 
                                 sdvm.DataCollection.Add(new StationDataMode()
                                 {
                                     HatProperty = presdm.Gh,
                                     LengthProperty = len,
-                                    RealLength = len + 200 / ScaleProperty,
+                                    RealLength = len + addingpart / ScaleProperty,
                                     PositionProperty = pos,
                                     Type = DataType.Single,
                                     SectionNumProperty = int.Parse(presdm.Ldh),
@@ -1652,17 +1653,19 @@ namespace Inter_face.ViewModel
                                 });
                             }
 
+                            float currentlen = float.Parse(item.Bjlx.Equals("3") ? item.Bjsj.Split(':')[4] : "200");
                             sdvm.DataCollection.Add(new StationDataMode()
                             {
                                 HatProperty = item.Gh,
-                                LengthProperty = 200 / ScaleProperty,
-                                RealLength = 200 / ScaleProperty,
+                                LengthProperty = currentlen / ScaleProperty,
+                                RealLength = currentlen / ScaleProperty,
                                 PositionProperty = float.Parse(item.Glb),
                                 Type = DataType.Single,
                                 SectionNumProperty = int.Parse(item.Ldh),
                                 ScaleProperty = ScaleProperty,
                                 SelectedProperty = false,
-                                PathDataProperty = "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                PathDataProperty = (item.Bjlx.Equals("3") ? "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0 " :
+                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z"),
                                 StationNameProperty = (item.Bjlx.Equals("1") ?
                                     string.Format("{0}:{1}:{2}", item.Bjlx, item.Bjsj, FormatStationPosition(item.Bjsj.Split(':')[1])) :
                                     string.Format("{0}:{1}", item.Bjlx, item.Bjsj))
@@ -1775,9 +1778,11 @@ namespace Inter_face.ViewModel
                     int n = 0;
                     int m = 0;
                     string[] parts = { };
+                    //string moreinfos;
                     float offset = 0;
                     float len = 0;
                     float pos = 0;
+                    float addingpart = 200;
 
                     if (xhxlist.Count == 0)
                     {
@@ -1847,6 +1852,8 @@ namespace Inter_face.ViewModel
                             else
                             {
                                 ChangeToTxt.CheZhanOutputData presdm = xhxlist[n - 1];
+                                addingpart = float.Parse(presdm.Bjlx.Equals("3") ? presdm.Bjsj.Split(':')[4] : "200");
+
                                 //len = (float)(float.Parse(item.Glb) - float.Parse(presdm.Glb) - 0.2) * 1000 / ScaleProperty;
                                 pos = float.Parse(presdm.Glb);
 
@@ -1857,13 +1864,13 @@ namespace Inter_face.ViewModel
                                     m++;
                                 }
 
-                                len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000 - 200 - offset) / ScaleProperty;
+                                len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000 - offset - addingpart) / ScaleProperty;
 
                                 sdvm.DataCollection.Add(new StationDataMode()
                                 {
                                     HatProperty = presdm.Gh,
                                     LengthProperty = len,
-                                    RealLength = len + 200 / ScaleProperty,
+                                    RealLength = len + addingpart / ScaleProperty,
                                     PositionProperty = pos,
                                     Type = DataType.Single,
                                     SectionNumProperty = int.Parse(presdm.Ldh),
@@ -1878,17 +1885,19 @@ namespace Inter_face.ViewModel
                                 });
                             }
 
+                            float currentlen = float.Parse(item.Bjlx.Equals("3") ? item.Bjsj.Split(':')[4] : "200");
                             sdvm.DataCollection.Add(new StationDataMode()
                             {
                                 HatProperty = item.Gh,
-                                LengthProperty = 200 / ScaleProperty,
-                                RealLength = 200 / ScaleProperty,
+                                LengthProperty = currentlen / ScaleProperty,
+                                RealLength = currentlen / ScaleProperty,
                                 PositionProperty = float.Parse(item.Glb),
                                 Type = DataType.Single,
                                 SectionNumProperty = int.Parse(item.Ldh),
                                 ScaleProperty = ScaleProperty,
                                 SelectedProperty = false,
-                                PathDataProperty = "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                PathDataProperty = (item.Bjlx.Equals("3") ? "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0 " :
+                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z"),
                                 StationNameProperty = (item.Bjlx.Equals("1") ?
                                     string.Format("{0}:{1}:{2}", item.Bjlx, item.Bjsj, FormatStationPosition(item.Bjsj.Split(':')[1])) :
                                     string.Format("{0}:{1}", item.Bjlx, item.Bjsj))
@@ -2649,7 +2658,7 @@ namespace Inter_face.ViewModel
             AddXinhaoX(taken, numbers);
         }
 
-        private void moveXinhaoX(string taken, float offset, string newSinge = "")
+        private void moveXinhaoX(string taken, float offset, string newSignal = "")
         {
             ISingleDataViewModel singledata;
             //sec:name
@@ -2698,7 +2707,7 @@ namespace Inter_face.ViewModel
                 parts = sdm.StationNameProperty.Split(':');
                 if (parts[0].Equals("1"))
                 {
-                    sdm.StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}", parts[0], newSinge, parts[2], parts[3], parts[4]);
+                    sdm.StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}", parts[0], newSignal, parts[2], parts[3], parts[4]);
                 }
                 else if (parts[0].Equals("2"))
                 {
@@ -2750,7 +2759,7 @@ namespace Inter_face.ViewModel
 
                 if (parts[0].Equals("1"))
                 {
-                    sdm.StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}", parts[0], newSinge, parts[2], parts[3], parts[4]);
+                    sdm.StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}", parts[0], newSignal, parts[2], parts[3], parts[4]);
                 }
                 else if (parts[0].Equals("2"))
                 {
@@ -2774,7 +2783,35 @@ namespace Inter_face.ViewModel
                 singledata.DataCollection.Insert(index - 1, preqj);
             }
         }
+        private void MoveSignals(float offset)
+        {
+            List<StationDataMode> signals = new List<StationDataMode>();
+            List<IDataModel> SeletedSignals = CurrentDatasProperty.SelectedItems.ToList();
 
+            if (offset < 0)
+            {
+                signals = SeletedSignals.Select(p => p as StationDataMode).ToList();                
+            }
+            else
+            {
+                SeletedSignals.Reverse();
+                signals = SeletedSignals.Select(p => p as StationDataMode).ToList();
+            }
+
+            int error = signals.Count(p =>
+            {
+                string[] parts = p.StationNameProperty.Split(':');
+                return parts[0].Equals("Q") || parts[0].Equals("1") || parts[0].Equals("3");
+            });
+
+            if (error > 0)
+                return;
+
+            foreach (StationDataMode item in signals)
+            {
+                moveXinhaoX(item.StationNameProperty, offset);
+            }
+        }
         private void MoveXinhaoS(string taken, float offset, string newSinge = "")
         {
             moveXinhaoX(taken, offset, newSinge);
@@ -3149,8 +3186,8 @@ namespace Inter_face.ViewModel
                 StationDataMode nextsdm = CurrentDatasProperty.DataCollection[index + 1] as StationDataMode;
                 if (nextsdm.StationNameProperty.StartsWith("3"))
                 {
-                    endpos = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[1]);
-                    endsecnum = int.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
+                    endpos = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
+                    endsecnum = int.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[1]);
                 }
                 else
                 {
@@ -3846,6 +3883,7 @@ namespace Inter_face.ViewModel
             List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
             List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
             string[] parts;
+            string bjData = string.Empty;
 
             try
             {
@@ -3856,10 +3894,26 @@ namespace Inter_face.ViewModel
                     parts = item.StationNameProperty.Split(':');
                     if (!parts[0].StartsWith("Q"))
                     {
+                        switch (parts[0])
+                        {
+                            case "1":
+                                bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                break;
+                            case "2":
+                                bjData = parts[1];
+                                break;
+                            case "3":
+                                //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
+                                bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                break;
+                            default:
+                                break;
+                        }
+
                         xhs.Add(new ChangeToTxt.CheZhanOutputData()
                         {
                             Bjlx = parts[0],
-                            Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
+                            Bjsj = bjData,
                             Gh = item.HatProperty,
                             Glb = item.PositionProperty.ToString("F3"),
                             Index = string.Empty,
@@ -3877,6 +3931,7 @@ namespace Inter_face.ViewModel
                 MessengerInstance.Send<string>("保存上行信号机数据出错", "ReadDataError");
             }
 
+            bjData = string.Empty;
             try
             {
                 
@@ -3886,10 +3941,141 @@ namespace Inter_face.ViewModel
                     parts = item.StationNameProperty.Split(':');
                     if (!parts[0].StartsWith("Q"))
                     {
+                        switch (parts[0])
+                        {
+                            case "1":
+                                bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                break;
+                            case "2":
+                                bjData = parts[1];
+                                break;
+                            case "3":
+                                bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                break;
+                            default:
+                                break;
+                        }
+                        
                         xhx.Add(new ChangeToTxt.CheZhanOutputData()
                         {
                             Bjlx = parts[0],
-                            Bjsj = parts.Length == 2 ? parts[1] : string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]),
+                            Bjsj = bjData,
+                            Gh = item.HatProperty,
+                            Glb = item.PositionProperty.ToString("F3"),
+                            Index = string.Empty,
+                            Ldh = item.SectionNumProperty.ToString(),
+                            Zjfx = "1"
+                        });
+                    }
+                }
+                if (_xhdataPath.Equals(string.Empty))
+                {
+                    SaveFileDialog savexhdataDialog = new SaveFileDialog();
+                    savexhdataDialog.Title = "保存信号数据";
+                    savexhdataDialog.Filter = "信号数据|*.xh";
+
+                    if (savexhdataDialog.ShowDialog() == true)
+                    {
+                        _xhdataPath = savexhdataDialog.FileName;
+                        GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                        IsXinhaoChanged = false;
+                    }
+                }
+                else
+                {
+                    GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                }
+            }
+
+            catch 
+            {
+                MessengerInstance.Send<string>("保存下行信号机数据出错", "ReadDataError");
+            }
+        }
+
+        private void saveOtherXhData()
+        {
+            ISingleDataViewModel singledata;
+            List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
+            List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
+            string[] parts;
+            string bjData = string.Empty;
+
+            try
+            {
+
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                {
+                    parts = item.StationNameProperty.Split(':');
+                    if (!parts[0].StartsWith("Q"))
+                    {
+                        switch (parts[0])
+                        {
+                            case "1":
+                                bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                break;
+                            case "2":
+                                bjData = parts[1];
+                                break;
+                            case "3":
+                                //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
+                                bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        xhs.Add(new ChangeToTxt.CheZhanOutputData()
+                        {
+                            Bjlx = parts[0],
+                            Bjsj = bjData,
+                            Gh = item.HatProperty,
+                            Glb = item.PositionProperty.ToString("F3"),
+                            Index = string.Empty,
+                            Ldh = item.SectionNumProperty.ToString(),
+                            Zjfx = "1"
+                        });
+                    }
+                }
+                //Doper.SaveXhData(xhs, xhx);
+                IsXinhaoChanged = false;
+            }
+
+            catch
+            {
+                MessengerInstance.Send<string>("保存上行信号机数据出错", "ReadDataError");
+            }
+
+            bjData = string.Empty;
+            try
+            {
+
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                {
+                    parts = item.StationNameProperty.Split(':');
+                    if (!parts[0].StartsWith("Q"))
+                    {
+                        switch (parts[0])
+                        {
+                            case "1":
+                                bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                break;
+                            case "2":
+                                bjData = parts[1];
+                                break;
+                            case "3":
+                                bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        xhx.Add(new ChangeToTxt.CheZhanOutputData()
+                        {
+                            Bjlx = parts[0],
+                            Bjsj = bjData,
                             Gh = item.HatProperty,
                             Glb = item.PositionProperty.ToString("F3"),
                             Index = string.Empty,
@@ -3899,13 +4085,42 @@ namespace Inter_face.ViewModel
                     }
                 }
 
-                GDoper.SaveXhData(xhs, xhx);
-                IsXinhaoChanged = false;
+                SaveFileDialog savexhdataDialog = new SaveFileDialog();
+                savexhdataDialog.Title = "保存信号数据";
+                savexhdataDialog.Filter = "信号数据|*.xh";
+
+                if (savexhdataDialog.ShowDialog() == true)
+                {
+                    _xhdataPath = savexhdataDialog.FileName;
+                    GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                    IsXinhaoChanged = false;
+                }
             }
 
-            catch 
+            catch
             {
                 MessengerInstance.Send<string>("保存下行信号机数据出错", "ReadDataError");
+            }
+        }
+
+        private void openXhdata()
+        {
+            OpenFileDialog openxhdataDialog = new OpenFileDialog();
+            openxhdataDialog.Title = "打开信号数据";
+            openxhdataDialog.Filter = "信号数据文件|*.xh|所有文件|*.*";
+            openxhdataDialog.Multiselect = false;
+
+            if (openxhdataDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    GDoper.OpenXhData(openxhdataDialog.FileName);
+                    _xhdataPath = openxhdataDialog.FileName;
+                }
+                catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
+                {
+
+                }
             }
         }
 
@@ -4103,7 +4318,7 @@ namespace Inter_face.ViewModel
                                 sds.Add(new SignalData()
                                 {
                                     HatProperty = item.HatProperty,
-                                    LengthProperty = item.LengthProperty,
+                                    LengthProperty = item.RealLength,
                                     PathDataProperty = item.PathDataProperty,
                                     PositionProperty = item.PositionProperty,
                                     ScaleProperty = item.ScaleProperty,
@@ -4125,7 +4340,7 @@ namespace Inter_face.ViewModel
                                 sdx.Add(new SignalData()
                                 {
                                     HatProperty = item.HatProperty,
-                                    LengthProperty = item.LengthProperty,
+                                    LengthProperty = item.RealLength,
                                     PathDataProperty = item.PathDataProperty,
                                     PositionProperty = item.PositionProperty,
                                     ScaleProperty = item.ScaleProperty,
@@ -4425,56 +4640,82 @@ namespace Inter_face.ViewModel
                     ?? (_movexinhaoCommand = new RelayCommand(
                                           () =>
                                           {
-                                              string[] parts = { };
-                                              float offset1 = 0;
-                                              float offset2 = 0;
-                                              StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
-                                              StationDataMode nextsdm = null;
-                                              float newposition = 0;
-                                              int index = CurrentDatasProperty.DataCollection.IndexOf(sdm);
-                                              if (index == CurrentDatasProperty.DataCollection.Count - 2)
+                                              if (!MoveXinHaoCommand.CanExecute(null))
                                               {
-                                                  nextsdm = sdm;
-                                                  newposition = nextsdm.PositionProperty + (CurrentDatasProperty.DataCollection[index + 1].LengthProperty + 20) * sdm.ScaleProperty / 1000;
+                                                  return;
                                               }
-                                              else
-                                              {
-                                                  nextsdm = CurrentDatasProperty.DataCollection[index + 2] as StationDataMode;
-                                                  if (nextsdm.StationNameProperty.StartsWith("3"))
+                                                  string[] parts = { };
+                                                  float offset1 = 0;
+                                                  float offset2 = 0;
+                                                  StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+                                                  StationDataMode nextsdm = null;
+                                                  float newposition = 0;
+                                                  int index = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+                                                  if (index == CurrentDatasProperty.DataCollection.Count - 2)
                                                   {
-                                                      newposition = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[1]);
+                                                      nextsdm = sdm;
+                                                      newposition = nextsdm.PositionProperty + (CurrentDatasProperty.DataCollection[index + 1].LengthProperty + 20) * sdm.ScaleProperty / 1000;
                                                   }
                                                   else
-                                                      newposition = nextsdm.PositionProperty;
-                                              }
-                                              StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 1] as StationDataMode;
+                                                  {
+                                                      nextsdm = CurrentDatasProperty.DataCollection[index + 2] as StationDataMode;
+                                                      if (nextsdm.StationNameProperty.StartsWith("3"))
+                                                      {
+                                                          newposition = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
+                                                      }
+                                                      else
+                                                          newposition = nextsdm.PositionProperty;
+                                                  }
+                                                  StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 1] as StationDataMode;
 
-                                              for (int i = presdm.SectionNumProperty; i < sdm.SectionNumProperty; i++)
-                                              {
-                                                  parts = cdlxlist[i - 1].Split(':');
-                                                  offset1 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                                              }
+                                                  for (int i = presdm.SectionNumProperty; i < sdm.SectionNumProperty; i++)
+                                                  {
+                                                      parts = cdlxlist[i - 1].Split(':');
+                                                      offset1 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                                  }
 
-                                              for (int i = sdm.SectionNumProperty; i < nextsdm.SectionNumProperty; i++)
-                                              {
-                                                  parts = cdlxlist[i - 1].Split(':');
-                                                  offset2 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                                              }
+                                                  for (int i = sdm.SectionNumProperty; i < nextsdm.SectionNumProperty; i++)
+                                                  {
+                                                      parts = cdlxlist[i - 1].Split(':');
+                                                      offset2 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                                  }
 
-                                              mxwindow = new MoveXinhaoWindow();
+                                                  mxwindow = new MoveXinhaoWindow();
 
-                                              GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<string>
-                                                  (string.Format("{0}:{1}:{2}:{3}:{4}",
-                                                  presdm.PositionProperty,
-                                                 newposition,
-                                                  sdm.PositionProperty, offset1.ToString(), offset2.ToString()),
-                                                  "Resources");
-                                              mxwindow.ShowDialog();
+                                                  GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<string>
+                                                      (string.Format("{0}:{1}:{2}:{3}:{4}",
+                                                      presdm.PositionProperty,
+                                                     newposition,
+                                                      sdm.PositionProperty, offset1.ToString(), offset2.ToString()),
+                                                      "Resources");
+                                                  mxwindow.ShowDialog();
+                                              
+                                          },
+                                          () => 
+                                          {
+                                              return CurrentDatasProperty.SelectedItems.Count == 1;
                                           }));
             }
         }
-        private RelayCommand _removexinhaoCommand;
+       
+        private RelayCommand _movesignalsCommand;
 
+        /// <summary>
+        /// Gets the MoveSignalsCommand.
+        /// </summary>
+        public RelayCommand MoveSignalsCommand
+        {
+            get
+            {
+                return _movesignalsCommand
+                    ?? (_movesignalsCommand = new RelayCommand(
+                    () =>
+                    {
+                        MoveSignals(MoveingDistence);
+                    }));
+            }
+        }
+        private RelayCommand _removexinhaoCommand;
         /// <summary>
         /// Gets the RemoveXinHaoCommand.
         /// </summary>
@@ -4486,9 +4727,15 @@ namespace Inter_face.ViewModel
                     ?? (_removexinhaoCommand = new RelayCommand(
                                           () =>
                                           {
-                                              StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
-                                              if (sdm != null)
-                                                  DeleteXinhao(sdm.StationNameProperty);
+                                              string[] stationNames = CurrentDatasProperty.SelectedItems.
+                                                                       Select(p => p as StationDataMode).
+                                                                       Select(p => p.StationNameProperty).ToArray();
+                                              //StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+                                              foreach (string item in stationNames)
+                                              {
+                                                  DeleteXinhao(item);
+                                              }
+
                                           }));
             }
         }
@@ -4723,6 +4970,40 @@ namespace Inter_face.ViewModel
                         StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
                         if (sdm != null)
                             DeleteDianFXx(sdm.StationNameProperty);
+                    }));
+            }
+        }
+        private RelayCommand _openxhdataCommand;
+
+        /// <summary>
+        /// Gets the OpenXhDataCommand.
+        /// </summary>
+        public RelayCommand OpenXhDataCommand
+        {
+            get
+            {
+                return _openxhdataCommand
+                    ?? (_openxhdataCommand = new RelayCommand(
+                    () =>
+                    {
+                        openXhdata();
+                    }));
+            }
+        }
+        private RelayCommand _savexhdataToanotherfileCommand;
+
+        /// <summary>
+        /// Gets the SaveXhdataToAntherFileCommand.
+        /// </summary>
+        public RelayCommand SaveXhdataToAntherFileCommand
+        {
+            get
+            {
+                return _savexhdataToanotherfileCommand
+                    ?? (_savexhdataToanotherfileCommand = new RelayCommand(
+                    () =>
+                    {
+                        saveOtherXhData();
                     }));
             }
         }

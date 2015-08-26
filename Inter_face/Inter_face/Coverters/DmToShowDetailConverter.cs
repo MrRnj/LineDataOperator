@@ -19,6 +19,7 @@ namespace Inter_face.Coverters
                     return string.Empty;
                 switch (idm.Type)
                 {
+                    case DataType.SingleS:
                     case DataType.Single:
                         {
                             signalmode = (StationDataMode)idm;
