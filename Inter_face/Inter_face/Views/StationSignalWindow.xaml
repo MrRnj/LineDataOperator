@@ -6,7 +6,7 @@
 	xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight"
 	x:Class="Inter_face.StationWindow"
 	x:Name="Window"
-	Title="更改车站信号机" Width="480" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+	Title="更改车站信号机" Width="520" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
     <Window.Resources>
     	<Inter_face_Coverters:StringToIntConverter x:Key="StringToIntConverter"/>
     	<vm:StationSignalViewModel x:Key="StationSignalViewModel"/>
@@ -15,7 +15,7 @@
     			<Grid.ColumnDefinitions>
     				<ColumnDefinition Width="100"/>
     				<ColumnDefinition Width="100"/>
-    				<ColumnDefinition Width="250"/>
+    				<ColumnDefinition Width="290"/>
     			</Grid.ColumnDefinitions>
     			<Grid.RowDefinitions>
     				<RowDefinition Height="30"/>
@@ -26,46 +26,50 @@
     			<Grid x:Name="InGrid" Grid.Column="2" Margin="0,1">
     				<Grid.ColumnDefinitions>
     					<ColumnDefinition Width="50"/>
+    					<ColumnDefinition Width="30"/>
+    					<ColumnDefinition Width="50"/>
     					<ColumnDefinition Width="20"/>
     					<ColumnDefinition Width="50"/>
-    					<ColumnDefinition Width="10"/>
     					<ColumnDefinition Width="50"/>
-    					<ColumnDefinition Width="50"/>
+						<ColumnDefinition Width="30"/>
     				</Grid.ColumnDefinitions>
     				<TextBox x:Name="InTextBox" Height="Auto" Margin="0" TextWrapping="Wrap" Text="{Binding InSignalProperty.Mark, Mode=TwoWay}" VerticalAlignment="Stretch" FontSize="12" IsEnabled="{Binding InSignalProperty.IsSelected}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-    				<Label x:Name="InLabel" Content="{Binding InSignalProperty.Guanhao}" Grid.Column="1" Margin="0" FontSize="8" HorizontalAlignment="Center"/>
+    				<Label x:Name="InLabel" Content="{Binding InSignalProperty.Guanhao}" Grid.Column="1" Margin="0" FontSize="8" HorizontalAlignment="Center" Width="Auto" Padding="10,5"/>
     				<TextBox x:Name="InP1TextBox" Grid.Column="2" Margin="0" TextWrapping="Wrap" Text="{Binding InSignalProperty.PartImenber, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}" FontSize="12" IsEnabled="{Binding InSignalProperty.IsSelected}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-    				<Label x:Name="InPlus1Label" Content="+" Grid.Column="3" Margin="0" FontSize="8" HorizontalAlignment="Stretch" Padding="2,5,1,5"/>
+    				<Label x:Name="InPlus1Label" Content="+" Grid.Column="3" Margin="0" FontSize="12" HorizontalAlignment="Center" Padding="2,5,2,3" VerticalAlignment="Center"/>
     				<TextBox x:Name="InP2Text" Grid.Column="4" Margin="0" TextWrapping="Wrap" Text="{Binding InSignalProperty.PartII, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}" SelectionOpacity="-2.6" IsEnabled="{Binding InSignalProperty.IsSelected}" VerticalContentAlignment="Center"/>
-    				<ComboBox x:Name="InComboBox"  Grid.Column="5" Margin="4,0,-10,0" Width="Auto" HorizontalAlignment="Stretch" ItemsSource="{Binding InSignalProperty.SecNumbersProperty}" SelectedValue="{Binding InSignalProperty.SectionNum, Mode=TwoWay}" SelectedIndex="{Binding InSignalProperty.SelectedIndex, Mode=TwoWay}" IsEnabled="{Binding InSignalProperty.IsSelected}">
+    				<ComboBox x:Name="InComboBox"  Grid.Column="5" Margin="4,0,0,0" Width="Auto" HorizontalAlignment="Stretch" ItemsSource="{Binding InSignalProperty.SecNumbersProperty}" SelectedValue="{Binding InSignalProperty.SectionNum, Mode=TwoWay}" SelectedIndex="{Binding InSignalProperty.SelectedIndex, Mode=TwoWay}" IsEnabled="{Binding InSignalProperty.IsSelected}">
     					<i:Interaction.Triggers>
     						<i:EventTrigger EventName="SelectionChanged">
     							<Custom:EventToCommand x:Name="SelectionChangedEventToCommand" Command="{Binding InSignalProperty.SceNumberChangedCommand, Mode=OneWay}" CommandParameter="{Binding InSignalProperty.TypeProperty}"/>
     						</i:EventTrigger>
     					</i:Interaction.Triggers>
     				</ComboBox>
+    				<CheckBox x:Name="InCheckBox" Content="" Grid.Column="6" Margin="6" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding InSignalProperty.IsEnableProperty, Mode=TwoWay}"/>
     			</Grid>
     			<Grid x:Name="OutGrid" Grid.Column="2" Margin="0,1" Grid.Row="1">
     				<Grid.ColumnDefinitions>
     					<ColumnDefinition Width="50"/>
+    					<ColumnDefinition Width="30"/>
+    					<ColumnDefinition Width="50"/>
     					<ColumnDefinition Width="20"/>
     					<ColumnDefinition Width="50"/>
-    					<ColumnDefinition Width="10"/>
     					<ColumnDefinition Width="50"/>
-    					<ColumnDefinition Width="50"/>
+						<ColumnDefinition Width="30"/>
     				</Grid.ColumnDefinitions>
     				<TextBox x:Name="OutTextBox" Height="Auto" Margin="0" TextWrapping="Wrap" Text="{Binding OutSignalProperty.Mark, Mode=TwoWay}" VerticalAlignment="Stretch" FontSize="12" IsEnabled="{Binding OutSignalProperty.IsSelected}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-    				<Label x:Name="OutLabel" Content="{Binding OutSignalProperty.Guanhao}" Grid.Column="1" Margin="0" FontSize="8" HorizontalAlignment="Center"/>
+    				<Label x:Name="OutLabel" Content="{Binding OutSignalProperty.Guanhao}" Grid.Column="1" Margin="0" FontSize="8" HorizontalAlignment="Center" Width="Auto" Padding="8,5"/>
     				<TextBox x:Name="OutP1TextBox" Grid.Column="2" Margin="0" TextWrapping="Wrap" Text="{Binding OutSignalProperty.PartImenber, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}" FontSize="12" IsEnabled="{Binding OutSignalProperty.IsSelected}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-    				<Label x:Name="OutPlus1Label" Content="+" Grid.Column="3" Margin="0" FontSize="8" HorizontalAlignment="Stretch" Padding="2,5,1,5"/>
+    				<Label x:Name="OutPlus1Label" Content="+" Grid.Column="3" Margin="0" FontSize="12" HorizontalAlignment="Center" Padding="2,5,1,5" VerticalAlignment="Center"/>
     				<TextBox x:Name="OutP2Text" Grid.Column="4" Margin="0" TextWrapping="Wrap" Text="{Binding OutSignalProperty.PartII, Converter={StaticResource StringToIntConverter}, Mode=TwoWay}" SelectionOpacity="-2.6" IsEnabled="{Binding OutSignalProperty.IsSelected}" VerticalContentAlignment="Center"/>
-    				<ComboBox x:Name="OutComboBox"  Grid.Column="5" Margin="4,0,-10,0" Width="Auto" HorizontalAlignment="Stretch" ItemsSource="{Binding OutSignalProperty.SecNumbersProperty, Mode=TwoWay}" SelectedValue="{Binding OutSignalProperty.SectionNum, Mode=OneWayToSource}" SelectedIndex="{Binding OutSignalProperty.SelectedIndex, Mode=TwoWay}" IsEnabled="{Binding OutSignalProperty.IsSelected}">
+    				<ComboBox x:Name="OutComboBox"  Grid.Column="5" Margin="4,0,0,0" Width="Auto" HorizontalAlignment="Stretch" ItemsSource="{Binding OutSignalProperty.SecNumbersProperty, Mode=TwoWay}" SelectedValue="{Binding OutSignalProperty.SectionNum, Mode=OneWayToSource}" SelectedIndex="{Binding OutSignalProperty.SelectedIndex, Mode=TwoWay}" IsEnabled="{Binding OutSignalProperty.IsSelected}">
     					<i:Interaction.Triggers>
     						<i:EventTrigger EventName="SelectionChanged">
     							<Custom:EventToCommand x:Name="SelectionChangedEventToCommand1" Command="{Binding OutSignalProperty.SceNumberChangedCommand, Mode=OneWay}" CommandParameter="{Binding OutSignalProperty.TypeProperty}"/>
     						</i:EventTrigger>
     					</i:Interaction.Triggers>
     				</ComboBox>
+    				<CheckBox x:Name="outCheckBox" Content="" Grid.Column="6" Margin="6,6,9,6" IsChecked="{Binding OutSignalProperty.IsEnableProperty, Mode=TwoWay}"/>
     			</Grid>
     		</Grid>			
     	</DataTemplate>

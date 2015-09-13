@@ -37,6 +37,7 @@ namespace Inter_face.ViewModel
         private float _startPos;
         private float _endPos;
         private string _xhdataPath;
+        private string _xhsavefilePath;
 
         private GraphyDataOper GDoper;
         private SignalDataExportor SDexportor;
@@ -921,6 +922,10 @@ namespace Inter_face.ViewModel
                    UpdataDianfx(string.Format("{0}:{1}:{2}",
                        infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
                });
+            MessengerInstance.Register<DataType>(this, "ShowRightDialog", p => 
+            {
+                showRightDialog();
+            });
         }
 
         void _datascollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -1222,7 +1227,6 @@ namespace Inter_face.ViewModel
                  try
                  {
                      GDoper.GetQuxianData(out qxxlist, out qxslist);
-
                      sdvm = new SingleDataViewModel();
                      sdvm.TypeNameProperty = "曲线";
                      sdvm.ShowDataProperty = true;
@@ -1652,7 +1656,7 @@ namespace Inter_face.ViewModel
                                     string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj))
                                 });
                             }
-
+                            //M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z
                             float currentlen = float.Parse(item.Bjlx.Equals("3") ? item.Bjsj.Split(':')[4] : "200");
                             sdvm.DataCollection.Add(new StationDataMode()
                             {
@@ -1664,8 +1668,9 @@ namespace Inter_face.ViewModel
                                 SectionNumProperty = int.Parse(item.Ldh),
                                 ScaleProperty = ScaleProperty,
                                 SelectedProperty = false,
-                                PathDataProperty = (item.Bjlx.Equals("3") ? "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0 " :
-                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z"),
+                                PathDataProperty = (item.Bjlx.Equals("3") ? "1:1 0:#00DC5625:#FF4500:M334,361 L436,410 M334,410 L436,361 " : item.Bjlx.Equals("2") ?
+                                "1:1 0:#FFDC5625:#FF000000:M383,333 C377,333,371,328,371,322 C371,316,376,311,383,311 C389,310,394,315,394,321 C395,328,389,333,383,333 M424,337 L423,321 L394,322 M423,321 L423,308 M359,333 C352,333,347,328,347,322 C347,316,352,311,358,311 C365,311,370,316,370,322 C370,328,365,333,359,333 z" :
+                                "1:1 0:#FFDC5625:#FF000000:M371,143 C361,143,353,136,353,126 C353,117,361,109,371,109 C381,109,389,117,389,126 C389,136,381,143,371,143 M418,127 L388,127 M418,149 L418,105"),
                                 StationNameProperty = (item.Bjlx.Equals("1") ?
                                     string.Format("{0}:{1}:{2}", item.Bjlx, item.Bjsj, FormatStationPosition(item.Bjsj.Split(':')[1])) :
                                     string.Format("{0}:{1}", item.Bjlx, item.Bjsj))
@@ -1896,8 +1901,9 @@ namespace Inter_face.ViewModel
                                 SectionNumProperty = int.Parse(item.Ldh),
                                 ScaleProperty = ScaleProperty,
                                 SelectedProperty = false,
-                                PathDataProperty = (item.Bjlx.Equals("3") ? "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0 " :
-                                "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z"),
+                                PathDataProperty = (item.Bjlx.Equals("3") ? "1:1 0:#00DC5625:#FF4500:M334,361 L436,410 M334,410 L436,361" : item.Bjlx.Equals("2") ?
+                                "1:1 0:#FFDC5625:#FF000000:M388,269 C394,269,399,264,399,258 C399,251,394,247,388,247 C381,247,376,251,376,258 C376,264,381,269,388,269 M347,242 L347,258 L376,258 M347,257 L347,270 M412,269 C418,269,423,264,423,258 C423,252,418,247,412,247 C405,247,400,252,400,258 C400,264,405,269,412,267 z" :
+                                "1:1 0:#FFDC5625:#FF000000:M400,208 C409,208,418,200,418,191 C418,181,409,174,400,174 C390,174,382,181,382,191 C382,200,390,208,400,208 M353,191 L383,191 M353,171 L353,212"),
                                 StationNameProperty = (item.Bjlx.Equals("1") ?
                                     string.Format("{0}:{1}:{2}", item.Bjlx, item.Bjsj, FormatStationPosition(item.Bjsj.Split(':')[1])) :
                                     string.Format("{0}:{1}", item.Bjlx, item.Bjsj))
@@ -1994,246 +2000,7 @@ namespace Inter_face.ViewModel
                 }
                 return string.Empty;
             }
-        }
-
-
-
-       /* public void LoadLiChengXData()
-        {
-            if (!IsLiChengLoadedProperty)
-            {
-                removeAdataItem((int)DataType.Position);
-                return;
-            }
-
-            SingleDataViewModel sdvm = null;
-
-            foreach (ISingleDataViewModel Singleitem in _DataBin)
-            {
-                if (Singleitem.TypeNum == (int)DataType.Position)
-                {
-                    sdvm = (SingleDataViewModel)Singleitem;
-                    sdvm.ShowDataProperty = true;
-                    break;
-                }
-            }
-
-            if (pdxlist == null || pdxlist.Count == 0) return;
-
-            string pathes = string.Empty;
-            float lc = 0;
-
-
-            if (sdvm == null)
-            {
-                sdvm = new SingleDataViewModel();
-                sdvm.TypeNameProperty = "里程";
-                sdvm.ShowDataProperty = true;
-                sdvm.TypeNum = (int)DataType.Position;
-                try
-                {
-                    int starter = (int)Math.Floor(float.Parse(pdxlist[0].Qdglb));
-                    int ender = (int)Math.Ceiling(float.Parse(pdxlist[pdxlist.Count - 1].Qdglb) +
-                        float.Parse(pdxlist[pdxlist.Count - 1].Pc)/1000);
-
-                    for (int i = starter; i < ender; i++)
-                    {
-                        lc = 0;
-                        pathes = string.Empty;
-
-                        if (i == starter)
-                        {
-                            int firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);
-                            lc = firstl / ScaleProperty;
-                            pathes = string.Format("M0,25 L0,40 {0},40", lc);
-
-                            for (int j = (int)Math.Ceiling(firstl / 100d); j < 10; j++)
-                            {
-                                pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                lc += 100 / ScaleProperty;
-                            }
-
-                            sdvm.DataCollection.Add(new StationDataMode()
-                            {
-                                HatProperty = pdxlist[0].Gh,
-                                LengthProperty = (1000 - firstl) / ScaleProperty,
-                                PositionProperty = float.Parse(pdxlist[0].Qdglb),
-                                Type = DataType.Position,
-                                SectionNumProperty = int.Parse(pdxlist[0].Ldh),
-                                ScaleProperty = ScaleProperty,
-                                SelectedProperty = false,
-                                PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
-                                StationNameProperty = string.Empty
-                            });
-
-                            continue;
-                        }
-
-                        for (int k = 0; k < 10; k++)
-                        {
-                            if (k == 0)
-                            {
-                                pathes += string.Format("M{0},25 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                lc += 100 / ScaleProperty;
-                                continue;
-                            }
-
-                            pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                            lc += 100 / ScaleProperty;
-                        }
-
-                        sdvm.DataCollection.Add(new StationDataMode()
-                        {
-                            HatProperty = pdxlist[0].Gh,
-                            LengthProperty = 1000 / ScaleProperty,
-                            PositionProperty = i,
-                            Type = DataType.Position,
-                            SectionNumProperty = int.Parse(pdxlist[0].Ldh),
-                            ScaleProperty = ScaleProperty,
-                            SelectedProperty = false,
-                            PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
-                            StationNameProperty = string.Empty
-                        });
-                    }
-                }
-
-                catch (NullReferenceException ure)
-                {
-                    MessengerInstance.Send<string>(ure.Message, "ReadDataError");
-                }
-            }
-
-            int p = 0;
-            float offset = 0;          
-
-            foreach (string item in cdlxlist)
-            {
-                pathes = string.Empty;
-                lc = 0;
-                string[] parts = item.Split(':');
-                float et = 0;
-                double near = Math.Round(Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000), 3);
-                double far = Math.Round(Math.Floor(float.Parse(parts[1].Split('+')[1]) / 1000), 3);
-                //float offset = (float)(far - near);         
-                string farhat = parts[1].Split('+')[0];
-
-                if ((float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1])) != 0)
-                {
-                    for (int i = p; i < sdvm.DataCollection.Count; i++)
-                    {
-                        if (Math.Abs(sdvm.DataCollection[i].PositionProperty - (near + offset)) < 0.001)
-                        {
-                            sdvm.DataCollection[i].LengthProperty = (float.Parse(parts[0].Split('+')[1]) -
-                                sdvm.DataCollection[i].PositionProperty * 1000) / ScaleProperty;
-                            int nearcount = (int)Math.Ceiling((float.Parse(parts[0].Split('+')[1]) / 1000
-                                - sdvm.DataCollection[i].PositionProperty) * 10);
-
-                            for (int k = 0; k < nearcount; k++)
-                            {
-                                /*if (float.Parse(parts[0].Split('+')[1]) / near == 1)
-                                {
-                                    pathes += string.Format("M{0},25 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                    lc += 100 / ScaleProperty;
-                                    continue;
-                                }*/
-
-                               /* if (k == nearcount - 1)
-                                {
-                                    et = (float)((float.Parse(parts[0].Split('+')[1]) - near * 1000 - (nearcount - 1) * 100)
-                                     / ScaleProperty);
-                                    pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + et
-                                     );
-                                    lc = lc + et;
-                                    continue;
-                                }
-
-                                if (k == 0)
-                                {
-                                    pathes += string.Format("M{0},25 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                    lc += 100 / ScaleProperty;
-                                    continue;
-                                }
-
-                                pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                lc += 100 / ScaleProperty;
-                            }
-
-                            sdvm.DataCollection[i].PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes);
-
-                            pathes = string.Empty;
-                            lc = 0;
-
-                            offset += (float)Math.Round(((float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1])) / 1000), 3);
-                            for (int j = i + 1; j < sdvm.DataCollection.Count; j++)
-                            {
-                                sdvm.DataCollection[j].HatProperty = farhat;
-                                sdvm.DataCollection[j].PositionProperty += 
-                                    (float)Math.Round(((float.Parse(parts[1].Split('+')[1]) - 
-                                    float.Parse(parts[0].Split('+')[1])) / 1000), 3);
-                                sdvm.DataCollection[j].SectionNumProperty += 1;
-                            }
-
-                            nearcount = (int)Math.Floor((float.Parse(parts[1].Split('+')[1]) - far * 1000) / 100);
-                            for (int l = nearcount; l < 10; l++)
-                            {
-                                if (l == nearcount)
-                                {
-                                    et = (float)(((nearcount + 1) * 100 - (float.Parse(parts[1].Split('+')[1]) - far * 1000 - nearcount * 100))
-                                     / ScaleProperty);
-                                    pathes += string.Format("M{0},15 L{1},40 {2},40", lc, lc, lc + et);
-                                    lc = lc + et;
-                                    continue;
-                                }
-
-                                pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                lc += 100 / ScaleProperty;
-                            }
-
-                            StationDataMode newsdm = new StationDataMode()
-                            {
-                                HatProperty = farhat,
-                                LengthProperty = (float)((far + 1) * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
-                                PositionProperty = (float)(float.Parse(parts[1].Split('+')[1]) / 1000),
-                                Type = DataType.Position,
-                                SectionNumProperty = sdvm.DataCollection[i].SectionNumProperty + 1,
-                                ScaleProperty = ScaleProperty,
-                                SelectedProperty = false,
-                                PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
-                                StationNameProperty = string.Empty
-                            };
-
-                            sdvm.DataCollection.Insert(i + 1, newsdm);
-                            p = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            
-            if (_datascollection.Count == 0)
-            {
-                _datascollection.Add(sdvm);
-            }
-            else
-            {
-                for (int i = 0; i < _datascollection.Count; i++)
-                {
-                    if (sdvm.TypeNum < _datascollection[i].TypeNum)
-                    {
-                        _datascollection.Insert(i, sdvm);
-                        break;
-                    }
-                    else if (i == _datascollection.Count - 1 && sdvm.TypeNum != _datascollection[i].TypeNum)
-                    {
-                        _datascollection.Add(sdvm);
-                        break;
-                    }
-                }
-            }
-
-            CountProperty = DatasCollection.Count;
-            IsLiChengLoadedProperty = true;
-        }*/
+        }     
 
         public void LoadLiChengXData()
         {
@@ -2269,9 +2036,20 @@ namespace Inter_face.ViewModel
                 sdvm.TypeNum = (int)DataType.Position;
                 try
                 {
-                    int starter = (int)Math.Floor(float.Parse(pdxlist[0].Qdglb));
-                    int ender = (int)Math.Ceiling(float.Parse(pdxlist[pdxlist.Count - 1].Qdglb) +
-                        float.Parse(pdxlist[pdxlist.Count - 1].Pc) / 1000);
+                    int starter = (int)Math.Floor(float.Parse(pdxlist[0].Qdglb));                    
+                    
+                    float offset = 0;
+                    string[] parts = null;
+
+                    foreach (string cdl in cdlxlist)
+                    {
+                        parts = cdl.Split(':');
+                        offset += (float.Parse(parts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1]));
+                    }
+
+                    float rawender = float.Parse(pdxlist[pdxlist.Count - 1].Qdglb) +
+                        float.Parse(pdxlist[pdxlist.Count - 1].Pc) / 1000;
+                    int ender = (int)Math.Ceiling(rawender + offset / 1000);               
                     int step = 1;
                     int p = 0;
 
@@ -2310,15 +2088,17 @@ namespace Inter_face.ViewModel
                         }
                         
                         float le = 0;
-                        float et = 0;
-                        string[] parts = null;
+                        float et = 0;                        
                         int nearcount = 0;
 
-                        for (int j = p; j < cdlxlist.Count; j++)
+                        if (p < cdlxlist.Count)
                         {
-                            parts = cdlxlist[j].Split(':');
+                            parts = cdlxlist[p].Split(':');
                             if (Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i)
                             {
+                                offset -= (float.Parse(parts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1]));
+                                ender = (int)Math.Ceiling(rawender + offset / 1000);
+
                                 le = (float.Parse(parts[0].Split('+')[1]) - i * 1000) / ScaleProperty;
                                 nearcount = (int)Math.Ceiling((float.Parse(parts[0].Split('+')[1]) / 1000
                                 - i) * 10);
@@ -2355,7 +2135,7 @@ namespace Inter_face.ViewModel
                                         LengthProperty = le,
                                         PositionProperty = i,
                                         Type = DataType.Position,
-                                        SectionNumProperty = j + 1,
+                                        SectionNumProperty = p + 1,
                                         ScaleProperty = ScaleProperty,
                                         SelectedProperty = false,
                                         PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
@@ -2370,7 +2150,7 @@ namespace Inter_face.ViewModel
                                    parts[1].Split('+')[1] : parts[1].Split('+')[1] + ".000";
                                 int temp = int.Parse((float.Parse(far) / 1000).ToString("F3").Split('.')[1]);
                                 if (temp > 0 && temp < 100) temp = 100;
-                                nearcount = (int)(10 - Math.Floor((double)(temp / 100)));                            
+                                nearcount = (int)(10 - Math.Floor((double)(temp / 100)));
                                 le = (float)((Math.Ceiling(float.Parse(far) / 1000) * 1000
                                     - float.Parse(far)) / ScaleProperty);
 
@@ -2388,6 +2168,7 @@ namespace Inter_face.ViewModel
                                     pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
                                     lc += 100 / ScaleProperty;
                                 }
+
                                 if (nearcount != 10)
                                 {
                                     sdvm.DataCollection.Add(new StationDataMode()
@@ -2396,7 +2177,7 @@ namespace Inter_face.ViewModel
                                         LengthProperty = le,
                                         PositionProperty = (float)(float.Parse(parts[1].Split('+')[1]) / 1000),
                                         Type = DataType.Position,
-                                        SectionNumProperty = j + 2,
+                                        SectionNumProperty = p + 2,
                                         ScaleProperty = ScaleProperty,
                                         SelectedProperty = false,
                                         PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
@@ -2412,18 +2193,17 @@ namespace Inter_face.ViewModel
                                     int sec = (int)Math.Floor(float.Parse(parts[1].Split('+')[1]) / 1000);
                                     int fst = (int)Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000);
                                     step = sec - fst;
+
                                 }
-                                p = j + 1;                              
-                                break;
+                                p += 1;
                             }
                             else
                             {
                                 step = 1;
-                                continue;
                             }
-                        }
 
-                        if (parts != null && Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i) continue;
+                            if (parts != null && Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i) continue;
+                        }                        
 
                         lc = 0;
                         pathes = string.Empty;
@@ -2602,7 +2382,9 @@ namespace Inter_face.ViewModel
                         LengthProperty = 200 / ScaleProperty,
                         RealLength = 200 / ScaleProperty,
                         PathDataProperty =
-                        "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                        SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M383,333 C377,333,371,328,371,322 C371,316,376,311,383,311 C389,310,394,315,394,321 C395,328,389,333,383,333 M424,337 L423,321 L394,322 M423,321 L423,308 M359,333 C352,333,347,328,347,322 C347,316,352,311,358,311 C365,311,370,316,370,322 C370,328,365,333,359,333 z" :
+                        "1:1 0:#FFDC5625:#FF000000:M388,269 C394,269,399,264,399,258 C399,251,394,247,388,247 C381,247,376,251,376,258 C376,264,381,269,388,269 M347,242 L347,258 L376,258 M347,257 L347,270 M412,269 C418,269,423,264,423,258 C423,252,418,247,412,247 C405,247,400,252,400,258 C400,264,405,269,412,267 z",
                         PositionProperty = pos,
                         ScaleProperty = ScaleProperty,
                         SectionNumProperty = sec,
@@ -2812,6 +2594,56 @@ namespace Inter_face.ViewModel
                 moveXinhaoX(item.StationNameProperty, offset);
             }
         }
+
+        private void MoveSignal()
+        {
+            string[] parts = { };
+            float offset1 = 0;
+            float offset2 = 0;
+            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            StationDataMode nextsdm = null;
+            float newposition = 0;
+            int index = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+            if (index == CurrentDatasProperty.DataCollection.Count - 2)
+            {
+                nextsdm = sdm;
+                newposition = nextsdm.PositionProperty + (CurrentDatasProperty.DataCollection[index + 1].LengthProperty + 20) * sdm.ScaleProperty / 1000;
+            }
+            else
+            {
+                nextsdm = CurrentDatasProperty.DataCollection[index + 2] as StationDataMode;
+                if (nextsdm.StationNameProperty.StartsWith("3"))
+                {
+                    newposition = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
+                }
+                else
+                    newposition = nextsdm.PositionProperty;
+            }
+            StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 1] as StationDataMode;
+
+            for (int i = presdm.SectionNumProperty; i < sdm.SectionNumProperty; i++)
+            {
+                parts = cdlxlist[i - 1].Split(':');
+                offset1 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+            }
+
+            for (int i = sdm.SectionNumProperty; i < nextsdm.SectionNumProperty; i++)
+            {
+                parts = cdlxlist[i - 1].Split(':');
+                offset2 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+            }
+
+            mxwindow = new MoveXinhaoWindow();
+
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<string>
+                (string.Format("{0}:{1}:{2}:{3}:{4}",
+                presdm.PositionProperty,
+               newposition,
+                sdm.PositionProperty, offset1.ToString(), offset2.ToString()),
+                "Resources");
+            mxwindow.ShowDialog();
+        }
+
         private void MoveXinhaoS(string taken, float offset, string newSinge = "")
         {
             moveXinhaoX(taken, offset, newSinge);
@@ -2869,7 +2701,9 @@ namespace Inter_face.ViewModel
                         LengthProperty = 200 / ScaleProperty,
                         RealLength = 200 / ScaleProperty,
                         PathDataProperty =
-                        "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                          SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M383,333 C377,333,371,328,371,322 C371,316,376,311,383,311 C389,310,394,315,394,321 C395,328,389,333,383,333 M424,337 L423,321 L394,322 M423,321 L423,308 M359,333 C352,333,347,328,347,322 C347,316,352,311,358,311 C365,311,370,316,370,322 C370,328,365,333,359,333 z" :
+                        "1:1 0:#FFDC5625:#FF000000:M388,269 C394,269,399,264,399,258 C399,251,394,247,388,247 C381,247,376,251,376,258 C376,264,381,269,388,269 M347,242 L347,258 L376,258 M347,257 L347,270 M412,269 C418,269,423,264,423,258 C423,252,418,247,412,247 C405,247,400,252,400,258 C400,264,405,269,412,267 z",
                         PositionProperty = pos,
                         ScaleProperty = ScaleProperty,
                         SectionNumProperty = secnum,
@@ -3005,7 +2839,10 @@ namespace Inter_face.ViewModel
                                 cdlxlist[secnum - 1].Split(':')[0].Split('+')[0],
                                 LengthProperty = 200 / ScaleProperty,
                                 RealLength = 200 / ScaleProperty,
-                                PathDataProperty = "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
+                                PathDataProperty = 
+                                SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M383,333 C377,333,371,328,371,322 C371,316,376,311,383,311 C389,310,394,315,394,321 C395,328,389,333,383,333 M424,337 L423,321 L394,322 M423,321 L423,308 M359,333 C352,333,347,328,347,322 C347,316,352,311,358,311 C365,311,370,316,370,322 C370,328,365,333,359,333 z" :
+                        "1:1 0:#FFDC5625:#FF000000:M388,269 C394,269,399,264,399,258 C399,251,394,247,388,247 C381,247,376,251,376,258 C376,264,381,269,388,269 M347,242 L347,258 L376,258 M347,257 L347,270 M412,269 C418,269,423,264,423,258 C423,252,418,247,412,247 C405,247,400,252,400,258 C400,264,405,269,412,267 z",
                                 PositionProperty = pos,
                                 ScaleProperty = ScaleProperty,
                                 SectionNumProperty = secnum,
@@ -3426,8 +3263,10 @@ namespace Inter_face.ViewModel
                                     LengthProperty = 200 / ScaleProperty,
                                     RealLength = 200 / ScaleProperty,
                                     PathDataProperty =
-                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                    PositionProperty = float.Parse(item.Glb),
+                                    SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M371,143 C361,143,353,136,353,126 C353,117,361,109,371,109 C381,109,389,117,389,126 C389,136,381,143,371,143 M418,127 L388,127 M418,149 L418,105" :
+                        "1:1 0:#FFDC5625:#FF000000:M400,208 C409,208,418,200,418,191 C418,181,409,174,400,174 C390,174,382,181,382,191 C382,200,390,208,400,208 M353,191 L383,191 M353,171 L353,212",
+                                    PositionProperty = -1.0f,
                                     ScaleProperty = ScaleProperty,
                                     SectionNumProperty = int.Parse(item.Ldh),
                                     SelectedProperty = false,
@@ -3442,8 +3281,10 @@ namespace Inter_face.ViewModel
                                     LengthProperty = 200 / ScaleProperty,
                                     RealLength = 200 / ScaleProperty,
                                     PathDataProperty =
-                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                    PositionProperty = float.Parse(item.Glb),
+                                    SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M371,143 C361,143,353,136,353,126 C353,117,361,109,371,109 C381,109,389,117,389,126 C389,136,381,143,371,143 M418,127 L388,127 M418,149 L418,105" :
+                        "1:1 0:#FFDC5625:#FF000000:M400,208 C409,208,418,200,418,191 C418,181,409,174,400,174 C390,174,382,181,382,191 C382,200,390,208,400,208 M353,191 L383,191 M353,171 L353,212",
+                                    PositionProperty = -1.0f,
                                     ScaleProperty = ScaleProperty,
                                     SectionNumProperty = int.Parse(item.Ldh),
                                     SelectedProperty = false,
@@ -3460,8 +3301,10 @@ namespace Inter_face.ViewModel
                                     LengthProperty = 200 / ScaleProperty,
                                     RealLength = 200 / ScaleProperty,
                                     PathDataProperty =
-                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                    PositionProperty = float.Parse(item.Glb),
+                                    SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M371,143 C361,143,353,136,353,126 C353,117,361,109,371,109 C381,109,389,117,389,126 C389,136,381,143,371,143 M418,127 L388,127 M418,149 L418,105" :
+                        "1:1 0:#FFDC5625:#FF000000:M400,208 C409,208,418,200,418,191 C418,181,409,174,400,174 C390,174,382,181,382,191 C382,200,390,208,400,208 M353,191 L383,191 M353,171 L353,212",
+                                    PositionProperty = -1.0f,
                                     ScaleProperty = ScaleProperty,
                                     SectionNumProperty = int.Parse(item.Ldh),
                                     SelectedProperty = false,
@@ -3478,8 +3321,10 @@ namespace Inter_face.ViewModel
                                     LengthProperty = 200 / ScaleProperty,
                                     RealLength = 200 / ScaleProperty,
                                     PathDataProperty =
-                                    "1:1 0:#FFDC5625:#FF35F30E:M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z",
-                                    PositionProperty = float.Parse(item.Glb),
+                                    SeletedXinhaoS ?
+                        "1:1 0:#FFDC5625:#FF000000:M371,143 C361,143,353,136,353,126 C353,117,361,109,371,109 C381,109,389,117,389,126 C389,136,381,143,371,143 M418,127 L388,127 M418,149 L418,105" :
+                        "1:1 0:#FFDC5625:#FF000000:M400,208 C409,208,418,200,418,191 C418,181,409,174,400,174 C390,174,382,181,382,191 C382,200,390,208,400,208 M353,191 L383,191 M353,171 L353,212",
+                                    PositionProperty = -1.0f,
                                     ScaleProperty = ScaleProperty,
                                     SectionNumProperty = int.Parse(item.Ldh),
                                     SelectedProperty = false,
@@ -3565,27 +3410,36 @@ namespace Inter_face.ViewModel
             SignalExportData sig_data_s = new SignalExportData();
             SignalExportData sig_data_x = new SignalExportData();
             ISingleDataViewModel singledata;
+            StationDataMode currentxinhao = null;
             StationDataMode currentqj = null;
             StationDataMode nextxinhao = null;
+            StationDataMode next2xinhao = null;
+            StationDataMode nextqj = null;
             float offset = 0;
             string[] parts;
+            string dfxinfo;
 
             try
             {
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
                 if (singledata.DataCollection.Count > 1)
                 {
-                    sig_data_s.StartPosProperty = singledata.DataCollection[1].PositionProperty;
+                    sig_data_s.StartPosProperty = singledata.DataCollection[1].PositionProperty * 1000;
+
                     for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
                     {
-                        offset = 0;
-                        sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                        sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+                        currentxinhao = singledata.DataCollection[i] as StationDataMode;
+                        if (currentxinhao.StationNameProperty.Split(':')[0].Equals("3"))
+                            continue;
 
-                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                        offset = 0;
+                        sig_data_s.IDProperty.Add(currentxinhao.StationNameProperty.Split(':')[1]);
+                        sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
+
+                        if (currentxinhao.StationNameProperty.Split(':')[0].Equals("1"))
                         {
                             sig_data_s.StationNameProperty.Add(
-                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                currentxinhao.StationNameProperty.Split(':')[2]);
                         }
                         else
                         {
@@ -3598,39 +3452,102 @@ namespace Inter_face.ViewModel
                         currentqj = singledata.DataCollection[i + 1] as StationDataMode;
                         nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
 
-                        sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        if (!nextxinhao.StationNameProperty.Split(':')[0].Equals("3"))
                         {
-                            sig_data_s.GapProperty.Add(0);
+                            sig_data_s.DistenceProperty.Add((currentqj.RealLength) * currentqj.ScaleProperty);
+
+                            if (currentxinhao.SectionNumProperty == nextxinhao.SectionNumProperty)
+                            {
+                                sig_data_s.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_s.GapProperty.Add(offset);
+                            }
+
+                            sig_data_s.DianFxInfoProperty.Add(string.Empty);
                         }
                         else
                         {
-                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            nextqj =singledata.DataCollection[i + 3] as StationDataMode;
+                            sig_data_s.DistenceProperty.Add((currentqj.RealLength + nextqj.RealLength) * currentqj.ScaleProperty);
+                            dfxinfo = nextxinhao.StationNameProperty;
+
+                            if (currentxinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
                             {
-                                parts = cdlxlist[j - 1].Split(':');
-                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                dfxinfo += ":0";
                             }
-                            sig_data_s.GapProperty.Add(offset);
-                        }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            next2xinhao = singledata.DataCollection[i + 4] as StationDataMode;
+                            if (next2xinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
+                            {
+                                dfxinfo += ":0";
+                            }
+                            else
+                            {
+                                for (int j = int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            offset = 0;
+                            if (currentxinhao.SectionNumProperty == next2xinhao.SectionNumProperty)
+                            {
+                                sig_data_s.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_s.GapProperty.Add(offset);
+                            }
+
+                            sig_data_s.DianFxInfoProperty.Add(dfxinfo);
+                        }                        
                     }
                 }
 
                 offset = 0;
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+
                 if (singledata.DataCollection.Count > 1)
                 {
-                    sig_data_x.StartPosProperty = singledata.DataCollection[1].PositionProperty;
+                    sig_data_x.StartPosProperty = singledata.DataCollection[1].PositionProperty * 1000;
+
                     for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
                     {
-                        offset = 0;
-                        sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                        sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
+                        currentxinhao = singledata.DataCollection[i] as StationDataMode;
+                        if (currentxinhao.StationNameProperty.Split(':')[0].Equals("3"))
+                            continue;
 
-                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
+                        offset = 0;
+                        sig_data_x.IDProperty.Add(currentxinhao.StationNameProperty.Split(':')[1]);
+                        sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
+
+                        if (currentxinhao.StationNameProperty.Split(':')[0].Equals("1"))
                         {
                             sig_data_x.StationNameProperty.Add(
-                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                                currentxinhao.StationNameProperty.Split(':')[2]);
                         }
                         else
                         {
@@ -3639,24 +3556,81 @@ namespace Inter_face.ViewModel
 
                         if (i + 1 == singledata.DataCollection.Count - 1)
                             break;
+
                         currentqj = singledata.DataCollection[i + 1] as StationDataMode;
                         nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
 
-                        sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        if (!nextxinhao.StationNameProperty.Split(':')[0].Equals("3"))
                         {
-                            sig_data_x.GapProperty.Add(0);
+                            sig_data_x.DistenceProperty.Add((currentqj.RealLength) * currentqj.ScaleProperty);
+                            if (currentxinhao.SectionNumProperty == nextxinhao.SectionNumProperty)
+                            {
+                                sig_data_x.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_x.GapProperty.Add(offset);
+                            }
+
+                            sig_data_x.DianFxInfoProperty.Add(string.Empty);
                         }
                         else
                         {
-                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            nextqj = singledata.DataCollection[i + 3] as StationDataMode;
+                            sig_data_x.DistenceProperty.Add((currentqj.RealLength + nextqj.RealLength) * currentqj.ScaleProperty);
+                            dfxinfo = nextxinhao.StationNameProperty;
+
+                            if (currentxinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
                             {
-                                parts = cdlxlist[j - 1].Split(':');
-                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                dfxinfo += ":0";
                             }
-                            sig_data_x.GapProperty.Add(offset);
-                        }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            next2xinhao = singledata.DataCollection[i + 4] as StationDataMode;
+                            if (next2xinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
+                            {
+                                dfxinfo += ":0";
+                            }
+                            else
+                            {
+                                for (int j = int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            offset = 0;
+                            if (currentxinhao.SectionNumProperty == nextxinhao.SectionNumProperty)
+                            {
+                                sig_data_x.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_x.GapProperty.Add(offset);
+                            }
+
+                            sig_data_x.DianFxInfoProperty.Add(dfxinfo);
+                        }                       
                     }
                 }
 
@@ -3690,11 +3664,15 @@ namespace Inter_face.ViewModel
             List<SignalExportData> datas_x = new List<SignalExportData>();
 
             ISingleDataViewModel singledata;
+            StationDataMode currentxinhao = null;
             StationDataMode currentqj = null;
             StationDataMode nextxinhao = null;
+            StationDataMode next2xinhao = null;
+            StationDataMode nextqj = null;
             string stationame = string.Empty;
             float offset = 0;
             string[] parts;
+            string dfxinfo = string.Empty;
 
             try
             {
@@ -3703,11 +3681,17 @@ namespace Inter_face.ViewModel
                 {
                     for (int i = singledata.DataCollection.IndexOf(
                         singledata.DataCollection.First(
-                        p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                        p => (p as StationDataMode).StationNameProperty.Split(':')[0].Equals("1")));
+                        i < singledata.DataCollection.Count - 1; i += 2)
                     {
-                        offset = 0;
-                        parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
-                        if (parts.Length > 2)
+                        currentxinhao = singledata.DataCollection[i] as StationDataMode;
+                        parts = currentxinhao.StationNameProperty.Split(':');
+                        if (parts[0].Equals("3"))
+                            continue;
+
+                        offset = 0;                        
+
+                        if (parts[0].Equals("1"))
                         {
                             if (!parts[2].Equals(stationame))
                             {
@@ -3715,78 +3699,130 @@ namespace Inter_face.ViewModel
                                 {
                                     sig_data_s = new SignalExportData();
                                     stationame = parts[2];
-
-                                    sig_data_s.StartPosProperty = singledata.DataCollection[i].PositionProperty;
+                                    sig_data_s.StartPosProperty = currentxinhao.PositionProperty * 1000;
                                 }
                                 else
                                 {
                                     stationame = string.Empty;
-                                    sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                                    sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                                    {
-                                        sig_data_s.StationNameProperty.Add(
-                                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                                    }
-                                    else
-                                    {
-                                        sig_data_s.StationNameProperty.Add(string.Empty);
-                                    }
+                                    sig_data_s.IDProperty.Add(parts[1]);
+                                    sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
+                                    sig_data_s.StationNameProperty.Add(parts[2]);
                                     datas_s.Add(sig_data_s);
                                     continue;
                                 }
                             }
                         }
 
-                        sig_data_s.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                        sig_data_s.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                        {
-                            sig_data_s.StationNameProperty.Add(
-                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                        sig_data_s.IDProperty.Add(parts[1]);
+                        sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
+                        if (parts[0].Equals("1"))
+                        {                            
+                            sig_data_s.StationNameProperty.Add(parts[2]);
                         }
                         else
                         {
                             sig_data_s.StationNameProperty.Add(string.Empty);
                         }
-
+                        
                         if (i + 1 == singledata.DataCollection.Count - 1)
                             break;
 
                         currentqj = singledata.DataCollection[i + 1] as StationDataMode;
                         nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
 
-                        sig_data_s.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        if (!nextxinhao.StationNameProperty.Split(':')[0].Equals("3"))
                         {
-                            sig_data_s.GapProperty.Add(0);
+                            sig_data_s.DistenceProperty.Add((currentqj.RealLength) * currentqj.ScaleProperty);
+
+                            if (currentxinhao.SectionNumProperty == nextxinhao.SectionNumProperty)
+                            {
+                                sig_data_s.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_s.GapProperty.Add(offset);
+                            }
+
+                            sig_data_s.DianFxInfoProperty.Add(string.Empty);
                         }
                         else
                         {
-                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            nextqj = singledata.DataCollection[i + 3] as StationDataMode;
+                            sig_data_s.DistenceProperty.Add((currentqj.RealLength + nextqj.RealLength) * currentqj.ScaleProperty);
+                            dfxinfo = nextxinhao.StationNameProperty;
+
+                            if (currentxinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
                             {
-                                parts = cdlxlist[j - 1].Split(':');
-                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                dfxinfo += ":0";
                             }
-                            sig_data_s.GapProperty.Add(offset);
-                        }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            next2xinhao = singledata.DataCollection[i + 4] as StationDataMode;
+                            if (next2xinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
+                            {
+                                dfxinfo += ":0";
+                            }
+                            else
+                            {
+                                for (int j = int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            offset = 0;
+                            if (currentxinhao.SectionNumProperty == next2xinhao.SectionNumProperty)
+                            {
+                                sig_data_s.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_s.GapProperty.Add(offset);
+                            }
+
+                            sig_data_s.DianFxInfoProperty.Add(dfxinfo);
+                        }                        
                     }
                 }
 
                 offset = 0;
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+
                 if (singledata.DataCollection.Count > 1)
                 {
                     for (int i = singledata.DataCollection.IndexOf(
                         singledata.DataCollection.First(
-                        p => (p as StationDataMode).StationNameProperty.Split(':').Length > 2)); i < singledata.DataCollection.Count - 1; i += 2)
+                        p => (p as StationDataMode).StationNameProperty.Split(':')[0].Equals("1")));
+                        i < singledata.DataCollection.Count - 1; i += 2)
                     {
+                        currentxinhao = singledata.DataCollection[i] as StationDataMode;
+                        parts = currentxinhao.StationNameProperty.Split(':');
+                        if (parts[0].Equals("3"))
+                            continue;
+
                         offset = 0;
-                        parts = (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':');
-                        if (parts.Length > 2)
+                       
+                        if (parts[0].Equals("1"))
                         {
                             if (!parts[2].Equals(stationame))
                             {
@@ -3794,37 +3830,25 @@ namespace Inter_face.ViewModel
                                 {
                                     sig_data_x = new SignalExportData();
                                     stationame = parts[2];
-
-                                    sig_data_x.StartPosProperty = singledata.DataCollection[i].PositionProperty;
+                                    sig_data_x.StartPosProperty = currentxinhao.PositionProperty * 1000;
                                 }
                                 else
                                 {
                                     stationame = string.Empty;
-                                    sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                                    sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                                    {
-                                        sig_data_x.StationNameProperty.Add(
-                                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
-                                    }
-                                    else
-                                    {
-                                        sig_data_x.StationNameProperty.Add(string.Empty);
-                                    }
+                                    sig_data_x.IDProperty.Add(parts[1]);
+                                    sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
+                                    sig_data_x.StationNameProperty.Add(parts[2]);
                                     datas_x.Add(sig_data_x);
                                     continue;
                                 }
                             }
                         }
 
-                        sig_data_x.IDProperty.Add((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[1]);
-                        sig_data_x.HatProperty.Add((singledata.DataCollection[i] as StationDataMode).HatProperty);
-
-                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[0].Equals("1"))
-                        {
-                            sig_data_x.StationNameProperty.Add(
-                                (singledata.DataCollection[i] as StationDataMode).StationNameProperty.Split(':')[2]);
+                        sig_data_x.IDProperty.Add(parts[1]);
+                        sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
+                        if (parts[0].Equals("1"))
+                        {                            
+                            sig_data_x.StationNameProperty.Add(parts[2]);
                         }
                         else
                         {
@@ -3837,21 +3861,93 @@ namespace Inter_face.ViewModel
                         currentqj = singledata.DataCollection[i + 1] as StationDataMode;
                         nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
 
-                        sig_data_x.DistenceProperty.Add((currentqj.LengthProperty + nextxinhao.LengthProperty) * currentqj.ScaleProperty);
-
-                        if (singledata.DataCollection[i].SectionNumProperty == nextxinhao.SectionNumProperty)
+                        if (!nextxinhao.StationNameProperty.Split(':')[0].Equals("3"))
                         {
-                            sig_data_x.GapProperty.Add(0);
+                            sig_data_x.DistenceProperty.Add((currentqj.RealLength) * currentqj.ScaleProperty);
+
+                            if (currentxinhao.SectionNumProperty == nextxinhao.SectionNumProperty)
+                            {
+                                sig_data_x.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_x.GapProperty.Add(offset);
+                            }
+
+                            sig_data_x.DianFxInfoProperty.Add(string.Empty);
                         }
                         else
                         {
-                            for (int j = singledata.DataCollection[i].SectionNumProperty; j < nextxinhao.SectionNumProperty; j++)
+                            nextqj = singledata.DataCollection[i + 3] as StationDataMode;
+                            sig_data_x.DistenceProperty.Add((currentqj.RealLength + nextqj.RealLength) * currentqj.ScaleProperty);
+                            dfxinfo = nextxinhao.StationNameProperty;
+
+                            if (currentxinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
                             {
-                                parts = cdlxlist[j - 1].Split(':');
-                                offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                dfxinfo += ":0";
                             }
-                            sig_data_x.GapProperty.Add(offset);
-                        }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            next2xinhao = singledata.DataCollection[i + 4] as StationDataMode;
+                            if (next2xinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
+                            {
+                                dfxinfo += ":0";
+                            }
+                            else
+                            {
+                                for (int j = int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            next2xinhao = singledata.DataCollection[i + 4] as StationDataMode;
+                            if (next2xinhao.SectionNumProperty.ToString() == dfxinfo.Split(':')[2].Split('+')[1])
+                            {
+                                dfxinfo += ":0";
+                            }
+                            else
+                            {
+                                for (int j = int.Parse(dfxinfo.Split(':')[2].Split('+')[1]); j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                dfxinfo += (":" + offset.ToString());
+                            }
+
+                            offset = 0;
+                            if (currentxinhao.SectionNumProperty == next2xinhao.SectionNumProperty)
+                            {
+                                sig_data_x.GapProperty.Add(0);
+                            }
+                            else
+                            {
+                                for (int j = currentxinhao.SectionNumProperty; j < next2xinhao.SectionNumProperty; j++)
+                                {
+                                    parts = cdlxlist[j - 1].Split(':');
+                                    offset += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
+                                }
+                                sig_data_x.GapProperty.Add(offset);
+                            }
+
+                            sig_data_x.DianFxInfoProperty.Add(dfxinfo);
+                        }                        
                     }
                 }
 
@@ -4362,6 +4458,58 @@ namespace Inter_face.ViewModel
             }
         }
 
+        private void showRightDialog()
+        {
+            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            if (sdm != null)
+            {
+                if (sdm.Type == DataType.Single || sdm.Type == DataType.SingleS)
+                {
+                    if (sdm.StationNameProperty.Split(':')[0].Equals("2"))
+                    {
+                        MoveSignal();
+                    }
+                    else if (sdm.StationNameProperty.Split(':')[0].Equals("3"))
+                    {
+                        beginModifyDianfx();
+                    }
+                }
+            }
+           
+        }
+
+        private void ExportToOtFormat()
+        {
+            sfwindow = new SaveFileDialog();
+            sfwindow.Filter = "All files (*.*)|*.*";
+            sfwindow.Title = "输出文件";
+            if (sfwindow.ShowDialog() == true)
+            {
+                try
+                {
+                    Cursor = 1;
+                    GDoper.GetPoDuData(out pdxlist, out pdslist);
+                    cdlxlist = pdxlist.TakeWhile(p => p.Cdl != "+:+").Select(q => q.Cdl).ToList();
+                    if (cdlxlist.Count == 0)
+                    {
+                        cdlxlist.Add("0+0:0+0");
+                    }
+                    GDoper.GetQuxianData(out qxxlist, out qxslist);
+                    GDoper.GetBjData(out czxlist, out czslist);
+
+                    ChangeToTxt ctt = new ChangeToTxt();
+
+                    ctt.ChangeToOtFile(qxxlist, pdxlist, czxlist, cdlxlist.ToArray(), sfwindow.FileName);
+                    Cursor = 0;
+                    MessengerInstance.Send<string>("输出OT文件完成！", "ReadDataRight");
+                }
+                catch
+                {
+                    MessengerInstance.Send<string>("输出OT文件失败！", "ReadDataError");
+                }
+            }            
+            
+        }
         #region Commands
        
         private RelayCommand _showdataChangedCommand;
@@ -4644,52 +4792,7 @@ namespace Inter_face.ViewModel
                                               {
                                                   return;
                                               }
-                                                  string[] parts = { };
-                                                  float offset1 = 0;
-                                                  float offset2 = 0;
-                                                  StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
-                                                  StationDataMode nextsdm = null;
-                                                  float newposition = 0;
-                                                  int index = CurrentDatasProperty.DataCollection.IndexOf(sdm);
-                                                  if (index == CurrentDatasProperty.DataCollection.Count - 2)
-                                                  {
-                                                      nextsdm = sdm;
-                                                      newposition = nextsdm.PositionProperty + (CurrentDatasProperty.DataCollection[index + 1].LengthProperty + 20) * sdm.ScaleProperty / 1000;
-                                                  }
-                                                  else
-                                                  {
-                                                      nextsdm = CurrentDatasProperty.DataCollection[index + 2] as StationDataMode;
-                                                      if (nextsdm.StationNameProperty.StartsWith("3"))
-                                                      {
-                                                          newposition = float.Parse(nextsdm.StationNameProperty.Split(':')[2].Split('+')[0]);
-                                                      }
-                                                      else
-                                                          newposition = nextsdm.PositionProperty;
-                                                  }
-                                                  StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 1] as StationDataMode;
-
-                                                  for (int i = presdm.SectionNumProperty; i < sdm.SectionNumProperty; i++)
-                                                  {
-                                                      parts = cdlxlist[i - 1].Split(':');
-                                                      offset1 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                                                  }
-
-                                                  for (int i = sdm.SectionNumProperty; i < nextsdm.SectionNumProperty; i++)
-                                                  {
-                                                      parts = cdlxlist[i - 1].Split(':');
-                                                      offset2 += (float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]));
-                                                  }
-
-                                                  mxwindow = new MoveXinhaoWindow();
-
-                                                  GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<string>
-                                                      (string.Format("{0}:{1}:{2}:{3}:{4}",
-                                                      presdm.PositionProperty,
-                                                     newposition,
-                                                      sdm.PositionProperty, offset1.ToString(), offset2.ToString()),
-                                                      "Resources");
-                                                  mxwindow.ShowDialog();
-                                              
+                                              MoveSignal();                                              
                                           },
                                           () => 
                                           {
@@ -5004,6 +5107,23 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                         saveOtherXhData();
+                    }));
+            }
+        }
+        private RelayCommand _exportToOTformatCommand;
+
+        /// <summary>
+        /// Gets the ExportToOTformatCommand.
+        /// </summary>
+        public RelayCommand ExportToOTformatCommand
+        {
+            get
+            {
+                return _exportToOTformatCommand
+                    ?? (_exportToOTformatCommand = new RelayCommand(
+                    () =>
+                    {
+                        ExportToOtFormat();
                     }));
             }
         }

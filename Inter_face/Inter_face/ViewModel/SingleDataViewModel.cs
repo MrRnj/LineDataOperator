@@ -399,6 +399,22 @@ namespace Inter_face.ViewModel
             }
         }
 
-        
+        private RelayCommand _showrightdialogCommand;
+
+        /// <summary>
+        /// Gets the ShowRightDialogCommand.
+        /// </summary>
+        public RelayCommand ShowRightDialogCommand
+        {
+            get
+            {
+                return _showrightdialogCommand
+                    ?? (_showrightdialogCommand = new RelayCommand(
+                    () =>
+                    {
+                        MessengerInstance.Send<DataType>((DataType)TypeNum, "ShowRightDialog"); 
+                    }));
+            }
+        }       
     }
 }

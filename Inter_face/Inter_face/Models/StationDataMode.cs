@@ -293,6 +293,6 @@ namespace Inter_face.Models
                 _reallengthProperty = value;
                 RaisePropertyChanged(RealLengthPropertyName);
             }
-        }
+        }       
     }
 }

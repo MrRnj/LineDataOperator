@@ -69,7 +69,8 @@ namespace Inter_face.ViewModel
                                     CdlInfoProperty = cdlist,
                                     Mark = inneritem.StationNameProperty.Split(':')[1],
                                     SelectedIndex = inneritem.SectionNumProperty - 1,
-                                    TypeProperty = "In"
+                                    TypeProperty = "In",
+                                    IsEnableProperty = inneritem.PositionProperty == -1 ? false : true
                                 };
                             }
                             else if (inneritem.StationNameProperty.Split(':')[3].Equals("C"))
@@ -85,7 +86,8 @@ namespace Inter_face.ViewModel
                                     CdlInfoProperty = cdlist,
                                     Mark = inneritem.StationNameProperty.Split(':')[1],
                                     SelectedIndex = inneritem.SectionNumProperty - 1,
-                                    TypeProperty = "Out"                                   
+                                    TypeProperty = "Out",
+                                    IsEnableProperty = inneritem.PositionProperty == -1 ? false : true                              
                                 };
                             }
                         }
@@ -207,7 +209,9 @@ namespace Inter_face.ViewModel
                     parts = inneritem.StationNameProperty.Split(':');
                     if (parts[3].Equals("J"))
                     {
-                        if (item.InSignalProperty.PartImenber == -1 || item.InSignalProperty.PartII == -1)
+                        if (!item.InSignalProperty.IsEnableProperty ||
+                            item.InSignalProperty.PartImenber == -1 || 
+                            item.InSignalProperty.PartII == -1)
                         {
                             inneritem.PositionProperty = -1;
                         }
@@ -223,7 +227,9 @@ namespace Inter_face.ViewModel
                     }
                     else if (parts[3].Equals("C"))
                     {
-                        inneritem.PositionProperty = item.OutSignalProperty.PartImenber == -1 || item.OutSignalProperty.PartII == -1 ?
+                        inneritem.PositionProperty = !item.OutSignalProperty.IsEnableProperty ||
+                                                      item.OutSignalProperty.PartImenber == -1 ||
+                                                      item.OutSignalProperty.PartII == -1 ?
                             -1 :
                            float.Parse(item.OutSignalProperty.PartImenber.ToString() + "." + (item.OutSignalProperty.PartII).ToString());
                         inneritem.SectionNumProperty = item.OutSignalProperty.SectionNum == null ?
@@ -250,7 +256,7 @@ namespace Inter_face.ViewModel
         {            
 
             foreach (StationSignaleDataModel item in StationSignalCollection)
-            {
+            {                
                 if (CheckSingleCdlinfo(item.InSignalProperty))
                 {
                     if (!CheckSingleCdlinfo(item.OutSignalProperty))
@@ -273,6 +279,9 @@ namespace Inter_face.ViewModel
             float position;
             int secnumber;
             errorMsg = string.Empty;
+
+            if (!sdvm.IsEnableProperty)
+                return true;
 
             if (sdvm.PartImenber != -1 || sdvm.PartII != -1)
             {

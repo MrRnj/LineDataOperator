@@ -17,5 +17,6 @@ namespace Inter_face.ViewModel
         int SelectedIndex { get; set; }
         RelayCommand ShowDataChangedCommand { get; }
         RelayCommand<System.Windows.Controls.SelectionChangedEventArgs> SelectionChangedCommand { get; }
+        RelayCommand ShowRightDialogCommand { get; }
     }
 }

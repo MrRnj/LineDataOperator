@@ -88,6 +88,7 @@
 		<Image x:Key="InsertSig" Source="icons/InsertSig.png" Stretch="Fill"/>
 		<Image x:Key="saveother" Source="icons/saveother.png" Stretch="Fill"/>
 		<Image x:Key="opensignals" Source="icons/opensignals.png" Stretch="Fill"/>
+        <Image x:Key="opentrack" Source="icons/opentrack.png" Stretch="Uniform"/>
         <ToolTip x:Key="NewSheetTip">
             <Grid>
                 <Grid.RowDefinitions>
@@ -176,10 +177,15 @@
                     </StackPanel>
                 </Grid.ToolTip>
                 <Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
-                    <Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
-                        <Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />
-                    </Canvas>
-                </Viewbox>
+            		<Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
+            			<i:Interaction.Triggers>
+            				<i:EventTrigger EventName="MouseDoubleCLick">
+            					<Custom:EventToCommand x:Name="DoubleClickEventToCommand"/>
+            				</i:EventTrigger>
+            			</i:Interaction.Triggers>
+            			<Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />
+            		</Canvas>
+            	</Viewbox>
                 <Path Data="M0.5,0.3 L0,49" Margin="0" Stretch="Fill" Stroke="Gray" Grid.Column="0" HorizontalAlignment="Left" Width="1" Fill="Black" Opacity="{Binding Converter={StaticResource DmToVisibilityConverter}, Mode=OneTime}" StrokeDashCap="Square" StrokeThickness="3" Grid.RowSpan="3" Visibility="Visible">
                     <Path.RenderTransform>
                         <TransformGroup>
@@ -221,6 +227,9 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <Custom:EventToCommand x:Name="SelectionChangedEventToCommand" Command="{Binding SelectionChangedCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseDoubleCLick">
+                        	<Custom:EventToCommand x:Name="DoubleClickEventToCommand" Command="{Binding ShowRightDialogCommand, Mode=OneWay}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ListBox>
@@ -336,6 +345,7 @@
 				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox Header="输出" >
 					<Fluent:Button x:Name="changemerge" Header="输出结果" LargeIcon="{StaticResource resulticon}" Click="changemerge_Click"/>
+                    <Fluent:Button x:Name="exportoto" Header="输出OT格式" LargeIcon="{StaticResource opentrack}" Command="{Binding DatasCollectionProperty.ExportToOTformatCommand, Mode=OneWay}"/>
 				</Fluent:RibbonGroupBox>
 			</Fluent:RibbonTabItem>
 			<Fluent:RibbonTabItem x:Name="ShowDataRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" d:LayoutOverrides="Height" Header="数据显示" IsSelected="True">

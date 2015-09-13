@@ -192,7 +192,35 @@ namespace Inter_face.Models
                 RaisePropertyChanged(IsSelectedPropertyName);
             }
         }
+        /// <summary>
+        /// The <see cref="IsEnableProperty" /> property's name.
+        /// </summary>
+        public const string IsEnablePropertyPropertyName = "IsEnableProperty";
 
+        private bool _isenableProperty = true;
+
+        /// <summary>
+        /// Sets and gets the IsEnableProperty property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsEnableProperty
+        {
+            get
+            {
+                return _isenableProperty;
+            }
+
+            set
+            {
+                if (_isenableProperty == value)
+                {
+                    return;
+                }
+
+                _isenableProperty = value;
+                RaisePropertyChanged(IsEnablePropertyPropertyName);
+            }
+        }
         private List<string> cdlInfo;
 
         public List<string> CdlInfoProperty
@@ -266,7 +294,7 @@ namespace Inter_face.Models
                                                   OutSectionumChanged();
                                           }));
             }
-        }
+        }       
 
         private void OutSectionumChanged()
         {

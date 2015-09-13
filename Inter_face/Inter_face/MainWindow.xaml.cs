@@ -136,6 +136,7 @@ namespace Inter_face
             qxtempfilepath = ReadSettings.GetQxtempfilepath();
             bjfilepath = ReadSettings.GetBjfilepath();
             bjtemptfilepath = ReadSettings.GetBjtempfilepath();
+            IniSheets.CleanXhDataFile();
             gdo = GraphyDataOper.CreatOper(pdtempfilepath,
                 bjtemptfilepath,
                 qxtempfilepath,

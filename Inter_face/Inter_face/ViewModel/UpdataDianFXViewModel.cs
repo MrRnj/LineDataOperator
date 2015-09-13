@@ -408,7 +408,7 @@ namespace Inter_face.ViewModel
                 p =>
                 {
                     isrefreshData = false;
-                    
+
                     string[] infos = p.DfxInfosProperty.Split(':');
                     cdl = p.CdlListProperty;
 
@@ -425,7 +425,7 @@ namespace Inter_face.ViewModel
                     leftedgeSecnum = int.Parse(infos[2].Split('+')[1]);
                     LeftEdgePos = formatShowpos(leftedgepos, leftedgeSecnum);
 
-                    rightedgepos = decimal.Parse(infos[4].Split('+')[0]);                    
+                    rightedgepos = decimal.Parse(infos[4].Split('+')[0]);
                     rightedgeSecnum = int.Parse(infos[4].Split('+')[1]);
                     RightEdgePos = formatShowpos(rightedgepos, rightedgeSecnum);
 
@@ -491,7 +491,7 @@ namespace Inter_face.ViewModel
             string part2 = posInstring.Split('.')[1];
             string hat = string.Empty;
 
-            if (Secnum == cdl.Count)
+            if (Secnum == cdl.Count + 1)
             {
                 hat = cdl[Secnum - 2].Split(':')[1].Split('+')[0];
             }
@@ -505,7 +505,7 @@ namespace Inter_face.ViewModel
 
         private string getHat(int secNum)
         {
-            if (secNum == cdl.Count)
+            if (secNum == cdl.Count + 1)
             {
                 return cdl[secNum - 2].Split(':')[1].Split('+')[0];
             }
@@ -524,7 +524,7 @@ namespace Inter_face.ViewModel
 
             for (int i = startSecnum; i <= endSecnum; i++)
             {
-                if (i == cdl.Count)
+                if (i == cdl.Count + 1)
                 {
                     parts = cdl[i - 2].Split(':');
                     if (usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
@@ -565,13 +565,13 @@ namespace Inter_face.ViewModel
             decimal realdis = getDis(middlepos, middleSecnum, endpos, endSecnum);
             if (realdis < dis)
             {
-                dis = realdis;               
+                dis = realdis;
                 secnum = endSecnum;
             }
             else
             {
                 offset = 0;
-                if (middleSecnum == cdl.Count)
+                if (middleSecnum == cdl.Count + 1)
                 {
                     parts = cdl[middleSecnum - 2].Split(':');
                 }
@@ -617,7 +617,7 @@ namespace Inter_face.ViewModel
             decimal realdis = getDis(startpos, startSecnum, middlepos, middleSecnum);
             if (realdis < dis)
             {
-                dis = realdis;                
+                dis = realdis;
                 secnum = startSecnum;
             }
             else
@@ -656,7 +656,7 @@ namespace Inter_face.ViewModel
                 HatProperty = Hat,
                 LengthProperty = (float)(LeftDis + RightDis),
                 RealLength = (float)(LeftDis + RightDis),
-                PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L50,0",
+                PathDataProperty = "2:1 0:#00DC5625:#FF4500:M334,361 L436,410 M334,410 L436,361",
                 PositionProperty = (float)leftedgepos,
                 ScaleProperty = 10,
                 SectionNumProperty = middleSecnum,
