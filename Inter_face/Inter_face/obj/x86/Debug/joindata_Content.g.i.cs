@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/opentrack.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/creatsignals.png")]
 
 

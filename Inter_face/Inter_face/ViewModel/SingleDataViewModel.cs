@@ -268,6 +268,151 @@ namespace Inter_face.ViewModel
             }
         }
         /// <summary>
+        /// The <see cref="MenuVisibility" /> property's name.
+        /// </summary>
+        public const string MenuVisibilityPropertyName = "MenuVisibility";
+
+        private System.Windows.Visibility _visibility = System.Windows.Visibility.Visible;
+
+        /// <summary>
+        /// Sets and gets the MenuVisibility property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public System.Windows.Visibility MenuVisibility
+        {
+            get
+            {
+                return _visibility;
+            }
+
+            set
+            {
+                if (_visibility == value)
+                {
+                    return;
+                }
+
+                _visibility = value;
+                RaisePropertyChanged(MenuVisibilityPropertyName);
+            }
+        }
+        /// <summary>
+        /// The <see cref="QjMenuVisibility" /> property's name.
+        /// </summary>
+        public const string QjMenuVisibilityPropertyName = "QjMenuVisibility";
+
+        private System.Windows.Visibility _qjMenuvisibility = System.Windows.Visibility.Collapsed;
+
+        /// <summary>
+        /// Sets and gets the QjMenuVisibility property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public System.Windows.Visibility QjMenuVisibility
+        {
+            get
+            {
+                return _qjMenuvisibility;
+            }
+
+            set
+            {
+                if (_qjMenuvisibility == value)
+                {
+                    return;
+                }
+
+                _qjMenuvisibility = value;
+                RaisePropertyChanged(QjMenuVisibilityPropertyName);
+            }
+        }
+        /// <summary>
+        /// The <see cref="XhMenuVisibility" /> property's name.
+        /// </summary>
+        public const string XhMenuVisibilityPropertyName = "XhMenuVisibility";
+
+        private System.Windows.Visibility _xhMenuvisibility = System.Windows.Visibility.Collapsed;
+
+        /// <summary>
+        /// Sets and gets the XhMenuVisibility property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public System.Windows.Visibility XhMenuVisibility
+        {
+            get
+            {
+                return _xhMenuvisibility;
+            }
+
+            set
+            {
+                if (_xhMenuvisibility == value)
+                {
+                    return;
+                }
+
+                _xhMenuvisibility = value;
+                RaisePropertyChanged(XhMenuVisibilityPropertyName);
+            }
+        }
+        /// <summary>
+        /// The <see cref="DfxMenuVisibility" /> property's name.
+        /// </summary>
+        public const string DfxMenuVisibilityPropertyName = "DfxMenuVisibility";
+
+        private System.Windows.Visibility _dfxMenuvisibility = System.Windows.Visibility.Collapsed;
+
+        /// <summary>
+        /// Sets and gets the DfxMenuVisibility property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public System.Windows.Visibility DfxMenuVisibility
+        {
+            get
+            {
+                return _dfxMenuvisibility;
+            }
+
+            set
+            {
+                if (_dfxMenuvisibility == value)
+                {
+                    return;
+                }
+
+                _dfxMenuvisibility = value;
+                RaisePropertyChanged(DfxMenuVisibilityPropertyName);
+            }
+        }
+        /// <summary>
+        /// The <see cref="CanMoveSignal" /> property's name.
+        /// </summary>
+        public const string CanMoveSignalPropertyName = "CanMoveSignal";
+
+        private bool _canMovesignal = true;
+
+        /// <summary>
+        /// Sets and gets the CanMoveSignal property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool CanMoveSignal
+        {
+            get
+            {
+                return _canMovesignal;
+            }
+
+            set
+            {
+                if (_canMovesignal == value)
+                {
+                    return;
+                }
+
+                _canMovesignal = value;
+                RaisePropertyChanged(CanMoveSignalPropertyName);
+            }
+        }
+        /// <summary>
         /// Initializes a new instance of the SingleDataViewModel class.
         /// </summary>
         public SingleDataViewModel()
@@ -348,7 +493,74 @@ namespace Inter_face.ViewModel
             }
             return false;
         }
+        private void checkMenuFunc(ObservableCollection<IDataModel> items)
+        {
+            string type = string.Empty;
+            DfxMenuVisibility = System.Windows.Visibility.Collapsed;
+            XhMenuVisibility = System.Windows.Visibility.Collapsed;
+            QjMenuVisibility = System.Windows.Visibility.Collapsed;
 
+            foreach (IDataModel item in items)
+            {                
+                StationDataMode sdm = item as StationDataMode;
+                if (sdm != null)
+                {
+                    type = sdm.StationNameProperty.Split('|')[0];
+                    if (type.StartsWith("Q"))
+                    {
+                        QjMenuVisibility = System.Windows.Visibility.Visible;
+                        if (items.Count > 1)
+                        {
+                            QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                            XhMenuVisibility = System.Windows.Visibility.Collapsed;
+                            DfxMenuVisibility = System.Windows.Visibility.Collapsed;
+                            break;
+                        }
+                        XhMenuVisibility = System.Windows.Visibility.Collapsed;
+                        DfxMenuVisibility = System.Windows.Visibility.Collapsed;
+                    }
+                    else if (type.StartsWith("3"))
+                    {
+                        DfxMenuVisibility = System.Windows.Visibility.Visible;
+                        if (items.Count > 1)
+                        {
+                            DfxMenuVisibility = System.Windows.Visibility.Collapsed;
+                            XhMenuVisibility = System.Windows.Visibility.Collapsed;
+                            QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                            break;
+                        }
+                        XhMenuVisibility = System.Windows.Visibility.Collapsed;
+                        QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                    }
+                    else if (type.StartsWith("1"))
+                    {
+                        XhMenuVisibility = System.Windows.Visibility.Collapsed;
+                        DfxMenuVisibility = System.Windows.Visibility.Collapsed;
+                        QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                        break;
+                    }
+                    else
+                    {
+                        XhMenuVisibility = System.Windows.Visibility.Visible;
+                        if (DfxMenuVisibility == System.Windows.Visibility.Visible ||
+                            QjMenuVisibility == System.Windows.Visibility.Visible)
+                        {
+                            XhMenuVisibility = System.Windows.Visibility.Collapsed;
+                        }
+                        DfxMenuVisibility = System.Windows.Visibility.Collapsed;
+                        QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                    }
+                }
+            }
+            if (XhMenuVisibility == System.Windows.Visibility.Visible)
+            {
+                if (items.Count > 1)
+                    CanMoveSignal = false;
+                else
+                    CanMoveSignal = true;
+            }
+            
+        }
         private GalaSoft.MvvmLight.Command.RelayCommand _showdatachangedCommand;
 
         /// <summary>
@@ -394,6 +606,7 @@ namespace Inter_face.ViewModel
                         IsShowSignale = checkSignal();
                         IsShowQujian = checkQujian();
                         IsShowDianFX = checkDianfx();
+                        checkMenuFunc(selectedItems);
                         MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");                        
                     }));
             }
@@ -415,6 +628,24 @@ namespace Inter_face.ViewModel
                         MessengerInstance.Send<DataType>((DataType)TypeNum, "ShowRightDialog"); 
                     }));
             }
-        }       
+        }
+
+        private RelayCommand<string> _exCommand;
+
+        /// <summary>
+        /// Gets the ExCommand.
+        /// </summary>
+        public RelayCommand<string> ExCommand
+        {
+            get
+            {
+                return _exCommand
+                    ?? (_exCommand = new RelayCommand<string>(
+                    p =>
+                    {
+                        MessengerInstance.Send<string>(p, "ExCommand");
+                    }));
+            }
+        }
     }
 }

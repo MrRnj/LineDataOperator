@@ -9,6 +9,7 @@ using System.Linq;
 using System.IO;
 using Microsoft.Win32;
 using System.Threading;
+using System.Windows;
 
 
 namespace Inter_face.ViewModel
@@ -747,6 +748,35 @@ namespace Inter_face.ViewModel
             }
         }
         /// <summary>
+        /// The <see cref="CanloadxhProperty" /> property's name.
+        /// </summary>
+        public const string CanloadxhPropertyPropertyName = "CanloadxhProperty";
+
+        private bool _canloadxhProperty = false;
+
+        /// <summary>
+        /// Sets and gets the CanloadxhProperty property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool CanloadxhProperty
+        {
+            get
+            {
+                return _canloadxhProperty;
+            }
+
+            set
+            {
+                if (_canloadxhProperty == value)
+                {
+                    return;
+                }
+
+                _canloadxhProperty = value;
+                RaisePropertyChanged(CanloadxhPropertyPropertyName);
+            }
+        }
+        /// <summary>
         /// Initializes a new instance of the DataCollectionViewModel class.
         /// </summary>
         public DataCollectionViewModel()
@@ -926,8 +956,37 @@ namespace Inter_face.ViewModel
             {
                 showRightDialog();
             });
+
+            MessengerInstance.Register<string>(this, "ExCommand",
+                p => { CommitMenuCommand(p); });
         }
 
+        private void CommitMenuCommand(string cmd)
+        {
+            switch (cmd)
+            {
+                case "InsertXH":
+                    InsertXinhaoCommand.Execute(null);
+                    break;
+                case "InsertDFX":
+                    beginInsertDianfx();
+                    break;
+                case "DeleteXH":
+                    RemoveXinHaoCommand.Execute(null);
+                    break;
+                case "MoveXH":
+                    MoveSignal();
+                    break;
+                case "DeleteDFX":
+                    DeleteDFXCommand.Execute(null);
+                    break;
+                case "ModifyDFX":
+                    beginModifyDianfx();
+                    break;
+                default:
+                    break;
+            }
+        }
         void _datascollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             IsXinhaoChanged = true;
@@ -4201,7 +4260,37 @@ namespace Inter_face.ViewModel
 
         private void openXhdata()
         {
-            OpenFileDialog openxhdataDialog = new OpenFileDialog();
+            OpenFileDialog openxhdataDialog;
+            if (hadanyXhdata())
+            {
+                if (MessageBox.Show("未保存信号数据将会丢失，是否继续？", "提示",
+                       MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.Yes)
+                {
+                    cleanXhdata();
+                    openxhdataDialog = new OpenFileDialog();
+                    openxhdataDialog.Title = "打开信号数据";
+                    openxhdataDialog.Filter = "信号数据文件|*.xh|所有文件|*.*";
+                    openxhdataDialog.Multiselect = false;
+
+                    if (openxhdataDialog.ShowDialog() == true)
+                    {
+                        try
+                        {
+                            GDoper.OpenXhData(openxhdataDialog.FileName);
+                            _xhdataPath = openxhdataDialog.FileName;
+                            CanloadxhProperty = true;
+                        }
+                        catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
+                        {                            
+                            MessengerInstance.Send<string>("读入信号机数据出错", "ReadDataError");
+                        }
+                    }
+                    return;
+                }
+                return;
+            }
+
+            openxhdataDialog = new OpenFileDialog();
             openxhdataDialog.Title = "打开信号数据";
             openxhdataDialog.Filter = "信号数据文件|*.xh|所有文件|*.*";
             openxhdataDialog.Multiselect = false;
@@ -4212,11 +4301,36 @@ namespace Inter_face.ViewModel
                 {
                     GDoper.OpenXhData(openxhdataDialog.FileName);
                     _xhdataPath = openxhdataDialog.FileName;
+                    CanloadxhProperty = true;
                 }
                 catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
                 {
-
+                    CanloadxhProperty = false;
+                    MessengerInstance.Send<string>("读入信号机数据出错", "ReadDataError");
                 }
+            }
+
+        }
+
+        private void creatNewxhdata()
+        {
+            try
+            {
+                if (hadanyXhdata())
+                {
+                    if (MessageBox.Show("未保存信号数据将会丢失，是否继续？", "提示", 
+                        MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.Yes)
+                    {
+                        cleanXhdata();
+                        CanloadxhProperty = true;
+                        return;
+                    }                    
+                }
+                CanloadxhProperty = true;
+            }
+            catch
+            {
+                CanloadxhProperty = false;
             }
         }
 
@@ -4255,9 +4369,15 @@ namespace Inter_face.ViewModel
                         string.Format("{0}|{1}", eme.Message, eme.ErrorPosMessageProperty), "ReadDataErrorWithOperate");
                 }
 
-                catch
+                catch (ExtractData.AutoBuildOperator.ErrorDistencException ede)
                 {
-                    MessengerInstance.Send<string>("自动调整出错！", "ReadDataError");
+                    MessengerInstance.Send<string>(
+                        string.Format("{0}|{1}", ede.Message, ede.ErrorPosMessageProperty), "ReadDataErrorWithOperate");
+                }
+
+                catch(System.Exception ex)
+                {
+                    MessengerInstance.Send<string>(ex.Message, "ReadDataError");
                 }
                 Cursor = 0;
             }
@@ -4509,6 +4629,84 @@ namespace Inter_face.ViewModel
                 }
             }            
             
+        }
+        private bool hadanyXhdata()
+        {
+            foreach (ISingleDataViewModel Singleitem in _DataBin)
+            {
+                if (Singleitem.TypeNum == (int)DataType.Single)
+                {
+                    return true;
+                }
+                if (Singleitem.TypeNum == (int)DataType.SingleS)
+                {
+                    return true;
+                }
+            }
+            return CanloadxhProperty || false;
+        }
+        private void cleanXhdata()
+        {
+            SingleDataViewModel sdvm = null;
+
+            foreach (ISingleDataViewModel Singleitem in _DataBin)
+            {
+                if (Singleitem.TypeNum == (int)DataType.Single)
+                {
+                    sdvm = (SingleDataViewModel)Singleitem;                    
+                    break;
+                }
+            }
+            if (sdvm != null)
+            {
+                _DataBin.Remove(sdvm);                
+            }
+
+            sdvm = null;
+            foreach (ISingleDataViewModel Singleitem in _datascollection)
+            {
+                if (Singleitem.TypeNum == (int)DataType.Single)
+                {
+                    sdvm = (SingleDataViewModel)Singleitem;
+                    break;
+                }
+            }
+            if (sdvm != null)
+            {
+                _datascollection.Remove(sdvm);
+                IsXinhaoLoadedProperty = false;
+            }
+           
+            sdvm = null;
+            foreach (ISingleDataViewModel Singleitem in _DataBin)
+            {
+                if (Singleitem.TypeNum == (int)DataType.SingleS)
+                {
+                    sdvm = (SingleDataViewModel)Singleitem;
+                    break;
+                }
+            }
+            if (sdvm != null)
+            {
+                _DataBin.Remove(sdvm);                
+            }
+
+            sdvm = null;
+            foreach (ISingleDataViewModel Singleitem in _datascollection)
+            {
+                if (Singleitem.TypeNum == (int)DataType.SingleS)
+                {
+                    sdvm = (SingleDataViewModel)Singleitem;
+                    break;
+                }
+            }
+            if (sdvm != null)
+            {
+                _datascollection.Remove(sdvm);
+                IsXinhaoSLoaded = false;
+            }
+
+            IniSheets.CleanXhDataFile();
         }
         #region Commands
        
@@ -5090,6 +5288,23 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                         openXhdata();
+                    }));
+            }
+        }
+        private RelayCommand _creatNewXhdataCommand;
+
+        /// <summary>
+        /// Gets the CreatNewXhdataCommand.
+        /// </summary>
+        public RelayCommand CreatNewXhdataCommand
+        {
+            get
+            {
+                return _creatNewXhdataCommand
+                    ?? (_creatNewXhdataCommand = new RelayCommand(
+                    () =>
+                    {
+                        creatNewxhdata();
                     }));
             }
         }

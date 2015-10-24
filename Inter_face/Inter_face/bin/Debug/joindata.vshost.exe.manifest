@@ -4,7 +4,7 @@
   <description asmv2:iconFile="Exeicon.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="joindata" version="1.9.0.0" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="joindata" version="1.9.5.0" language="neutral" processorArchitecture="x86" />
     <commandLine file="joindata.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -72,14 +72,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExtractData.dll" size="214528">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExtractData.dll" size="215040">
       <assemblyIdentity name="ExtractData" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>mgC/exsyPBWIbRHZzEo07ZGtVPg=</dsig:DigestValue>
+        <dsig:DigestValue>LAjKxRWHJ6gYlDNmol1RaHpQpNk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -120,14 +120,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="469504">
-      <assemblyIdentity name="joindata" version="1.9.0.0" language="neutral" processorArchitecture="x86" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="478208">
+      <assemblyIdentity name="joindata" version="1.9.5.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>6+vPTOa/kjvl/v0yuYAYEPf2Siw=</dsig:DigestValue>
+        <dsig:DigestValue>nHNxQZBi3VGlNzhIw3Dm9cW6LIM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

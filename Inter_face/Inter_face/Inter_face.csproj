@@ -168,6 +168,7 @@
     <Compile Include="Coverters\PosToPart2LenConverter.cs" />
     <Compile Include="Coverters\StationDataToBoolenConverter.cs" />
     <Compile Include="Coverters\StringToIntConverter.cs" />
+    <Compile Include="Coverters\TypeToMenuVisibilityConvertercs.cs" />
     <Compile Include="Coverters\ValueToLengthConverter.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Models\DianFXneededInfosMode.cs" />
@@ -477,6 +478,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\opentrack.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\creatsignals.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

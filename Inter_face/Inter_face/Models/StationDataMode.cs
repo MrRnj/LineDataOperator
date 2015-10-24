@@ -264,6 +264,7 @@ namespace Inter_face.Models
             }
         }
 
+        
         /// <summary>
         /// The <see cref="RealLength" /> property's name.
         /// </summary>
@@ -293,6 +294,11 @@ namespace Inter_face.Models
                 _reallengthProperty = value;
                 RaisePropertyChanged(RealLengthPropertyName);
             }
-        }       
+        }
+
+        IDataModel IDataModel.Self
+        {
+            get { return this; }
+        }
     }
 }

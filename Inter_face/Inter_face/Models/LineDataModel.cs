@@ -354,10 +354,15 @@ namespace Inter_face.Models
             }
         }
 
+        IDataModel IDataModel.Self
+        {
+            get { return this; }
+        }
 
         public string ChangeData(float oriheight, float oriposition, float length, float angle)
         {
             throw new NotImplementedException();
         }
+       
     }   
 }

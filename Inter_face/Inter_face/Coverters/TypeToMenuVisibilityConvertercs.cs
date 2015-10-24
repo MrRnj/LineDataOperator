@@ -1,29 +1,26 @@
-﻿using System;
+﻿using Inter_face.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows.Controls;
 
 namespace Inter_face.Coverters
 {
-    class ISDToSelectionModeConverter : System.Windows.Data.IValueConverter
+    class TypeToMenuVisibilityConvertercs : System.Windows.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             try
             {
                 int typenum = (int)value;
-
                 if (typenum == (int)DataType.Single || typenum == (int)DataType.SingleS)
-                {
-                    return SelectionMode.Extended;
-                }
+                    return System.Windows.Visibility.Visible;
                 else
-                    return SelectionMode.Single;
+                    return System.Windows.Visibility.Hidden;
             }
             catch
             {
-                return SelectionMode.Single;
+                return System.Windows.Visibility.Hidden;
             }
         }
 

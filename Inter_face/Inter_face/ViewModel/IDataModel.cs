@@ -11,6 +11,7 @@ namespace Inter_face.Models
         int ScaleProperty { get; set; }
         string HatProperty { get; set; }
         string PathDataProperty { get; set; }
+        IDataModel Self { get; }
         string ChangeData(float oriheight, float oriposition, float length, float angle);
     }
 }

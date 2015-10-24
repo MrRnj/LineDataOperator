@@ -13,6 +13,7 @@
                      Height="640" Width="933" WindowState="Maximized" Icon="icons/title.png" Loaded="RibbonWindow_Loaded"
                      >
     <Fluent:RibbonWindow.Resources>
+    	<Inter_face_Coverters:TypeToMenuVisibilityConvertercs x:Key="TypeToMenuVisibilityConvertercs"/>
         <Inter_face_Coverters:MovingDistenceStringToIntConverter x:Key="MovingDistenceStringToIntConverter"/>
         <Inter_face_Coverters:BoolenToVisibilityConverter x:Key="BoolenToVisibilityConverter"/>
         <Inter_face_Coverters:DmToDfxVisibilityConverter x:Key="DmToDfxVisibilityConverter"/>
@@ -89,6 +90,7 @@
 		<Image x:Key="saveother" Source="icons/saveother.png" Stretch="Fill"/>
 		<Image x:Key="opensignals" Source="icons/opensignals.png" Stretch="Fill"/>
         <Image x:Key="opentrack" Source="icons/opentrack.png" Stretch="Uniform"/>
+        <Image x:Key="creatsignals" Source="icons/creatsignals.png" Stretch="None"/>
         <ToolTip x:Key="NewSheetTip">
             <Grid>
                 <Grid.RowDefinitions>
@@ -161,6 +163,7 @@
         </ToolTip>
         <DataTemplate x:Key="DetailDataTemplate">
             <Grid x:Name="grid" Margin="-1,0">
+            	
                 <Grid.RowDefinitions>
                     <RowDefinition Height="10"/>
                     <RowDefinition Height="30"/>
@@ -177,6 +180,7 @@
                     </StackPanel>
                 </Grid.ToolTip>
                 <Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
+                	
             		<Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
             			<i:Interaction.Triggers>
             				<i:EventTrigger EventName="MouseDoubleCLick">
@@ -202,6 +206,11 @@
         </DataTemplate>
         <DataTemplate x:Key="SingleDataTemplate">
             <Grid Height="60">
+            	<i:Interaction.Triggers>
+            		<i:EventTrigger>
+            			<Custom:EventToCommand x:Name="DoubleClickEventToCommand" Command="{Binding ShowRightDialogCommand, Mode=OneWay}"/>
+            		</i:EventTrigger>
+            	</i:Interaction.Triggers>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="100"/>
@@ -224,12 +233,19 @@
                 </CheckBox>
                 <Label x:Name="TypeLabel" Content="{Binding TypeNameProperty}" Grid.Column="1" Margin="4,10" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 <ListBox x:Name="DetailListBox" ScrollViewer.CanContentScroll="False" Grid.Column="2" ItemsPanel="{DynamicResource DetailItemsPanelTemplate}" BorderThickness="0" ItemsSource="{Binding DataCollection}" ItemTemplate="{DynamicResource DetailDataTemplate}" FontSize="26.667" FontWeight="Bold" SelectedItem="{Binding CurrentDataProperty}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" SelectionMode="{Binding TypeNum, Converter={StaticResource ISDToSelectionModeConverter}}" >
-                    <i:Interaction.Triggers>
+                   <ListBox.ContextMenu>
+                   	    <ContextMenu Visibility="{Binding TypeNum, Converter={StaticResource TypeToMenuVisibilityConvertercs}}">
+                            <MenuItem Header="插入信号机" Visibility="{Binding QjMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="InsertXH"/>
+                            <MenuItem Header="插入电分相" Visibility="{Binding QjMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="InsertDFX"/>
+                            <MenuItem Header="删除信号机" Visibility="{Binding XhMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="DeleteXH"/>
+                            <MenuItem Header="移动信号机" IsEnabled="{Binding CanMoveSignal}" Visibility="{Binding XhMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="MoveXH"/>
+                            <MenuItem Header="删除电分相" Visibility="{Binding DfxMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="DeleteDFX"/>
+                            <MenuItem Header="编辑电分相" Visibility="{Binding DfxMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="ModifyDFX"/>
+                		</ContextMenu>	        
+				   </ListBox.ContextMenu>
+				    <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <Custom:EventToCommand x:Name="SelectionChangedEventToCommand" Command="{Binding SelectionChangedCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseDoubleCLick">
-                        	<Custom:EventToCommand x:Name="DoubleClickEventToCommand" Command="{Binding ShowRightDialogCommand, Mode=OneWay}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ListBox>
@@ -356,11 +372,12 @@
                     <Fluent:ToggleButton x:Name="PositionToggleButton" Content="里程数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsLiChengLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" Command="{Binding DatasCollectionProperty.LoadPositionCommand, Mode=OneWay}" LargeIcon="{StaticResource ruleicon}" Header="里程数据" ToolTip="显示里程数据" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
 				</Fluent:RibbonGroupBox>
 				<Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
-                    <Fluent:ToggleButton x:Name="loadxhdataButton" Header="载入下行" LargeIcon="{StaticResource Downway}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}" FontSize="11"/>
-                    <Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="载入上行" LargeIcon="{StaticResource Upway}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}"/>
-                    <Fluent:Button x:Name="ModifyStationsignalButton" Header="修改车站信号机" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}" LargeIcon="{StaticResource stationsignalicon}" Height="Auto"/>      	
+                    <Fluent:ToggleButton x:Name="loadxhdataButton" Header="载入下行" LargeIcon="{StaticResource Downway}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}" FontSize="11" IsEnabled="{Binding DatasCollectionProperty.CanloadxhProperty}"/>
+                    <Fluent:ToggleButton x:Name="loadxhsdatabutton" Header="载入上行" LargeIcon="{StaticResource Upway}" Command="{Binding DatasCollectionProperty.LoadXinHaoSCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoSLoaded, Mode=TwoWay}" IsEnabled="{Binding DatasCollectionProperty.CanloadxhProperty}"/>
+                    <Fluent:Button x:Name="ModifyStationsignalButton" Header="修改车站信号机" ToolTip="修改车站信号机" Command="{Binding DatasCollectionProperty.ModifyStationSignalCommand, Mode=OneWay}" LargeIcon="{StaticResource stationsignalicon}" Height="Auto" IsEnabled="{Binding DatasCollectionProperty.CanloadxhProperty}"/>      	
 				</Fluent:RibbonGroupBox>
-				<Fluent:RibbonGroupBox x:Name="signalDataRibbonGroupBox" d:LayoutOverrides="Height" Header="信号机数据操作">					
+				<Fluent:RibbonGroupBox x:Name="signalDataRibbonGroupBox" d:LayoutOverrides="Height" Header="信号机数据操作">	
+					<Fluent:Button x:Name="creatnewsignalButton" Header="新建数据" ToolTip="新建信号机数据" Command="{Binding DatasCollectionProperty.CreatNewXhdataCommand, Mode=OneWay}" LargeIcon="{DynamicResource creatsignals}" Height="Auto" />				
 					<Fluent:Button x:Name="opensignalButton" Header="打开数据" ToolTip="打开信号机数据" Command="{Binding DatasCollectionProperty.OpenXhDataCommand, Mode=OneWay}" LargeIcon="{DynamicResource opensignals}" Height="Auto" />
 					<Fluent:Button x:Name="SaveStationsignalButton" Header="保存" ToolTip="保存信号机" Command="{Binding DatasCollectionProperty.SaveXhDataCommand, Mode=OneWay}" LargeIcon="{StaticResource SaveXH}" Height="Auto" IsEnabled="{Binding DatasCollectionProperty.IsXinhaoChanged}"/>
 					<Fluent:Button x:Name="SaveothersignalButton" Header="另存" ToolTip="另存" Command="{Binding DatasCollectionProperty.SaveXhdataToAntherFileCommand, Mode=OneWay}" LargeIcon="{DynamicResource saveother}" Height="Auto"/>
