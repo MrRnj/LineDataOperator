@@ -1,0 +1,25 @@
+﻿<Window x:Class="Inter_face.Views.AdjustSignalDisWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:vm="clr-namespace:Inter_face.ViewModel"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inter_face.Views"
+        mc:Ignorable="d" Height="118.045" Width="150" WindowStyle="ToolWindow" Title="调整分区长度">
+    <Window.Resources>
+        <vm:AdjustSignalsDisAsSameViewMode x:Key="AdjustSignalsDisAsSameViewMode"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Mode="OneWay" Source="{StaticResource AdjustSignalsDisAsSameViewMode}"/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24*"/>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="32*"/>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="DistextBox" Margin="28.556,4,33.444,4" Grid.Row="1" TextWrapping="Wrap" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" Text="{Binding Dis, Mode=TwoWay}"/>
+        <Button x:Name="Adjustbutton" Content="调整" Margin="28,4" Grid.Row="2" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" Command="{Binding AdjustCommand, Mode=OneWay}"/>
+        <TextBlock x:Name="textBlock" Margin="17.21,-3.831,21.902,-3.831" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="分区长度（m）" Width="102.888" TextAlignment="Center"/>
+    </Grid>
+</Window>

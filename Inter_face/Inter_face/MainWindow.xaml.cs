@@ -63,10 +63,10 @@ namespace Inter_face
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p =>
             {
-                AddInfobox(p, string.Empty, string.Empty, 0, "1");
+                AddInfobox(p, string.Empty, string.Empty, 0, "0");
             });
 
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataErrorWithOperate", p =>
+            Messenger.Default.Register<string>(this, "ReadDataErrorWithOperate", p =>
             {
                 string msg = p.Split('|')[0];
                 string[] moreinfo = p.Split('|')[1].Split('*');
@@ -414,6 +414,14 @@ namespace Inter_face
                 catch (CheckDatasign.OnlyoneSheetException ex)
                 {
                     this.Dispatcher.BeginInvoke(new Action(() => { System.Windows.MessageBox.Show(ex.Message); }));
+                }
+
+                catch(LogicErrorException lee)
+                {
+                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        System.Windows.MessageBox.Show(lee.ErrorMesssage);
+                    }));
                 }
 
                 catch (System.Exception ex) 
@@ -1416,11 +1424,6 @@ namespace Inter_face
 
                 last_star_pos = csds.Last_star_pos;
 
-                OnChecksignChanged(this, new ChecksignChangedEventArgs("正在合并标记文件"));
-                bjdata = rsi.GetBjInfo(bjfilepath, last_star_pos);
-                MergeSheet.MergeBj(bjtemptfilepath, bjdata);
-                ecd.GetBj_list(ref bjx, ref bjs);
-
                 OnChecksignChanged(this, new ChecksignChangedEventArgs("正在合并坡度文件"));
                 pddata = rsi.GetPdInfo(pdfilepath, last_star_pos);
                 if (!MergeSheet.MergePd(pdtempfilepath, pddata, pdfilepath, adjust))
@@ -1433,6 +1436,11 @@ namespace Inter_face
                 qxdata = rsi.GetQxInfo(qxfilepath, last_star_pos);
                 MergeSheet.MergeQx(qxtempfilepath, qxdata);
                 ecd.GetQx_list(ref qxx, ref qxs);
+
+                OnChecksignChanged(this, new ChecksignChangedEventArgs("正在合并标记文件"));
+                bjdata = rsi.GetBjInfo(bjfilepath, last_star_pos);
+                MergeSheet.MergeBj(bjtemptfilepath, bjdata);
+                ecd.GetBj_list(ref bjx, ref bjs);               
 
                 OnCheckfinishied(this, null);
             }

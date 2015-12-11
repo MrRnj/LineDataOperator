@@ -17,6 +17,7 @@ namespace Inter_face.ViewModel
         bool IsShowQujian { get; set; }
         bool IsShowSignale { get; set; }
         bool IsShowDianFX { get; set; }
+        bool IsSingleQJ { get; set; }
         string TypeNameProperty { get; set; }
         int TypeNum { get; set; }
         int SelectedIndex { get; set; }

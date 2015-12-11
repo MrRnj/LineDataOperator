@@ -19,7 +19,7 @@ namespace Inter_face
 	{
 		public ACdlWindow()
 		{
-			this.InitializeComponent();
+            InitializeComponent();
 			
 			// 在此点之下插入创建对象所需的代码。
 		}

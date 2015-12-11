@@ -26,6 +26,7 @@ namespace Inter_face.Coverters
 
             if (!string.IsNullOrEmpty(raw))
             {
+                raw = raw.TrimStart('0');
                 int.TryParse(raw, out result);
                 if (result < 0 || raw.Contains('.'))
                 {

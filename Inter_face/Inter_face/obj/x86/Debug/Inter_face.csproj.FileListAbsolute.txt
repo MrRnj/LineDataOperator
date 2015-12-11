@@ -87,8 +87,8 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\joindata.pdb
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\ExtractData.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Fluent.dll
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.Extras.WPF4.dll
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.WPF4.dll
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.dll
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.Extras.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\LateBindingApi.Core.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Expression.Drawing.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Practices.ServiceLocation.dll
@@ -98,11 +98,12 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\DataCatcher.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\OfficeApi.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\VBIDEApi.dll
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\stdole.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\ExtractData.pdb
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.Extras.WPF4.pdb
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.Extras.WPF4.xml
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.WPF4.pdb
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.WPF4.xml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.pdb
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.xml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.Extras.pdb
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\GalaSoft.MvvmLight.Extras.xml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Expression.Drawing.xml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Practices.ServiceLocation.xml
@@ -117,6 +118,7 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\MoveXinhaoWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ProcessForm.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ShowInfoBox.g.cs
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\AdjustSignalDisWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\DianFXWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\DivSpinner.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\LdhInfoWindow.g.cs
@@ -133,6 +135,7 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ModifyQujianWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\MoveXinhaoWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ShowInfoBox.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\AdjustSignalDisWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\DianFXWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\DivSpinner.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\LdhInfoWindow.baml

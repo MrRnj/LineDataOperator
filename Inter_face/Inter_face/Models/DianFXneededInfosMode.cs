@@ -47,6 +47,6 @@ namespace Inter_face.Models
             get { return isUpdataVar; }
             set { isUpdataVar = value; }
         }
-
+        
     }
 }

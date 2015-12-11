@@ -14,8 +14,8 @@ namespace Inter_face.Coverters
             if (content != null)
             {
                 string[] parts = content.Split(':');
-                float first = float.Parse(parts[0].Split('+')[1]) / 1000;
-                float secend = float.Parse(parts[1].Split('+')[1]) / 1000;
+                decimal first = decimal.Parse((float.Parse(parts[0].Split('+')[1]) / 1000).ToString("0.000000"));
+                decimal secend = decimal.Parse((float.Parse(parts[1].Split('+')[1]) / 1000).ToString("0.000000")); ;
                 string result = string.Format("{0} {1}+{2} = {3} {4}+{5}", parts[0].Split('+')[0],
                     Math.Floor(first).ToString(),
                     ((first - Math.Floor(first)) * 1000).ToString("F3"),

@@ -4,7 +4,7 @@ using Inter_face.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
-
+using System;
 
 namespace Inter_face.ViewModel
 {
@@ -433,6 +433,36 @@ namespace Inter_face.ViewModel
                 _typenum = value;
             }
         }
+        
+        /// <summary>
+        /// The <see cref="IsSingleQJ" /> property's name.
+        /// </summary>
+        public const string IsSingleQJPropertyName = "IsSingleQJ";
+
+        private bool _isSingleqj = true;
+
+        /// <summary>
+        /// Sets and gets the CanMoveSignal property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsSingleQJ
+        {
+            get
+            {
+                return _isSingleqj;
+            }
+
+            set
+            {
+                if (_isSingleqj == value)
+                {
+                    return;
+                }
+
+                _isSingleqj = value;
+                RaisePropertyChanged(IsSingleQJPropertyName);
+            }
+        }
 
         private bool checkDianfx()
         {
@@ -493,29 +523,69 @@ namespace Inter_face.ViewModel
             }
             return false;
         }
+
         private void checkMenuFunc(ObservableCollection<IDataModel> items)
         {
             string type = string.Empty;
+            int index = 0;            
+            StationDataMode nextsdm;
             DfxMenuVisibility = System.Windows.Visibility.Collapsed;
             XhMenuVisibility = System.Windows.Visibility.Collapsed;
-            QjMenuVisibility = System.Windows.Visibility.Collapsed;
+            QjMenuVisibility = System.Windows.Visibility.Collapsed;            
 
             foreach (IDataModel item in items)
             {                
                 StationDataMode sdm = item as StationDataMode;
+                index = DataCollection.IndexOf(item);
+
                 if (sdm != null)
                 {
                     type = sdm.StationNameProperty.Split('|')[0];
                     if (type.StartsWith("Q"))
                     {
                         QjMenuVisibility = System.Windows.Visibility.Visible;
+
                         if (items.Count > 1)
                         {
-                            QjMenuVisibility = System.Windows.Visibility.Collapsed;
                             XhMenuVisibility = System.Windows.Visibility.Collapsed;
                             DfxMenuVisibility = System.Windows.Visibility.Collapsed;
-                            break;
+                            IsSingleQJ = false;
+
+                            if (TypeNum == (int)DataType.SingleS)
+                            {
+                                if(index == DataCollection.Count - 1)
+                                {
+                                    QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                                    break;
+                                }
+                                nextsdm = DataCollection[index + 1] as StationDataMode;
+                                if (nextsdm.StationNameProperty.Split(':')[0].Equals("1") ||
+                                    nextsdm.StationNameProperty.Split(':')[0].Equals("3"))
+                                {
+                                    QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                                    break;
+                                }
+                            }
+                            else if (TypeNum == (int)DataType.Single)
+                            {
+                                if (index == 0 || index == 1)
+                                {
+                                    QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                                    break;
+                                }
+                                nextsdm = DataCollection[index - 1] as StationDataMode;
+                                if (nextsdm.StationNameProperty.Split(':')[0].Equals("1") ||
+                                    nextsdm.StationNameProperty.Split(':')[0].Equals("3") )
+                                {
+                                    QjMenuVisibility = System.Windows.Visibility.Collapsed;
+                                    break;
+                                }
+                            }
+                            QjMenuVisibility = System.Windows.Visibility.Visible;
                         }
+                        else
+                            IsSingleQJ = true;
+
                         XhMenuVisibility = System.Windows.Visibility.Collapsed;
                         DfxMenuVisibility = System.Windows.Visibility.Collapsed;
                     }
@@ -646,6 +716,6 @@ namespace Inter_face.ViewModel
                         MessengerInstance.Send<string>(p, "ExCommand");
                     }));
             }
-        }
+        }        
     }
 }

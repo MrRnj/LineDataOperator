@@ -210,18 +210,28 @@ namespace Inter_face.ViewModel
         private void AddCdl()
         {
             string msg = string.Format("{0}+{1}:{2}+{3}",
-                Hat_Front, (float.Parse(Fst_Front) * 1000 + float.Parse(Sec_Front)).ToString(),
-                Hat_After, (float.Parse(Fst_After) * 1000 + float.Parse(Sec_After)).ToString());
-            MessengerInstance.Send<string>(msg, "cdl");
+                Hat_Front,
+                (decimal.Parse(Fst_Front) * 1000 + decimal.Parse(float.Parse(Sec_Front).ToString("#0.000"))).ToString(),
+                Hat_After,
+                (decimal.Parse(Fst_After) * 1000 + decimal.Parse(float.Parse(Sec_After).ToString("#0.000"))).ToString());
+            MessengerInstance.Send(msg, "cdl");
         }
 
         private bool CanAddCdl()
         {
             try
             {
-                return !string.IsNullOrEmpty(Hat_After) && !string.IsNullOrEmpty(Hat_Front) &&
-                        float.Parse(Fst_Front) >= 0 && float.Parse(Fst_After) >= 0 &&
-                        float.Parse(Sec_Front) >= 0 && float.Parse(Sec_After) >= 0;
+                return !string.IsNullOrEmpty(Hat_After) &&
+                       !string.IsNullOrEmpty(Hat_Front) &&
+                        float.Parse(Fst_Front) >= 0 &&
+                        !Fst_Front.Contains('.') &&
+                        float.Parse(Sec_Front) >= 0 &&
+                        float.Parse(Sec_Front) < 1000 &&
+                        float.Parse(Fst_After) >= 0 &&
+                        !Fst_After.Contains('.') &&
+                        float.Parse(Sec_After) >= 0 &&
+                        float.Parse(Sec_After) < 1000;
+
             }
             catch
             {

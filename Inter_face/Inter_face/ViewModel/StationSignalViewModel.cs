@@ -217,7 +217,8 @@ namespace Inter_face.ViewModel
                         }
                         else
                         {
-                            inneritem.PositionProperty = float.Parse(item.InSignalProperty.PartImenber.ToString() + "." + (item.InSignalProperty.PartII).ToString());
+                            inneritem.PositionProperty = float.Parse((float.Parse(item.InSignalProperty.PartImenber.ToString()) + 
+                                                                      float.Parse((item.InSignalProperty.PartII).ToString()) / 1000).ToString("#0.000"));
                         }
                         inneritem.SectionNumProperty = item.InSignalProperty.SectionNum == null ?
                             -1 : int.Parse(item.InSignalProperty.SectionNum);
@@ -231,7 +232,8 @@ namespace Inter_face.ViewModel
                                                       item.OutSignalProperty.PartImenber == -1 ||
                                                       item.OutSignalProperty.PartII == -1 ?
                             -1 :
-                           float.Parse(item.OutSignalProperty.PartImenber.ToString() + "." + (item.OutSignalProperty.PartII).ToString());
+                          float.Parse((float.Parse(item.OutSignalProperty.PartImenber.ToString()) +
+                                       float.Parse((item.OutSignalProperty.PartII).ToString()) / 1000).ToString("#0.000"));
                         inneritem.SectionNumProperty = item.OutSignalProperty.SectionNum == null ?
                             -1 : int.Parse(item.OutSignalProperty.SectionNum);
                         inneritem.StationNameProperty =
@@ -240,7 +242,7 @@ namespace Inter_face.ViewModel
                     }
                 }                
             }
-            MessengerInstance.Send<List<StationDataMode>>(exchangeddatas, "UpdataStationSignal");
+            MessengerInstance.Send(exchangeddatas, "UpdataStationSignal");
         }
 
         private void ShowLdh()

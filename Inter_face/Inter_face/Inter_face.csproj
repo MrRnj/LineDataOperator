@@ -81,28 +81,28 @@
     <Reference Include="Fluent">
       <HintPath>..\..\..\..\..\..\..\TDDownload\接牵引计算数据\Fluent.dll</HintPath>
     </Reference>
-    <Reference Include="GalaSoft.MvvmLight.Extras.WPF4, Version=4.3.31.28629, Culture=neutral, PublicKeyToken=1673db7d5906b0ad, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MvvmLightLibs.4.3.31.1\lib\net40\GalaSoft.MvvmLight.Extras.WPF4.dll</HintPath>
+    <Reference Include="GalaSoft.MvvmLight, Version=5.2.0.37223, Culture=neutral, PublicKeyToken=0e453835af4ee6ce, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net40\GalaSoft.MvvmLight.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="GalaSoft.MvvmLight.WPF4, Version=4.3.31.28629, Culture=neutral, PublicKeyToken=63eb5c012e0b3c1c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MvvmLightLibs.4.3.31.1\lib\net40\GalaSoft.MvvmLight.WPF4.dll</HintPath>
+    <Reference Include="GalaSoft.MvvmLight.Extras, Version=5.2.0.37224, Culture=neutral, PublicKeyToken=f46ff315b1088208, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net40\GalaSoft.MvvmLight.Extras.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="LateBindingApi.Core">
       <HintPath>..\..\..\..\Visual Studio 2013\Projects\dAtaeXchangefRramwork\ExtractData_1010\ExtractData\ExtractData\bin\Debug\LateBindingApi.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Drawing" />
-    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\CommonServiceLocator.1.2\lib\portable-windows8+net40+sl5+windowsphone8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MvvmLightLibs.4.3.31.1\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -131,6 +131,7 @@
     <Compile Include="BackUps\CustomeSelectionItems.cs" />
     <Compile Include="Coverters\ActrueLengthToShowLengthConverter.cs" />
     <Compile Include="Coverters\AdjustLengthConverter.cs" />
+    <Compile Include="Coverters\BoolenConverter.cs" />
     <Compile Include="Coverters\BoolenToVisibilityConverter.cs" />
     <Compile Include="Coverters\ClddataToShowStyleConverter.cs" />
     <Compile Include="Coverters\DatasCollectionToVisibilityConverter.cs" />
@@ -179,6 +180,7 @@
       <DependentUpon>ModifyCdldataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\AcdlViewModel.cs" />
+    <Compile Include="ViewModel\AdjustSignalsDisAsSameViewMode.cs" />
     <Compile Include="ViewModel\ModifyCdlViewModel.cs" />
     <Compile Include="ViewModel\ModifyFilePosViewModel.cs" />
     <Compile Include="ViewModel\ProcessViewModel.cs" />
@@ -205,6 +207,9 @@
     <Compile Include="ViewModel\StationSignalViewModel.cs" />
     <Compile Include="ViewModel\UpdataDianFXViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="Views\AdjustSignalDisWindow.xaml.cs">
+      <DependentUpon>AdjustSignalDisWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DianFXWindow.xaml.cs">
       <DependentUpon>DianFXWindow.xaml</DependentUpon>
     </Compile>
@@ -256,6 +261,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ShowInfoBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AdjustSignalDisWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

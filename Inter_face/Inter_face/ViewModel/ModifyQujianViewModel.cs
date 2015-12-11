@@ -13,7 +13,7 @@ namespace Inter_face.ViewModel
         private int currentsectionum;
         public ModifyQujianViewModel()
         {
-            MessengerInstance.Register<string>(this, "Resources",
+            MessengerInstance.Register<string>(this, "ResourcesQJ",
                (p) =>
                {
                    string[] parts = p.Split(';');
