@@ -63,7 +63,9 @@ namespace Inter_face
                 this.contentbutton.Content = message;
             }
         }
-        
+
+        public bool FixProperty { get; set; }
+
         public ShowInfoBox()
         {
             InitializeComponent();
@@ -93,7 +95,7 @@ namespace Inter_face
         }
 
         private void ok_Click(object sender, RoutedEventArgs e)
-        {
+        {           
             SetValue(SituationProperty,"0");
             OnOperationbuttonClick(this, new OperationbuttonClickEventArgs(OperationSituation.Ok));
         }

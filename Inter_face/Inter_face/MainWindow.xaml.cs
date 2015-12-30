@@ -34,6 +34,7 @@ namespace Inter_face
         string bjfilepath;
         string bjtemptfilepath;
         string basefilepath;
+        string fixextrainfo;
         int last_star_pos;
 
         List<ExtractData.ChangeToTxt.PoduOutputData> pdx;
@@ -72,6 +73,16 @@ namespace Inter_face
                 string[] moreinfo = p.Split('|')[1].Split('*');
 
                 AddInfobox(msg, moreinfo[2], moreinfo[1], int.Parse(moreinfo[0]), "1");
+            });
+
+            Messenger.Default.Register<string>(this, "FixErrorWithOperate", p =>
+            {
+                string msg = p.Split('|')[0];
+                string[] moreinfo = p.Split('|')[1].Split('*');
+                //string[] fixpart = moreinfo[3].Split('+');
+                fixextrainfo = moreinfo[3] + "?" + moreinfo[1];
+
+                AddInfobox(msg, moreinfo[2], moreinfo[1], int.Parse(moreinfo[0]), "1", true);
             });
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataRight", p =>
@@ -563,7 +574,7 @@ namespace Inter_face
 
         #region showinfobox
 
-        private void AddInfobox(string message,string erorrsource, string position, int rowindex, string situation) 
+        private void AddInfobox(string message, string erorrsource, string position, int rowindex, string situation, bool fix = false)
         {
             ShowInfoBox sib = new ShowInfoBox();
             sib.Situation = situation;
@@ -571,6 +582,7 @@ namespace Inter_face
             sib.Position = position;
             sib.Rowindex = rowindex;
             sib.FilePath = erorrsource;
+            sib.FixProperty = fix;
 
             sib.ContentbuttonClick += new ShowInfoBox.ContentbuttonClickEventhandler(sib_ContentbuttonClick);
             sib.OperationbuttonClick += new ShowInfoBox.OperationbuttonClickEventhandler(sib_OperationbuttonClick);
@@ -588,6 +600,13 @@ namespace Inter_face
             else if (e.Situation == OperationSituation.Ignore) 
             {
                 infobox.Situation = "2";
+            }
+            else if (e.Situation == OperationSituation.Ok)
+            {
+                if (infobox.FixProperty)
+                {
+                    Messenger.Default.Send<string>(fixextrainfo, "FixPosError");
+                }
             }
         }
 

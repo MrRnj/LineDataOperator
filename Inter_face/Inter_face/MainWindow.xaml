@@ -209,7 +209,7 @@
             <Grid Height="60">
                 <i:Interaction.Triggers>
                     <i:EventTrigger>
-                        <Custom:EventToCommand x:Name="DoubleClickEventToCommand" Command="{Binding ShowRightDialogCommand, Mode=OneWay}"/>
+                        <Custom:EventToCommand x:Name="DoubleClickEventToCommand"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <Grid.ColumnDefinitions>
