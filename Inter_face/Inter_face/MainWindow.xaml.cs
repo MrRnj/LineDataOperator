@@ -1,23 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Fluent;
 using ExtractData;
 using System.Windows.Forms;
 using System.Threading;
 using System.IO;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 
 namespace Inter_face
@@ -36,8 +25,9 @@ namespace Inter_face
         string basefilepath;
         string fixextrainfo;
         int last_star_pos;
+        bool overWrightoldData;        
 
-        List<ExtractData.ChangeToTxt.PoduOutputData> pdx;
+        List<ChangeToTxt.PoduOutputData> pdx;
         List<ExtractData.ChangeToTxt.PoduOutputData> pds;
         List<ExtractData.ChangeToTxt.QuxianOutputData> qxx;
         List<ExtractData.ChangeToTxt.QuxianOutputData> qxs;
@@ -49,12 +39,13 @@ namespace Inter_face
         SaveFileDialog savetxtfile;
         CheckDatasign cds;
         CheckDataLogic cdl;
+        FillExcel fe;
         ModifyFilenamesWindow modifyfilenameswindow;
         ExtractData.WorkSheetBase worksheetbase;
         ExtractData.GraphyDataOper gdo;
         int maxprocessbarvalue = 0;
         //string result;
-       // ProcessForm pf;
+        // ProcessForm pf;
 
         public MainWindow()
         {
@@ -64,7 +55,7 @@ namespace Inter_face
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p =>
             {
-                AddInfobox(p, string.Empty, string.Empty, 0, "0");
+                AddInfobox(p, string.Empty, string.Empty, 0, "1");
             });
 
             Messenger.Default.Register<string>(this, "ReadDataErrorWithOperate", p =>
@@ -98,12 +89,14 @@ namespace Inter_face
                         modifyfilenameswindow.Close();
                     }
 
-                    if (p.Length != 0)
+                    IniSheets.MakeCleanBooks(null, null, null, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
+                    this.ProcessLabel.Content = "初始化完成";
+
+                    if (p.Count() != 0)
                     {
-                        FillExcel fe = new FillExcel(pdfilepath, qxfilepath, bjfilepath);
+                        fe.Overwright = false;
                         fe.DatapathChanged += new FillExcel.DatapathChangedEvent(fe_DatapathChanged);
                         fe.Loaderror += new FillExcel.LoaderrorEventhandler(fe_Loaderror);
-
                         fe.datapathes = p;
 
                         maxprocessbarvalue = 3 * p.Length * 10;
@@ -112,10 +105,11 @@ namespace Inter_face
                         this.ProgressBar.Visibility = Visibility.Visible;
 
                         this.loadformdatabase.IsEnabled = false;
-
+                       
                         Thread fethread = new Thread(new ThreadStart(fe.FillData));
                         fethread.Start();
-                    }
+                    }                   
+
                 });
         }
 
@@ -157,30 +151,14 @@ namespace Inter_face
         }
 
         #region loaddatabase
+
         private void loadformdatabase_Click(object sender, RoutedEventArgs e)
-        {
-            IniSheets.MakeCleanBooks(pdfilepath, qxfilepath, bjfilepath, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
-            this.ProcessLabel.Content = "工作表初始化完成";
+        {            
+            fe = new FillExcel(pdfilepath, qxfilepath, bjfilepath);
 
-            openacessfile.Filter = "access files (*.mdb)|*.mdb|All files (*.*)|*.*";
-            openacessfile.FilterIndex = 1;
-            openacessfile.Multiselect = true;
-
-            if (openacessfile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                string[] datapathes = openacessfile.FileNames;
-                if (datapathes.Length > 1)
-                {
-                    modifyfilenameswindow = new ModifyFilenamesWindow();
-                    Messenger.Default.Send<string[]>(datapathes, "ModifyFilePos");                    
-                    modifyfilenameswindow.ShowDialog();
-                }
-                else
-                {
-                    Messenger.Default.Send<string[]>(datapathes, "sendFilenames");
-                }
-            }
-
+            modifyfilenameswindow = new ModifyFilenamesWindow();
+            Messenger.Default.Send<FulfillSource>(fe.Ffs, "ModifyFilePos");
+            modifyfilenameswindow.ShowDialog();
         }
 
         void fe_Loaderror(object sender, FillExcel.LoaderrorEventArgs e)
@@ -202,11 +180,11 @@ namespace Inter_face
                 this.ProcessLabel.Content = labcontent;
                 this.ProgressBar.Value += 10;
                 //result += this.ProcessLabel.Content;
-                if (this.ProgressBar.Value == this.ProgressBar.Maximum)
+                if (ProgressBar.Value == ProgressBar.Maximum)
                 {
                     this.ProcessLabel.Content = "读取完成";
                     this.ProgressBar.Visibility = Visibility.Hidden;
-                    this.loadformdatabase.IsEnabled = true;
+                    loadformdatabase.IsEnabled = true;
                     AddInfobox("数据读取完成", string.Empty, string.Empty, 0, "3");
                 }
             }));
@@ -604,9 +582,10 @@ namespace Inter_face
             else if (e.Situation == OperationSituation.Ok)
             {
                 if (infobox.FixProperty)
-                {
+                {                    
                     Messenger.Default.Send<string>(fixextrainfo, "FixPosError");
                 }
+                infobox.Situation = "0";
             }
         }
 
@@ -1041,9 +1020,6 @@ namespace Inter_face
         {
             if (filepathes.Length != 0)
             {
-                IniSheets.MakeCleanBooks(pdfilepath, qxfilepath, bjfilepath, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
-                this.ProcessLabel.Content = "工作表初始化完成";
-
                 if (filepathes.Length > 1)
                 {
                     modifyfilenameswindow = new ModifyFilenamesWindow();
@@ -1148,7 +1124,22 @@ namespace Inter_face
     {
         string pdfilepath, qxfilepath, bjfilepath;
         ExtractData.FulfillSource ffs = null;
+        public FulfillSource Ffs
+        {
+            get { return ffs; }
+        }
         public string[] datapathes;
+        private bool overWright;
+
+        public bool Overwright
+        {
+            get { return overWright; }
+            set
+            {
+                overWright = value;
+                ffs.OverwrightData = overWright;
+            }
+        }
 
         public FillExcel(string pdfilepath, string qxfilepath, string bjfilepath)
         {

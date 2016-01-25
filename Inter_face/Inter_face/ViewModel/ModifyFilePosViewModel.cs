@@ -2,6 +2,11 @@
 using GalaSoft.MvvmLight.Command;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using ExtractData;
+using System.Linq;
+using System.IO;
+using System.Windows;
+using System.Windows.Forms;
 
 namespace Inter_face.ViewModel
 {
@@ -13,20 +18,27 @@ namespace Inter_face.ViewModel
     /// </summary>
     public class ModifyFilePosViewModel : ViewModelBase
     {
+        FulfillSource ffs;
+        OpenFileDialog openacessfile;
+        private List<string> deletedSheetsname;
+
         /// <summary>
         /// Initializes a new instance of the ModifyFilePosViewModel class.
         /// </summary>
         public ModifyFilePosViewModel()
         {
             fileNames = new ObservableCollection<string>();
-            MessengerInstance.Register<string[]>(this, "ModifyFilePos",
+            MessengerInstance.Register<FulfillSource>(this, "ModifyFilePos",
                 (p) =>
                 {
-                    foreach (string filename in p)
+                    ffs = p;
+
+                    foreach (string filename in p.GetExistSheets())
                     {
                         FileNamesProperty.Add(filename);
                     }
                 });
+            deletedSheetsname = new List<string>();
         }
 
         private ObservableCollection<string> fileNames;
@@ -65,7 +77,7 @@ namespace Inter_face.ViewModel
                 _selectedindexProperty = value;
                 RaisePropertyChanged(selectedIndexPropertyName);
             }
-        }
+        }       
 
         private void Up()
         {
@@ -89,17 +101,97 @@ namespace Inter_face.ViewModel
         {
             if (FileNamesProperty.Count != 0)
             {
+                if (!deletedSheetsname.Contains(FileNamesProperty[selectedIndex]))
+                    deletedSheetsname.Add(FileNamesProperty[selectedIndex]);
                 FileNamesProperty.RemoveAt(selectedIndex);
+            }
+            selectedIndex = 0;
+        }
+
+        private void Add(string[] files)
+        {
+            string existnames = string.Empty;
+            List<string> existFiles = ffs.HasExistsheet(files.Select(p => Path.GetFileNameWithoutExtension(p)).ToArray());
+
+            if (existFiles != null && existFiles.Count != 0)
+            {
+                foreach (string item in existFiles)
+                {
+                    existnames += (item + @"\r\n");
+                }
+
+                if (System.Windows.MessageBox.Show(string.Format(@"是否覆盖下列数据：\r\n{0}", existnames),
+                    "提示", MessageBoxButton.YesNo, MessageBoxImage.Asterisk, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                {
+                    foreach (string item in existFiles)
+                    {
+                        if (!deletedSheetsname.Contains(item))
+                            deletedSheetsname.Add(item);
+                    }
+                }                
+            }
+
+            foreach (string file in files)
+            {
+                if (!existFiles.Contains(Path.GetFileNameWithoutExtension(file)))
+                    FileNamesProperty.Add(file);
+            }
+        }
+
+        private void loadformDialog()
+        {
+            openacessfile = new OpenFileDialog();
+
+            openacessfile.Filter = "access files (*.mdb)|*.mdb|All files (*.*)|*.*";
+            openacessfile.FilterIndex = 1;
+            openacessfile.Multiselect = true;
+
+            if (openacessfile.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string[] datapathes = openacessfile.FileNames;
+                Add(datapathes);
+            }
+        }
+
+        private void dropEnter(System.Windows.DragEventArgs e)
+        {
+            if (e.KeyStates == DragDropKeyStates.LeftMouseButton && e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                string[] filenames = ((System.Array)(e.Data.GetData(System.Windows.DataFormats.FileDrop))) as string[];
+                if (filenames != null && filenames.All(p => System.IO.Path.GetExtension(p).Equals(".mdb")))
+                    e.Effects = System.Windows.DragDropEffects.Link;
+                else
+                    e.Effects = System.Windows.DragDropEffects.None;
+
+            }
+            else
+                e.Effects = System.Windows.DragDropEffects.None;
+        }
+
+        private void loadformDrop(System.Windows.DragEventArgs e)
+        {
+            string[] filepathes = null;
+
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            {
+                filepathes = (((System.Array)(e.Data.GetData(System.Windows.DataFormats.FileDrop))) as string[]);
+                if (filepathes != null)
+                {
+                    Add(filepathes.Where(p => Path.GetExtension(p).ToLower().Equals(".mdb")).ToArray());
+                }
             }
         }
 
         private void commit()
         {
             List<string> result = new List<string>();
+
+            ffs.DeleteSheet(deletedSheetsname.ToArray());
+            
             foreach (string filename in FileNamesProperty)
             {
                 result.Add(filename);
-            }
+            }            
 
             MessengerInstance.Send<string[]>(result.ToArray(), "sendFilenames");
         }
@@ -107,6 +199,18 @@ namespace Inter_face.ViewModel
         private void NoChanged()
         {
             MessengerInstance.Send<string[]>(new string[] { }, "sendFilenames");
+        }
+
+        private void RemoveAll()
+        {
+            foreach (string filename in FileNamesProperty)
+            {
+                if (!deletedSheetsname.Contains(filename))
+                    deletedSheetsname.Add(filename);                
+            }
+
+            FileNamesProperty.Clear();
+            selectedIndex = -1;          
         }
 
         private RelayCommand _upCommand;
@@ -216,7 +320,85 @@ namespace Inter_face.ViewModel
 
                         Delete();
                     },
+                    () => { return FileNamesProperty.Count != 0 && selectedIndex != -1; }));
+            }
+        }
+
+        private RelayCommand _removeallCommand;
+
+        /// <summary>
+        /// Gets the RemoveAllCommand.
+        /// </summary>
+        public RelayCommand RemoveAllCommand
+        {
+            get
+            {
+                return _removeallCommand
+                    ?? (_removeallCommand = new RelayCommand(
+                    () =>
+                    {
+                        if (!RemoveAllCommand.CanExecute(null))
+                        {
+                            return;
+                        }
+
+                        RemoveAll();
+                    },
                     () => { return FileNamesProperty.Count != 0; }));
+            }
+        }
+
+        private RelayCommand _loadCommand;
+
+        /// <summary>
+        /// Gets the CancelCommand.
+        /// </summary>
+        public RelayCommand LoadCommand
+        {
+            get
+            {
+                return _loadCommand
+                    ?? (_loadCommand = new RelayCommand(
+                    () =>
+                    {
+                        loadformDialog();
+                    }));
+            }
+        }
+
+        private RelayCommand<System.Windows.DragEventArgs> _dragenterCommand;
+
+        /// <summary>
+        /// Gets the CancelCommand.
+        /// </summary>
+        public RelayCommand<System.Windows.DragEventArgs> DragEnterCommand
+        {
+            get
+            {
+                return _dragenterCommand
+                    ?? (_dragenterCommand = new RelayCommand<System.Windows.DragEventArgs>(
+                    (e) =>
+                    {
+                        dropEnter(e);
+                    }));
+            }
+        }
+
+        private RelayCommand<System.Windows.DragEventArgs> _loadformDropCommand;
+
+        /// <summary>
+        /// Gets the CancelCommand.
+        /// </summary>
+        public RelayCommand<System.Windows.DragEventArgs> LoadFormDropCommand
+        {
+            get
+            {
+                return _loadformDropCommand
+                    ?? (_loadformDropCommand = new RelayCommand<System.Windows.DragEventArgs>(
+                    (e) =>
+                    {
+                        loadformDrop(e);
+                    }));
             }
         }
     }

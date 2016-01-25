@@ -474,8 +474,8 @@ namespace Inter_face.ViewModel
             {
                 Hat = getHat(middleSecnum);
 
-                leftedgepos = (decimal)offsetPosBackword(middlepos, LeftDis, ref leftedgeSecnum);
-                rightedgepos = (decimal)offsetPosForword(middlepos, RightDis, ref rightedgeSecnum);
+                leftedgepos = offsetPosBackword(middlepos, LeftDis, ref leftedgeSecnum);
+                rightedgepos = offsetPosForword(middlepos, RightDis, ref rightedgeSecnum);
                 LeftEdgePos = formatShowpos(leftedgepos, leftedgeSecnum);
                 RightEdgePos = formatShowpos(rightedgepos, rightedgeSecnum);
 
@@ -518,39 +518,57 @@ namespace Inter_face.ViewModel
         private int getSecnum(decimal pos)
         {
             decimal usedPos = pos * 1000;
+            decimal start = startpos * 1000;
+            decimal end = 0;
             int sec = 0;
             //int matchedtimes = 0;
             string[] parts = { };
+            decimal offset = 0;
 
             for (int i = startSecnum; i <= endSecnum; i++)
             {
                 if (i == cdl.Count + 1)
                 {
                     parts = cdl[i - 2].Split(':');
-                    if (usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
+                    if(usedPos>= decimal.Parse(parts[0].Split('+')[1]) && usedPos <= end)
                     {
                         sec = i;
                         break;
-                    }
-                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos >= 0.0009m)
+                    }                    
+                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos - offset >= 0.0009m)
                     {
                         sec = i - 1;
                         break;
                     }
                 }
                 else
-                {
+                {                    
                     parts = cdl[i - 1].Split(':');
-                    if (usedPos - decimal.Parse(parts[1].Split('+')[1]) >= 0.0009m)
+                    end = decimal.Parse(parts[0].Split('+')[1]);
+                    if (usedPos >= start && usedPos <= end)
+                    {
+                        sec = i;
+                    }
+                    else
+                    {
+                        start = decimal.Parse(parts[1].Split('+')[1]);
+                        if (i == endSecnum)
+                        {
+                            sec = endSecnum;
+                            break;
+                        }
+                    }
+                   /* if (usedPos + offset - decimal.Parse(parts[0].Split('+')[1]) > 0.0009m)
                     {
                         sec = i + 1;
+                        offset += (decimal.Parse(parts[1].Split('+')[1]) - decimal.Parse(parts[0].Split('+')[1]));
                         continue;
                     }
-                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos >= 0.0009m)
+                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos - offset >= 0.0009m)
                     {
                         sec = i;
                         break;
-                    }
+                    }*/
                 }
             }
 
@@ -579,7 +597,7 @@ namespace Inter_face.ViewModel
                 {
                     parts = cdl[middleSecnum - 1].Split(':');
                 }
-                decimal limitdis = decimal.Parse(parts[0].Split('+')[1]) - middlepos;
+                decimal limitdis = decimal.Parse(parts[0].Split('+')[1]) - middlepos * 1000;
 
                 for (int i = middleSecnum; i < endSecnum; i++)
                 {

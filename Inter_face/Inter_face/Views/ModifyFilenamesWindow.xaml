@@ -3,36 +3,50 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="clr-namespace:Inter_face.ViewModel"
 	xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight"
+	xmlns:Coverters="clr-namespace:Inter_face.Coverters"
 	x:Class="Inter_face.ModifyFilenamesWindow"
 	x:Name="Window"
 	Title="排列文件"
-	Width="550" Height="250" WindowStyle="ToolWindow" DataContext="{DynamicResource ModifyFilePosViewModel}">
+	Width="550" Height="270" WindowStyle="ToolWindow" DataContext="{DynamicResource ModifyFilePosViewModel}">
     <Window.Resources>
-    	<vm:ModifyFilePosViewModel x:Key="ModifyFilePosViewModel"/>
+        <Coverters:FilePathToFileNameConverter x:Key="FilePathToFileNameConverter"/>
+        <vm:ModifyFilePosViewModel x:Key="ModifyFilePosViewModel"/>
     </Window.Resources>
-	<i:Interaction.Triggers>
-		<i:EventTrigger EventName="Closed">
-			<Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding CancelCommand, Mode=OneWay}"/>
-		</i:EventTrigger>
-	</i:Interaction.Triggers>
-	<Grid x:Name="LayoutRoot">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="20"/>
-			<RowDefinition Height="40"/>
-			<RowDefinition Height="40"/>
-			<RowDefinition Height="40"/>
-			<RowDefinition Height="40"/>
-			<RowDefinition Height="40"/>
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="0.762*"/>
-			<ColumnDefinition Width="100"/>
-		</Grid.ColumnDefinitions>
-		<ListBox x:Name="filenamesListBox" Margin="8" Grid.RowSpan="6" SelectedIndex="{Binding selectedIndex, Mode=TwoWay}" ItemsSource="{Binding FileNamesProperty}"/>
-		<Button x:Name="UpButton" Content="上移" Grid.Column="1" Margin="6.092,7,8,8" Grid.Row="1" Command="{Binding UpCommand, Mode=OneWay}"/>
-		<Button x:Name="DownButton" Content="下移" Grid.Column="1" Margin="8" Grid.Row="2" Command="{Binding DownCommand, Mode=OneWay}"/>
-		<Button x:Name="DeleteButton" Content="删除" Grid.Column="1" Margin="8" Grid.Row="3" Command="{Binding DeleteCommand, Mode=OneWay}"/>
-		<Button x:Name="OkButton" Content="确定" Grid.Column="1" Margin="8" Grid.Row="4" Command="{Binding CommitCommand, Mode=OneWay}"/>
-		<Button x:Name="CancelButton" Content="取消" Grid.Column="1" Margin="8" Grid.Row="5" Command="{Binding CancelCommand, Mode=OneWay}"/>
-	</Grid>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding CancelCommand, Mode=OneWay}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.762*"/>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="filenamesListBox" Margin="8" Grid.RowSpan="6" SelectedIndex="{Binding selectedIndex, Mode=TwoWay}" ItemsSource="{Binding FileNamesProperty}" AllowDrop="True">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="DragEnter">
+                    <Custom:EventToCommand x:Name="DragEnterEventToCommand" PassEventArgsToCommand="True" Command="{Binding DragEnterCommand, Mode=OneWay}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="Drop">
+                    <Custom:EventToCommand x:Name="DropEventToComand" PassEventArgsToCommand="True" Command="{Binding LoadFormDropCommand, Mode=OneWay}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListBox>
+        <Button x:Name="UpButton" Content="上移" Grid.Column="1" Margin="8" Command="{Binding UpCommand, Mode=OneWay}" Grid.ColumnSpan="2"/>
+        <Button x:Name="DownButton" Content="下移" Grid.Column="1" Margin="8" Grid.Row="1" Command="{Binding DownCommand, Mode=OneWay}" Grid.ColumnSpan="2"/>
+        <Button x:Name="AddButton" Content="添加" Grid.Column="1" Margin="8" Grid.Row="2" Command="{Binding LoadCommand, Mode=OneWay}" Grid.ColumnSpan="2"/>
+        <Button x:Name="DeleteButton" Content="删除" Grid.Column="1" Margin="8,8,4,8" Grid.Row="3" Command="{Binding DeleteCommand, Mode=OneWay}"/>
+        <Button x:Name="RemoveallButton" Content="清空" Grid.Column="2" Margin="8,8,4,8" Grid.Row="3" Command="{Binding RemoveAllCommand, Mode=OneWay}"/>
+        <Button x:Name="OkButton" Content="确定" Grid.Column="1" Margin="8" Grid.Row="4" Command="{Binding CommitCommand, Mode=OneWay}" Grid.ColumnSpan="2"/>
+        <Button x:Name="CancelButton" Content="取消" Grid.Column="1" Margin="8" Grid.Row="5" Command="{Binding CancelCommand, Mode=OneWay}" Grid.ColumnSpan="2"/>
+    </Grid>
 </Window>

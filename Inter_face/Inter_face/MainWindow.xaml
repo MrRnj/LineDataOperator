@@ -317,7 +317,7 @@
             <Fluent:RibbonTabItem Header="文件" IsSelected="True">
                 <Fluent:RibbonGroupBox Header="读取数据" Height="Auto">
                     <Fluent:Button x:Name="CreatNewWork" Click="CreatNewWork_Click"  Header="新建数据表" LargeIcon="{StaticResource newworkicon}" ToolTip="{StaticResource NewSheetTip}" />
-                    <Fluent:Button x:Name="loadformdatabase" Click="loadformdatabase_Click" Header="读取数据库" LargeIcon="{DynamicResource accessicon}" ToolTip="{StaticResource ReadAccessTip}" AllowDrop="True" DragEnter="loadformdatabase_DragEnter" Drop="loadformdatabase_Drop" />
+                    <Fluent:Button x:Name="loadformdatabase" Click="loadformdatabase_Click" Header="读取数据库" LargeIcon="{DynamicResource accessicon}" ToolTip="{StaticResource ReadAccessTip}" AllowDrop="False"/>
                     <Fluent:Button x:Name="loadformSourceZip" Click="loadformSourceZip_Click"  Header="读取原始数据" LargeIcon="{StaticResource lbopicon}" ToolTip="{StaticResource ReadResourceTip}" AllowDrop="True" DragEnter="loadformSourceZip_DragEnter" Drop="loadformSourceZip_Drop"/>
                     <Fluent:Button x:Name="loadformOpZip" Click="loadformOpZip_Click"  Header="读取处理后数据" LargeIcon="{StaticResource laopicon}" ToolTip="{StaticResource ReadOperatedTip}" AllowDrop="True" DragEnter="loadformOpZip_DragEnter" Drop="loadformOpZip_Drop"/>
                 </Fluent:RibbonGroupBox>

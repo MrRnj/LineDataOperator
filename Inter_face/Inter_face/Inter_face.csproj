@@ -151,6 +151,7 @@
     <Compile Include="Coverters\DmToVisibilityConverter.cs" />
     <Compile Include="Coverters\DmToXhSelectedConverter.cs" />
     <Compile Include="Coverters\DmToXhvisibilityConverter.cs" />
+    <Compile Include="Coverters\FilePathToFileNameConverter.cs" />
     <Compile Include="Coverters\FloatToEndPositionConverter.cs" />
     <Compile Include="Coverters\FloatToStartStringConverter.cs" />
     <Compile Include="Coverters\IDatamodelToAliConverter.cs" />
