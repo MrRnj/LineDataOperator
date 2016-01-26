@@ -984,7 +984,10 @@ namespace Inter_face.ViewModel
                 p =>
                 {
                     string[] fixinfo = p.Split('?');
-                    ABoper.AdjustLength(fixinfo[2], int.Parse(fixinfo[0]), float.Parse(fixinfo[1]));
+                    if(!ABoper.AdjustLength(fixinfo[2], int.Parse(fixinfo[0]), float.Parse(fixinfo[1])))
+                    {
+                        MessageBox.Show("高程自动调整失败，请手动调整！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 });
         }
 

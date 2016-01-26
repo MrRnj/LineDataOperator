@@ -111,22 +111,38 @@ namespace Inter_face.ViewModel
         private void Add(string[] files)
         {
             string existnames = string.Empty;
-            List<string> existFiles = ffs.HasExistsheet(files.Select(p => Path.GetFileNameWithoutExtension(p)).ToArray());
+            int index = 0;
+            List<string> existFiles = new List<string>();
+            //List<string> existFiles = ffs.HasExistsheet(files.Select(p => Path.GetFileNameWithoutExtension(p)).ToArray());
+            existFiles = (from fn in FileNamesProperty
+                          join f in files
+                               on fn equals Path.GetFileNameWithoutExtension(f)
+                          select fn).ToList();
 
             if (existFiles != null && existFiles.Count != 0)
             {
                 foreach (string item in existFiles)
                 {
-                    existnames += (item + @"\r\n");
+                    existnames += (item + "\r\n");
                 }
 
-                if (System.Windows.MessageBox.Show(string.Format(@"是否覆盖下列数据：\r\n{0}", existnames),
+                if (System.Windows.MessageBox.Show(string.Format("是否覆盖下列数据：\r\n{0}", existnames),
                     "提示", MessageBoxButton.YesNo, MessageBoxImage.Asterisk, MessageBoxResult.Yes) == MessageBoxResult.Yes)
                 {
                     foreach (string item in existFiles)
                     {
                         if (!deletedSheetsname.Contains(item))
                             deletedSheetsname.Add(item);
+                        foreach (string file in files)
+                        {
+                            if (item.Equals(Path.GetFileNameWithoutExtension(file)))
+                            {
+                                index = FileNamesProperty.IndexOf(item);
+                                FileNamesProperty.RemoveAt(index);
+                                FileNamesProperty.Insert(index, file);
+                                break;
+                            }                            
+                        }
                     }
                 }                
             }
