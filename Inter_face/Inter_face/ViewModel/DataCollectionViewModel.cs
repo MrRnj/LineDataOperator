@@ -724,7 +724,7 @@ namespace Inter_face.ViewModel
         /// </summary>
         public const string ExportXhTextPropertyName = "ExportXhText";
 
-        private string _exportxhtextProperty = "输出";
+        private string _exportxhtextProperty = "";
 
         /// <summary>
         /// Sets and gets the ExportXhText property.
@@ -800,7 +800,8 @@ namespace Inter_face.ViewModel
             _takenOfcurrentDFX = string.Empty;
             _xhdataPath = string.Empty;
             _startPos = -1;
-            _endPos = -1;           
+            _endPos = -1;
+            ExportXhText = "分页输出";
 
             MessengerInstance.Register<GraphyDataOper>(this, "gdo", p => { gdo = p; });
             MessengerInstance.Register<System.Windows.Threading.Dispatcher>(this, "Dispatcher", p => { dispatcher = p; });

@@ -87,13 +87,13 @@ namespace Inter_face
                     if (modifyfilenameswindow != null)
                     {
                         modifyfilenameswindow.Close();
-                    }
-
-                    IniSheets.MakeCleanBooks(null, null, null, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
-                    this.ProcessLabel.Content = "初始化完成";
+                    }                    
 
                     if (p.Count() != 0)
                     {
+                        IniSheets.MakeCleanBooks(null, null, null, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
+                        this.ProcessLabel.Content = "初始化完成";
+
                         fe.Overwright = false;
                         fe.DatapathChanged += new FillExcel.DatapathChangedEvent(fe_DatapathChanged);
                         fe.Loaderror += new FillExcel.LoaderrorEventhandler(fe_Loaderror);
