@@ -164,7 +164,6 @@
         </ToolTip>
         <DataTemplate x:Key="DetailDataTemplate">
             <Grid x:Name="grid" Margin="-1,0">
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="10"/>
                     <RowDefinition Height="30"/>

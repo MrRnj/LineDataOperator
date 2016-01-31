@@ -47,6 +47,16 @@ namespace Inter_face.Models
             get { return isUpdataVar; }
             set { isUpdataVar = value; }
         }
-        
+
+        //0 - 上行 1 - 下行
+        private int deriction;
+
+        public int DerictionProperty
+        {
+            get { return deriction; }
+            set { deriction = value; }
+        }
+
+
     }
 }

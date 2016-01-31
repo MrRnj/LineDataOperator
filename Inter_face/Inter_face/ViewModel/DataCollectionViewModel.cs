@@ -673,6 +673,127 @@ namespace Inter_face.ViewModel
 
             set
             {
+                if (value)
+                {
+                    Thread QuikSaveXhdataThread = null;
+
+                    if (GDoper != null)
+                    {
+                        if (QuikSaveXhdataThread != null && QuikSaveXhdataThread.IsAlive)
+                        {
+                            QuikSaveXhdataThread.Abort();
+                            QuikSaveXhdataThread = null;
+                        }
+
+                        QuikSaveXhdataThread = new Thread(() =>
+                        {
+                            ISingleDataViewModel singledata = null;
+                            List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
+                            List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
+                            string[] parts;
+                            string bjData = string.Empty;
+
+                            try
+                            {
+
+                                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                            }
+                            catch
+                            {
+                                singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
+                            }
+
+                            foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                            {
+                                parts = item.StationNameProperty.Split(':');
+                                if (!parts[0].StartsWith("Q"))
+                                {
+                                    switch (parts[0])
+                                    {
+                                        case "1":
+                                            bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                            break;
+                                        case "2":
+                                            bjData = parts[1];
+                                            break;
+                                        case "3":
+                                            //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
+                                            bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                    xhs.Add(new ChangeToTxt.CheZhanOutputData()
+                                    {
+                                        Bjlx = parts[0],
+                                        Bjsj = bjData,
+                                        Gh = item.HatProperty,
+                                        Glb = item.PositionProperty.ToString("F3"),
+                                        Index = string.Empty,
+                                        Ldh = item.SectionNumProperty.ToString(),
+                                        Zjfx = "1"
+                                    });
+                                }
+                            }
+
+                            bjData = string.Empty;
+                            try
+                            {
+
+                                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                            }
+                            catch
+                            {
+                                singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
+                            }
+
+                            foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                            {
+                                parts = item.StationNameProperty.Split(':');
+                                if (!parts[0].StartsWith("Q"))
+                                {
+                                    switch (parts[0])
+                                    {
+                                        case "1":
+                                            bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                            break;
+                                        case "2":
+                                            bjData = parts[1];
+                                            break;
+                                        case "3":
+                                            bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                    xhx.Add(new ChangeToTxt.CheZhanOutputData()
+                                    {
+                                        Bjlx = parts[0],
+                                        Bjsj = bjData,
+                                        Gh = item.HatProperty,
+                                        Glb = item.PositionProperty.ToString("F3"),
+                                        Index = string.Empty,
+                                        Ldh = item.SectionNumProperty.ToString(),
+                                        Zjfx = "1"
+                                    });
+                                }
+                            }
+
+                            string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath), 
+                                                             Path.GetFileNameWithoutExtension(_xhdataPath) +
+                                                             ".xhbackup");
+                            if (!_xhdataPath.Equals(string.Empty))
+                            {
+                                GDoper.XhDataQuikSave(xhs, xhx, backupfile);
+                            }
+                        });
+
+                        QuikSaveXhdataThread.Start();
+                    }
+                }
+
                 if (_isxinhaochangedProperty == value)
                 {
                     return;
@@ -680,7 +801,7 @@ namespace Inter_face.ViewModel
 
                 RaisePropertyChanging(IsXinhaoChangedPropertyName);
                 _isxinhaochangedProperty = value;
-                RaisePropertyChanged(IsXinhaoChangedPropertyName);
+                RaisePropertyChanged(IsXinhaoChangedPropertyName);                
             }
         }
 
@@ -784,7 +905,7 @@ namespace Inter_face.ViewModel
         public DataCollectionViewModel()
         {
             _datascollection = new ObservableCollection<ISingleDataViewModel>();
-            _datascollection.CollectionChanged += _datascollection_CollectionChanged;            
+            //_datascollection.CollectionChanged += _datascollection_CollectionChanged;            
             _Pdpath = Path.Combine(_currentdir, @"excelmodels\接坡面数据_Single.xlsx");
             _Qxpath = Path.Combine(_currentdir, @"excelmodels\接曲线数据_single.xlsx");
             _Bjpath = Path.Combine(_currentdir, @"excelmodels\接标记数据_single.xlsx");
@@ -962,16 +1083,36 @@ namespace Inter_face.ViewModel
             MessengerInstance.Register<StationDataMode>(this, "InsertDianfx", 
                 p => 
                 {
-                    string[] infos = p.StationNameProperty.Split(':');
-                    InsertDianFXx(string.Format("{0}:{1}:{2}",
-                        infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
+                    if (dianfxwindow != null)
+                    {
+                        dianfxwindow.Close();
+                        dianfxwindow = null;
+                    }
+
+                    if (p != null)
+                    {
+                        string[] infos = p.StationNameProperty.Split(':');
+                        InsertDianFXx(string.Format("{0}:{1}:{2}",
+                            infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
+                    }
+                    
                 });
             MessengerInstance.Register<StationDataMode>(this, "UpdataDianfx",
                p =>
                {
-                   string[] infos = p.StationNameProperty.Split(':');
-                   UpdataDianfx(string.Format("{0}:{1}:{2}",
-                       infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
+                   if (dianfxwindow != null)
+                   {
+                       dianfxwindow.Close();
+                       dianfxwindow = null;
+                   }
+
+                   if (p != null)
+                   {
+                       string[] infos = p.StationNameProperty.Split(':');
+                       UpdataDianfx(string.Format("{0}:{1}:{2}",
+                           infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
+                   }
+                   
                });
             MessengerInstance.Register<DataType>(this, "ShowRightDialog", p => 
             {
@@ -3243,7 +3384,8 @@ namespace Inter_face.ViewModel
                     //（路段号+里程）
                     LeftPosProperty = string.Format("{0}+{1}", startsecnum.ToString(), startpos.ToString("F3")),
                     RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3")),
-                    IsUpdataProperty = false
+                    IsUpdataProperty = false,
+                    DerictionProperty = SeletedXinhaoS ? 1 : 0
                 },
                 "DfxInputInfos");
 
@@ -3296,7 +3438,8 @@ namespace Inter_face.ViewModel
                     DfxInfosProperty = dfxinfosstring,
                     LeftPosProperty = string.Format("{0}+{1}", startsecnum.ToString(), startpos.ToString("F3")),
                     RightPosProperty = string.Format("{0}+{1}", endsecnum.ToString(), endpos.ToString("F3")),
-                    IsUpdataProperty = true
+                    IsUpdataProperty = true,
+                    DerictionProperty = SeletedXinhaoS ? 1 : 0
                 },
                 "DfxInputInfos");
 
@@ -4308,6 +4451,10 @@ namespace Inter_face.ViewModel
                 }
                 else
                 {
+                    string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath),
+                                                             Path.GetFileNameWithoutExtension(_xhdataPath) +
+                                                             ".xhbackup" );
+                    File.Delete(backupfile);
                     GDoper.SaveXhData(xhs, xhx, _xhdataPath);
                 }
             }
@@ -4414,6 +4561,14 @@ namespace Inter_face.ViewModel
                     }
                 }
 
+                if (!_xhdataPath.Equals(string.Empty))
+                {
+                    string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath),
+                                                            Path.GetFileNameWithoutExtension(_xhdataPath) +
+                                                            "_backup" + Path.GetExtension(_xhdataPath));
+                    File.Delete(backupfile);
+                }
+
                 SaveFileDialog savexhdataDialog = new SaveFileDialog();
                 savexhdataDialog.Title = "保存信号数据";
                 savexhdataDialog.Filter = "信号数据|*.xh";
@@ -4446,7 +4601,7 @@ namespace Inter_face.ViewModel
                     cleanXhdata();
                     openxhdataDialog = new OpenFileDialog();
                     openxhdataDialog.Title = "打开信号数据";
-                    openxhdataDialog.Filter = "信号数据文件|*.xh|所有文件|*.*";
+                    openxhdataDialog.Filter = "信号数据文件|*.xh|备放文件|*.xhbackup|所有文件|*.*";
                     openxhdataDialog.Multiselect = false;
 
                     if (openxhdataDialog.ShowDialog() == true)
@@ -4454,12 +4609,27 @@ namespace Inter_face.ViewModel
                         try
                         {
                             Cursor = 1;
-                            GDoper.OpenXhData(openxhdataDialog.FileName);
-                            _xhdataPath = openxhdataDialog.FileName;
+                            if (Path.GetExtension(openxhdataDialog.FileName).Equals(".xh"))
+                            {
+                                _xhdataPath = openxhdataDialog.FileName;
+                            }
+                            else if (Path.GetExtension(openxhdataDialog.FileName).Equals(".xhbackup"))
+                            {
+                                _xhdataPath = Path.Combine(Path.GetDirectoryName(openxhdataDialog.FileName),
+                                                      Path.GetFileNameWithoutExtension(openxhdataDialog.FileName) + ".xh");
+                                _xhdataPath = _xhdataPath.TrimEnd(' ');
+                                File.Delete(_xhdataPath);
+                                File.Copy(openxhdataDialog.FileName, _xhdataPath);
+                                File.Delete(openxhdataDialog.FileName);
+
+                            }
+
+                            GDoper.OpenXhData(_xhdataPath);
+
                             CanloadxhProperty = true;
                         }
                         catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
-                        {                            
+                        {
                             MessengerInstance.Send<string>("读入信号机数据出错", "ReadDataError");
                         }
                         finally
@@ -4474,7 +4644,7 @@ namespace Inter_face.ViewModel
 
             openxhdataDialog = new OpenFileDialog();
             openxhdataDialog.Title = "打开信号数据";
-            openxhdataDialog.Filter = "信号数据文件|*.xh|所有文件|*.*";
+            openxhdataDialog.Filter = "信号数据文件|*.xh|备放文件|*.xhbackup|所有文件|*.*";
             openxhdataDialog.Multiselect = false;
 
             if (openxhdataDialog.ShowDialog() == true)
@@ -4482,8 +4652,23 @@ namespace Inter_face.ViewModel
                 try
                 {
                     Cursor = 1;
-                    GDoper.OpenXhData(openxhdataDialog.FileName);
-                    _xhdataPath = openxhdataDialog.FileName;
+                    if (Path.GetExtension(openxhdataDialog.FileName).Equals(".xh"))
+                    {
+                        _xhdataPath = openxhdataDialog.FileName;
+                    }
+                    else if (Path.GetExtension(openxhdataDialog.FileName).Equals(".xhbackup"))
+                    {
+                        _xhdataPath = Path.Combine(Path.GetDirectoryName(openxhdataDialog.FileName),
+                                              Path.GetFileNameWithoutExtension(openxhdataDialog.FileName) + ".xh");
+                        _xhdataPath= _xhdataPath.TrimEnd(' ');
+                        File.Delete(_xhdataPath);
+                        File.Copy(openxhdataDialog.FileName, _xhdataPath);
+                        File.Delete(openxhdataDialog.FileName);
+
+                    }
+
+                    GDoper.OpenXhData(_xhdataPath);
+
                     CanloadxhProperty = true;
                 }
                 catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
@@ -4588,6 +4773,25 @@ namespace Inter_face.ViewModel
 
         private void Dispose()
         {
+            if (_xhdataPath != string.Empty)
+            {
+                string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath),
+                                                             Path.GetFileNameWithoutExtension(_xhdataPath) +
+                                                             ".xhbackup");
+                if (File.Exists(backupfile))
+                {
+                    if (MessageBox.Show("是否保存对信号数据的修改？", "提示", MessageBoxButton.YesNo, 
+                        MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        SaveXhData();
+                    }
+                    else
+                    {
+                        File.Delete(backupfile);
+                    }
+                }
+            }
+
             GDoper.Dispose();
             SDexportor.Dispose();
             ABoper.Dispose();
@@ -5592,6 +5796,7 @@ namespace Inter_face.ViewModel
                 if (Disp != null)
                     Disp.BeginInvoke(new Action(() => { proceswindow.Close(); }));
             }
-        }        
+        }         
+           
     }
 }

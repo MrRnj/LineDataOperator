@@ -402,6 +402,67 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(HatPropertyName);
             }
         }
+
+        /// <summary>
+        /// The <see cref="LeftSign" /> property's name.
+        /// </summary>
+        public const string LeftSignPropertyName = "LeftSign";
+
+        private string _leftsignProperty = string.Empty;
+
+        /// <summary>
+        /// Sets and gets the LeftSign property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string LeftSign
+        {
+            get
+            {
+                return _leftsignProperty;
+            }
+
+            set
+            {
+                if (_leftsignProperty == value)
+                {
+                    return;
+                }
+
+                _leftsignProperty = value;
+                RaisePropertyChanged(LeftSignPropertyName);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="RightSign" /> property's name.
+        /// </summary>
+        public const string RightSignPropertyName = "RightSign";
+
+        private string _rightsignProperty = string.Empty;
+
+        /// <summary>
+        /// Sets and gets the LeftSign property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string RightSign
+        {
+            get
+            {
+                return _rightsignProperty;
+            }
+
+            set
+            {
+                if (_rightsignProperty == value)
+                {
+                    return;
+                }
+
+                _rightsignProperty = value;
+                RaisePropertyChanged(RightSignPropertyName);
+            }
+        }
+
         public UpdataDianFXViewModel()
         {
             MessengerInstance.Register<DianFXneededInfosMode>(this, "DfxInputInfos",
@@ -446,6 +507,17 @@ namespace Inter_face.ViewModel
 
                     isrefreshData = true;
                     isupdata = p.IsUpdataProperty;
+
+                    if (p.DerictionProperty == 1)
+                    {
+                        LeftSign = "断";
+                        RightSign = "合";
+                    }
+                    else
+                    {
+                        LeftSign = "合";
+                        RightSign = "断";
+                    }
                 });
         }
 
@@ -697,8 +769,15 @@ namespace Inter_face.ViewModel
                 MessengerInstance.Send<StationDataMode>(dianfxdata, "UpdataDianfx");
         }
 
-        private RelayCommand _commitCommand;
+        private void cancel()
+        {
+            if (!isupdata)
+                MessengerInstance.Send<StationDataMode>(null, "InsertDianfx");
+            else
+                MessengerInstance.Send<StationDataMode>(null, "UpdataDianfx");
+        }
 
+        private RelayCommand _commitCommand;
         /// <summary>
         /// Gets the CommitCommand.
         /// </summary>
@@ -711,6 +790,23 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                         commit();
+                    }));
+            }
+        }
+
+        private RelayCommand _cancelCommand;
+        /// <summary>
+        /// Gets the CancelCommand.
+        /// </summary>
+        public RelayCommand CancelCommand
+        {
+            get
+            {
+                return _cancelCommand
+                    ?? (_cancelCommand = new RelayCommand(
+                    () =>
+                    {
+                        cancel();
                     }));
             }
         }
