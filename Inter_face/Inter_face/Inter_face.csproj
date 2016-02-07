@@ -133,6 +133,7 @@
     <Compile Include="Coverters\AdjustLengthConverter.cs" />
     <Compile Include="Coverters\BoolenConverter.cs" />
     <Compile Include="Coverters\BoolenToVisibilityConverter.cs" />
+    <Compile Include="Coverters\ChartToColorConverter.cs" />
     <Compile Include="Coverters\ClddataToShowStyleConverter.cs" />
     <Compile Include="Coverters\DatasCollectionToVisibilityConverter.cs" />
     <Compile Include="Coverters\DmToDfxVisibilityConverter.cs" />
@@ -445,9 +446,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Readme.MvvmlightSnippet.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="icons\curve.png" />
   </ItemGroup>
   <ItemGroup>
@@ -491,6 +489,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\creatsignals.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Readme.MvvmlightSnippet.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

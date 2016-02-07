@@ -3,12 +3,13 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
     xmlns:vm="clr-namespace:Inter_face.ViewModel"
-	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters" mc:Ignorable="d"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight" mc:Ignorable="d"
 	x:Class="Inter_face.DianFXWindow"
 	x:Name="Window"
 	Title="DianFXWindow"
 	Width="1100" Height="182" MinWidth="1100" MaxHeight="200">
     <Window.Resources>
+        <Inter_face_Coverters:ChartToColorConverter x:Key="ChartToColorConverter"/>
         <Inter_face_Coverters:PartIntConverter x:Key="PartIntConverter"/>
         <Inter_face_Coverters:StringToIntConverter x:Key="StringToIntConverter"/>
         <vm:UpdataDianFXViewModel x:Key="UpdataDianFXViewModelDataSource" d:IsDataSource="True"/>
@@ -81,7 +82,14 @@
         </Grid>
         <TextBox x:Name="LeftEdgeDisTextBox" Grid.Column="2" Margin="4" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{Binding LeftDis, Converter={StaticResource PartIntConverter}, Mode=TwoWay}"  Width="45" Height="21.8366666666667" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" BorderBrush="#FF0AF718"/>
         <TextBox x:Name="RightEdgeDisTextBox" Grid.Column="4" Margin="4" TextWrapping="Wrap" HorizontalAlignment="Center" Text="{Binding RightDis, Converter={StaticResource PartIntConverter}, Mode=TwoWay}" Width="45" Height="21.8366666666667" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" BorderBrush="#FF0AF718"/>
-        <TextBlock x:Name="RightSigntextBlock" Grid.Column="5" HorizontalAlignment="Left" Margin="16,4,0,5" TextWrapping="Wrap" Width="95.333" TextAlignment="Center" FontSize="16" Text="{Binding RightSign}"><Run/><LineBreak/><Run/></TextBlock>
-        <TextBlock x:Name="LeftSigntextBlock" Grid.Column="1" Margin="0,4,16,5" TextWrapping="Wrap" TextAlignment="Center" FontSize="16" Text="{Binding LeftSign}" HorizontalAlignment="Right" Width="95.333"><Run/><LineBreak/><Run/></TextBlock>
+        <TextBlock x:Name="RightSigntextBlock" Grid.Column="5" HorizontalAlignment="Left" Margin="16,4,0,5" TextWrapping="Wrap" Width="95.333" TextAlignment="Center" FontSize="16" Text="{Binding RightSign}" Background="{Binding RightSign, Converter={StaticResource ChartToColorConverter}}" FontWeight="Bold"><Run/><LineBreak/><Run/></TextBlock>
+        <TextBlock x:Name="LeftSigntextBlock" Grid.Column="1" Margin="0,4,16,5" TextWrapping="Wrap" TextAlignment="Center" FontSize="16" Text="{Binding LeftSign}" HorizontalAlignment="Right" Width="95.333" Background="{Binding LeftSign, Converter={StaticResource ChartToColorConverter}}" FontWeight="Bold"><Run/><LineBreak/><Run/></TextBlock>
+        <ComboBox x:Name="cdlComboBox" Grid.Column="4" Margin="3.8,16,3.8,14.667" Grid.Row="1" ItemsSource="{Binding SecArray}" SelectedIndex="{Binding CurentNumIndex, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <Custom:EventToCommand x:Name="SelectionChangedEventToCommand" Command="{Binding CheckSecNumCommand, Mode=OneWay}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
     </Grid>
 </Window>

@@ -659,6 +659,7 @@ namespace Inter_face.ViewModel
         public const string IsXinhaoChangedPropertyName = "IsXinhaoChanged";
 
         private bool _isxinhaochangedProperty = false;
+        Thread QuikSaveXhdataThread = null;
 
         /// <summary>
         /// Sets and gets the IsXinhaoChanged property.
@@ -675,8 +676,7 @@ namespace Inter_face.ViewModel
             {
                 if (value)
                 {
-                    Thread QuikSaveXhdataThread = null;
-
+                    
                     if (GDoper != null)
                     {
                         if (QuikSaveXhdataThread != null && QuikSaveXhdataThread.IsAlive)
@@ -3377,7 +3377,8 @@ namespace Inter_face.ViewModel
                     sdm.LengthProperty.ToString("F3")
                     );
 
-                MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
+       
+        MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
                 {
                     CdlListProperty = cdlxlist,
                     DfxInfosProperty = dfxinfosstring,

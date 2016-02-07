@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using Inter_face.Models;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Inter_face.ViewModel
 {
@@ -24,11 +25,11 @@ namespace Inter_face.ViewModel
         private int leftedgeSecnum;
         private decimal rightedgepos;
         private int rightedgeSecnum;
-        private decimal middlepos;
-        private int middleSecnum;
+        private decimal middlepos;        
         private List<string> cdl;
         private bool isrefreshData = true;
         private bool isupdata;
+        private bool ischeckSecnum = true;
 
         /// <summary>
         /// The <see cref="Name" /> property's name.
@@ -88,6 +89,37 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(StartShowPosPropertyName);
             }
         }
+
+        /// <summary>
+        /// The <see cref="MidSecnum" /> property's name.
+        /// </summary>
+        public const string MidSecnumPropertyName = "MidSecnum";
+
+        private int middleSecnum = 0;
+
+        /// <summary>
+        /// Sets and gets the MidSecnum property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public int MidSecnum
+        {
+            get
+            {
+                return middleSecnum;
+            }
+
+            set
+            {
+                if (middleSecnum == value)
+                {
+                    return;
+                }
+
+                middleSecnum = value;
+                RaisePropertyChanged(MidSecnumPropertyName);
+            }
+        }
+
         /// <summary>
         /// The <see cref="EndShowPos" /> property's name.
         /// </summary>
@@ -177,7 +209,7 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(EnddisPropertyName);
             }
         }
-
+      
         /// <summary>
         /// The <see cref="LeftDis" /> property's name.
         /// </summary>
@@ -463,8 +495,78 @@ namespace Inter_face.ViewModel
             }
         }
 
+        /// <summary>
+        /// The <see cref="CurrentMidSecNum" /> property's name.
+        /// </summary>
+        public const string CurrentMidSecNumPropertyName = "CurrentMidSecNum";
+
+        private int _currentMidsecnum = 0;
+
+        /// <summary>
+        /// Sets and gets the CurrentMidSecNum property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public int CurrentMidSecNum
+        {
+            get
+            {
+                return _currentMidsecnum;
+            }
+
+            set
+            {
+                if (_currentMidsecnum == value)
+                {
+                    return;
+                }
+
+                _currentMidsecnum = value;
+                RaisePropertyChanged(CurrentMidSecNumPropertyName);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="CurentNumIndex" /> property's name.
+        /// </summary>
+        public const string CurentNumIndexPropertyName = "CurentNumIndex";
+
+        private int _currentNumindex = 0;
+
+        /// <summary>
+        /// Sets and gets the CurentNumIndex property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public int CurentNumIndex
+        {
+            get
+            {
+                return _currentNumindex;
+            }
+
+            set
+            {
+                if (_currentNumindex == value)
+                {
+                    return;
+                }
+
+                _currentNumindex = value;
+                RaisePropertyChanged(CurentNumIndexPropertyName);
+            }
+        }
+
+        private ObservableCollection<string> secArray;
+
+        public ObservableCollection<string> SecArray
+        {
+            get { return secArray; }
+            set { secArray = value; }
+        }
+
+
         public UpdataDianFXViewModel()
         {
+            secArray = new ObservableCollection<string>();
             MessengerInstance.Register<DianFXneededInfosMode>(this, "DfxInputInfos",
                 p =>
                 {
@@ -518,6 +620,13 @@ namespace Inter_face.ViewModel
                         LeftSign = "合";
                         RightSign = "断";
                     }
+
+                    for (int i = startSecnum; i <= endSecnum; i++)
+                    {
+                        secArray.Add(i.ToString());                        
+                    }
+
+                    CurentNumIndex = secArray.IndexOf(middleSecnum.ToString());                    
                 });
         }
 
@@ -538,10 +647,17 @@ namespace Inter_face.ViewModel
             return (secPos - fstPos) * 1000 - (decimal)offset;
         }
 
-        private void refreshData()
+        private void refreshData(bool seachMidsec = true)
         {
             middlepos = (decimal)(PartI * 1000 + PartII) / 1000;
-            middleSecnum = getSecnum(middlepos);
+            if (seachMidsec)
+            {
+                middleSecnum = getSecnum(middlepos);
+                ischeckSecnum = false;
+                CurentNumIndex = secArray.IndexOf(middleSecnum.ToString());
+                ischeckSecnum = true;
+            }           
+
             if (middleSecnum != 0)
             {
                 Hat = getHat(middleSecnum);
@@ -620,6 +736,7 @@ namespace Inter_face.ViewModel
                     if (usedPos >= start && usedPos <= end)
                     {
                         sec = i;
+                        break;
                     }
                     else
                     {
@@ -777,6 +894,64 @@ namespace Inter_face.ViewModel
                 MessengerInstance.Send<StationDataMode>(null, "UpdataDianfx");
         }
 
+        private void checkSecnum()
+        {
+            string[] parts = { };
+            int oldSecnum = MidSecnum;
+            MidSecnum = int.Parse(secArray[CurentNumIndex]);
+
+            if (MidSecnum == 1)
+            {
+                parts = cdl[0].Split(':');
+                if (middlepos * 1000 > decimal.Parse(parts[0].Split('+')[1]))
+                {
+                    ischeckSecnum = false;
+                    CurentNumIndex = secArray.IndexOf(oldSecnum.ToString());
+                    ischeckSecnum = true;
+                    System.Windows.MessageBox.Show("路段号与里程无对应关系！", "错误",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+            }
+            else if (MidSecnum == cdl.Count + 1)
+            {
+                parts = cdl[MidSecnum - 2].Split(':');
+                if (middlepos * 1000 < decimal.Parse(parts[1].Split('+')[1]))
+                {
+                    ischeckSecnum = false;
+                    CurentNumIndex = secArray.IndexOf(oldSecnum.ToString());
+                    ischeckSecnum = true;
+                    System.Windows.MessageBox.Show("路段号与里程无对应关系！", "错误",
+                       System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+            }
+            else
+            {
+                parts = cdl[MidSecnum - 1].Split(':');
+                if (middlepos * 1000 > decimal.Parse(parts[0].Split('+')[1]))
+                {
+                    ischeckSecnum = false;
+                    CurentNumIndex = secArray.IndexOf(oldSecnum.ToString());
+                    ischeckSecnum = true;
+                    System.Windows.MessageBox.Show("路段号与里程无对应关系！", "错误",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+                parts = cdl[MidSecnum - 2].Split(':');
+                if (middlepos * 1000 < decimal.Parse(parts[1].Split('+')[1]))
+                {
+                    ischeckSecnum = false;
+                    CurentNumIndex = secArray.IndexOf(oldSecnum.ToString());
+                    ischeckSecnum = true;
+                    System.Windows.MessageBox.Show("路段号与里程无对应关系！", "错误",
+                       System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                    return;
+                }
+            }
+            refreshData(false);            
+        }
+
         private RelayCommand _commitCommand;
         /// <summary>
         /// Gets the CommitCommand.
@@ -807,6 +982,25 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                         cancel();
+                    }));
+            }
+        }
+
+        private RelayCommand _checkSecnumCommand;
+
+        /// <summary>
+        /// Gets the CheckSecNumCommand.
+        /// </summary>
+        public RelayCommand CheckSecNumCommand
+        {
+            get
+            {
+                return _checkSecnumCommand
+                    ?? (_checkSecnumCommand = new RelayCommand(
+                    () =>
+                    {
+                        if (ischeckSecnum)
+                            checkSecnum();
                     }));
             }
         }
