@@ -1281,7 +1281,7 @@ namespace Inter_face.ViewModel
 
                 finally
                 {
-
+                    Cursor = 0;
                 }
             }
 
@@ -1407,7 +1407,7 @@ namespace Inter_face.ViewModel
 
                 finally
                 {
-
+                    Cursor = 0;
                 }
             }
 
@@ -1576,8 +1576,8 @@ namespace Inter_face.ViewModel
                  }
 
                  catch (NullReferenceException ure)
-                 {
-                     MessengerInstance.Send<string>(ure.Message, "ReadDataError");
+                 {                    
+                    MessengerInstance.Send<string>(ure.Message, "ReadDataError");
                  }
              }
 
@@ -4001,17 +4001,19 @@ namespace Inter_face.ViewModel
                 sfwindow.Filter = "xls files (*.xls)|*.xls|All files (*.*)|*.*";
                 if (sfwindow.ShowDialog() == true)
                 {
+                    Cursor = 1;
                     SDexportor.ExportDataAsOne(sig_data_s, sig_data_x, sfwindow.FileName);
+                    Cursor = 0;
                 }
             }
 
             catch (System.InvalidOperationException ioe)
-            {
+            {                
                 MessengerInstance.Send<string>("上下行信号机数据不完整", "ReadDataError");
             }
 
             catch
-            {
+            {                
                 MessengerInstance.Send<string>("输出信号机数据出错", "ReadDataError");
             }
         }
@@ -4323,7 +4325,9 @@ namespace Inter_face.ViewModel
                 sfwindow.Filter = "xls files (*.xls)|*.xls|All files (*.*)|*.*";
                 if (sfwindow.ShowDialog() == true)
                 {
+                    Cursor = 1;
                     SDexportor.ExportDataSeparately(datas_s, datas_x, sfwindow.FileName);
+                    Cursor = 0;
                 }
             }
 

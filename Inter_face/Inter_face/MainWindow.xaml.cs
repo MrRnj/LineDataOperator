@@ -55,6 +55,7 @@ namespace Inter_face
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p =>
             {
+                Cursor = System.Windows.Input.Cursors.Arrow;
                 AddInfobox(p, string.Empty, string.Empty, 0, "1");
             });
 
@@ -62,6 +63,7 @@ namespace Inter_face
             {
                 string msg = p.Split('|')[0];
                 string[] moreinfo = p.Split('|')[1].Split('*');
+                Cursor = System.Windows.Input.Cursors.Arrow;
 
                 AddInfobox(msg, moreinfo[2], moreinfo[1], int.Parse(moreinfo[0]), "1");
             });
@@ -72,12 +74,14 @@ namespace Inter_face
                 string[] moreinfo = p.Split('|')[1].Split('*');
                 //string[] fixpart = moreinfo[3].Split('+');
                 fixextrainfo = moreinfo[3] + "?" + moreinfo[1];
+                Cursor = System.Windows.Input.Cursors.Arrow;
 
                 AddInfobox(msg, moreinfo[2], moreinfo[1], int.Parse(moreinfo[0]), "1", true);
             });
 
             GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataRight", p =>
             {
+                Cursor = System.Windows.Input.Cursors.Arrow;
                 AddInfobox(p, string.Empty, string.Empty, 0, "0");
             });
 
