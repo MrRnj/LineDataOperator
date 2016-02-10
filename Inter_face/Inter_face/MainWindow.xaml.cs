@@ -49,11 +49,12 @@ namespace Inter_face
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();   
+                     
             openacessfile = new OpenFileDialog();
             initialWorkbooks();
-
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataError", p =>
+            Messenger.Default.Send(Dispatcher, "WindowDispatcher");
+            Messenger.Default.Register<string>(this, "ReadDataError", p =>
             {
                 Cursor = System.Windows.Input.Cursors.Arrow;
                 AddInfobox(p, string.Empty, string.Empty, 0, "1");

@@ -38,7 +38,7 @@ namespace Inter_face.ViewModel
         private float _startPos;
         private float _endPos;
         private string _xhdataPath;
-        private string _xhsavefilePath;
+        private string _xhsavefilePath;       
 
         private GraphyDataOper GDoper;
         private SignalDataExportor SDexportor;
@@ -78,6 +78,7 @@ namespace Inter_face.ViewModel
         ShowProcessBar showprocesbar;
         DianFXWindow dianfxwindow;
         AdjustSignalDisWindow asdwindow;
+        ProcessForm processform;
 
         System.Windows.Threading.Dispatcher dispatcher;
 
@@ -1052,16 +1053,16 @@ namespace Inter_face.ViewModel
                                                   "Resources");*/
                     }
                 });
-            MessengerInstance.Register<string>(this, "InsertXinhao", 
-                (p) => 
+            MessengerInstance.Register<string>(this, "InsertXinhao",
+                (p) =>
                 {
                     string[] parts = p.Split(':');
                     int sec = int.Parse(parts[1]) == cdlxlist.Count() + 2 ? cdlxlist.Count() + 1 : int.Parse(parts[1]);
                     InsertXinhaoX(float.Parse(parts[0]), sec, parts[2], null);
                 });
 
-            MessengerInstance.Register<List<StationDataMode>>(this, "UpdataStationSignal", 
-                (p) => 
+            MessengerInstance.Register<List<StationDataMode>>(this, "UpdataStationSignal",
+                (p) =>
                 {
                     if (!SeletedXinhaoS)
                         p.Reverse();
@@ -1077,11 +1078,11 @@ namespace Inter_face.ViewModel
                     {
                         asdwindow.Close();
                         asdwindow = null;
-                    }                    
+                    }
                 });
 
-            MessengerInstance.Register<StationDataMode>(this, "InsertDianfx", 
-                p => 
+            MessengerInstance.Register<StationDataMode>(this, "InsertDianfx",
+                p =>
                 {
                     if (dianfxwindow != null)
                     {
@@ -1095,7 +1096,7 @@ namespace Inter_face.ViewModel
                         InsertDianFXx(string.Format("{0}:{1}:{2}",
                             infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
                     }
-                    
+
                 });
             MessengerInstance.Register<StationDataMode>(this, "UpdataDianfx",
                p =>
@@ -1112,9 +1113,9 @@ namespace Inter_face.ViewModel
                        UpdataDianfx(string.Format("{0}:{1}:{2}",
                            infos[2].Split('+')[1], infos[3].Split('+')[1], infos[4].Split('+')[1]), p);
                    }
-                   
+
                });
-            MessengerInstance.Register<DataType>(this, "ShowRightDialog", p => 
+            MessengerInstance.Register<DataType>(this, "ShowRightDialog", p =>
             {
                 showRightDialog();
             });
@@ -1126,11 +1127,31 @@ namespace Inter_face.ViewModel
                 p =>
                 {
                     string[] fixinfo = p.Split('?');
-                    if(!ABoper.AdjustLength(fixinfo[2], int.Parse(fixinfo[0]), float.Parse(fixinfo[1])))
+                    if (!ABoper.AdjustLength(fixinfo[2], int.Parse(fixinfo[0]), float.Parse(fixinfo[1])))
                     {
                         MessageBox.Show("高程自动调整失败，请手动调整！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 });
+
+        }
+
+        private void ShowProcessWindow()
+        {
+            processform = new ProcessForm();
+            processform.ShowDialog();
+        }
+
+        private void CloseProcessWindow()
+        {
+            dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal,
+               new Action(() =>
+               {
+                   if (processform != null)
+                   {
+                       processform.Close();
+                       processform = null;
+                   }
+               }));            
         }
 
         private void CommitMenuCommand(string cmd)
@@ -3772,6 +3793,7 @@ namespace Inter_face.ViewModel
             float offset = 0;
             string[] parts;
             string dfxinfo;
+            Thread exportAsoneThread;
 
             try
             {
@@ -4001,9 +4023,14 @@ namespace Inter_face.ViewModel
                 sfwindow.Filter = "xls files (*.xls)|*.xls|All files (*.*)|*.*";
                 if (sfwindow.ShowDialog() == true)
                 {
-                    Cursor = 1;
-                    SDexportor.ExportDataAsOne(sig_data_s, sig_data_x, sfwindow.FileName);
-                    Cursor = 0;
+                    exportAsoneThread = new Thread(() =>
+                    {
+                        SDexportor.ExportDataAsOne(sig_data_s, sig_data_x, sfwindow.FileName);
+                        CloseProcessWindow();
+                    });
+
+                    exportAsoneThread.Start();
+                    ShowProcessWindow();                   
                 }
             }
 
@@ -4035,6 +4062,7 @@ namespace Inter_face.ViewModel
             float offset = 0;
             string[] parts;
             string dfxinfo = string.Empty;
+            Thread exportsparatelyThread;
 
             try
             {
@@ -4325,9 +4353,13 @@ namespace Inter_face.ViewModel
                 sfwindow.Filter = "xls files (*.xls)|*.xls|All files (*.*)|*.*";
                 if (sfwindow.ShowDialog() == true)
                 {
-                    Cursor = 1;
-                    SDexportor.ExportDataSeparately(datas_s, datas_x, sfwindow.FileName);
-                    Cursor = 0;
+                    exportsparatelyThread = new Thread(() =>
+                    {
+                        SDexportor.ExportDataSeparately(datas_s, datas_x, sfwindow.FileName);
+                        CloseProcessWindow();
+                    });
+                    exportsparatelyThread.Start();
+                    ShowProcessWindow();                   
                 }
             }
 
@@ -4441,6 +4473,7 @@ namespace Inter_face.ViewModel
                     }
                 }
 
+                GDoper.SaveXhdataCompleted += GDoper_SaveXhdataCompleted;
                 if (_xhdataPath.Equals(string.Empty))
                 {
                     SaveFileDialog savexhdataDialog = new SaveFileDialog();
@@ -4450,17 +4483,28 @@ namespace Inter_face.ViewModel
                     if (savexhdataDialog.ShowDialog() == true)
                     {
                         _xhdataPath = savexhdataDialog.FileName;
-                        GDoper.SaveXhData(xhs, xhx, _xhdataPath);
-                        IsXinhaoChanged = false;
+                        Thread savexhThread = new Thread(() =>
+                        {
+                            GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                            IsXinhaoChanged = false;                            
+                        });
+                        savexhThread.Start();
+                        ShowProcessWindow();
                     }
                 }
                 else
                 {
                     string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath),
                                                              Path.GetFileNameWithoutExtension(_xhdataPath) +
-                                                             ".xhbackup" );
+                                                             ".xhbackup");
                     File.Delete(backupfile);
-                    GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                    Thread savexhThread = new Thread(() =>
+                        {
+                            GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                            IsXinhaoChanged = false;                            
+                        });
+                    savexhThread.Start();
+                    ShowProcessWindow();
                 }
             }
 
@@ -4472,6 +4516,11 @@ namespace Inter_face.ViewModel
             Cursor = 0;
         }
 
+        private void GDoper_SaveXhdataCompleted(object sender, EventArgs e)
+        {
+            CloseProcessWindow();
+        }
+
         private void saveOtherXhData()
         {
             ISingleDataViewModel singledata;
@@ -4480,6 +4529,7 @@ namespace Inter_face.ViewModel
             string[] parts;
             string bjData = string.Empty;
             Cursor = 1;
+            Thread saveOtherxhdataTread;
 
             try
             {
@@ -4581,8 +4631,14 @@ namespace Inter_face.ViewModel
                 if (savexhdataDialog.ShowDialog() == true)
                 {
                     _xhdataPath = savexhdataDialog.FileName;
-                    GDoper.SaveXhData(xhs, xhx, _xhdataPath);
-                    IsXinhaoChanged = false;
+                    saveOtherxhdataTread = new Thread(() =>
+                    {
+                        GDoper.SaveXhData(xhs, xhx, _xhdataPath);
+                        IsXinhaoChanged = false;
+                        CloseProcessWindow();
+                    });
+                    saveOtherxhdataTread.Start();
+                    ShowProcessWindow();
                 }
             }
 
@@ -4596,7 +4652,8 @@ namespace Inter_face.ViewModel
 
         private void openXhdata()
         {
-            OpenFileDialog openxhdataDialog;            
+            OpenFileDialog openxhdataDialog;
+            Thread openxhThread;
 
             if (hadanyXhdata())
             {
@@ -4629,9 +4686,15 @@ namespace Inter_face.ViewModel
 
                             }
 
-                            GDoper.OpenXhData(_xhdataPath);
+                            openxhThread = new Thread(() =>
+                            {
+                                GDoper.OpenXhData(_xhdataPath);
+                                CanloadxhProperty = true;
+                                CloseProcessWindow();
+                            });
 
-                            CanloadxhProperty = true;
+                            openxhThread.Start();
+                            ShowProcessWindow();
                         }
                         catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
                         {
@@ -4672,9 +4735,15 @@ namespace Inter_face.ViewModel
 
                     }
 
-                    GDoper.OpenXhData(_xhdataPath);
+                    openxhThread = new Thread(() =>
+                    {
+                        GDoper.OpenXhData(_xhdataPath);
+                        CanloadxhProperty = true;
+                        CloseProcessWindow();
+                    });
 
-                    CanloadxhProperty = true;
+                    openxhThread.Start();
+                    ShowProcessWindow();
                 }
                 catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
                 {
@@ -5191,7 +5260,7 @@ namespace Inter_face.ViewModel
                 return _loadPoduDataCommand
                     ?? (_loadPoduDataCommand = new RelayCommand(
                                           () =>
-                                          {
+                                          {                                             
                                               LoadPoduXData();
                                           }));
             }
@@ -5263,7 +5332,7 @@ namespace Inter_face.ViewModel
                 return _loadxhCommand
                     ?? (_loadxhCommand = new RelayCommand(
                                           () =>
-                                          {
+                                          {                                              
                                               LoadXinHaoData();
                                           }));
             }
