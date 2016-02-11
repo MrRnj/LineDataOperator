@@ -45,11 +45,11 @@
                 <ColumnDefinition Width="0.1*"/>
             </Grid.ColumnDefinitions>
             <Slider x:Name="DivSlider" Grid.Column="1" Margin="0" Grid.Row="1" Minimum="{Binding MinValue}" SmallChange="1" LargeChange="100" Value="{Binding CurrentPosition, Mode=TwoWay}" VerticalAlignment="Center" Maximum="{Binding MaxValue}">
-            	<i:Interaction.Triggers>
-            		<i:EventTrigger EventName="ValueChanged">
-            			<Custom:EventToCommand x:Name="ValueChangedEventToCommand" Command="{Binding ValueChangedCommand, Mode=OneWay}"/>
-            		</i:EventTrigger>
-            	</i:Interaction.Triggers>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="ValueChanged">
+                        <Custom:EventToCommand x:Name="ValueChangedEventToCommand" Command="{Binding ValueChangedCommand, Mode=OneWay}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </Slider>
             <Label x:Name="StartLabel" Margin="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Content="{Binding StartPosition}"/>
             <Label x:Name="EndLabel" Grid.Column="2" Margin="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding EndPosition}"/>
@@ -104,7 +104,7 @@
                     <Binding Path="CurrentPosition"/>
                 </MultiBinding>
             </TextBox>
-            <Label x:Name="LcLabel" Margin="4,4,-20,4" VerticalContentAlignment="Center" Content="{Binding CurrentLC}" HorizontalContentAlignment="Center" Grid.Row="2"/>
+            <Label x:Name="LcLabel" Margin="-55,4,0,4" VerticalContentAlignment="Center" Content="{Binding CurrentLC}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Width="140"/>
         </Grid>
         <Button x:Name="OkButton" Content="确定" Grid.Column="1" Margin="4,9" Grid.Row="1" Command="{Binding InsertCommand, Mode=OneWay}"/>
         <Button x:Name="CancelButton" Content="取消" Grid.Column="2" Margin="4,9" Grid.Row="1" Command="{Binding CancelCommand, Mode=OneWay}" IsCancel="True"/>

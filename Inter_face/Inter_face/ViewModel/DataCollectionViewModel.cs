@@ -985,8 +985,12 @@ namespace Inter_face.ViewModel
                     {
                         if (item.TypeNum == (int)p)
                         {
-                            SelectedIndex = n;
-                            break;
+                            SelectedIndex = n;                            
+                            //break;
+                        }
+                        else
+                        {
+                            item.CurrentDataProperty = null;
                         }
                         n++;
                     }

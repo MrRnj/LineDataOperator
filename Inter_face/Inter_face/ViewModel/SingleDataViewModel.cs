@@ -99,12 +99,7 @@ namespace Inter_face.ViewModel
             {
                 //if (value != null)
                    // MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
-
-                if (_CurrentDataProperty == value)
-                {
-                    return;
-                }
-
+                
                 RaisePropertyChanging(CurrentDataPropertyPropertyName);
 
                 if (value != null)
@@ -117,17 +112,12 @@ namespace Inter_face.ViewModel
                     }
 
                     value.SelectedProperty = true;
-                    
-                   /* if (value.Type != DataType.Single)
-                        MessengerInstance.Send<int>(0, "SelectedTabItem");
-                    else
-                    {
-                        StationDataMode sdm = value as StationDataMode;
-                        if (sdm.StationNameProperty.StartsWith("Q"))
-                            MessengerInstance.Send<int>(0, "SelectedTabItem");
-                        else
-                            MessengerInstance.Send<int>(2, "SelectedTabItem");
-                    }*/
+                    MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
+                   
+                }
+                else
+                {
+                    SelectedIndex = -1;
                 }
                 _CurrentDataProperty = value;
                 RaisePropertyChanged(CurrentDataPropertyPropertyName);
@@ -676,8 +666,7 @@ namespace Inter_face.ViewModel
                         IsShowSignale = checkSignal();
                         IsShowQujian = checkQujian();
                         IsShowDianFX = checkDianfx();
-                        checkMenuFunc(selectedItems);
-                        MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");                        
+                        checkMenuFunc(selectedItems);                                                
                     }));
             }
         }
@@ -716,6 +705,7 @@ namespace Inter_face.ViewModel
                         MessengerInstance.Send<string>(p, "ExCommand");
                     }));
             }
-        }        
+        }
+           
     }
 }

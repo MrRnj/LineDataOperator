@@ -8,6 +8,9 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO;
 using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using Inter_face.Models;
 
 namespace Inter_face
 {
@@ -1120,8 +1123,8 @@ namespace Inter_face
                     loadaopdata(filepath);
                 }
             }
-        }       
-        
+        }
+       
     }
 
     #region internalclass

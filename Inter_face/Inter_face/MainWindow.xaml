@@ -181,12 +181,7 @@
                 </Grid.ToolTip>
                 <Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
 
-                    <Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDoubleCLick">
-                                <Custom:EventToCommand x:Name="DoubleClickEventToCommand"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
+                    <Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">                        
                         <Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />
                     </Canvas>
                 </Viewbox>
