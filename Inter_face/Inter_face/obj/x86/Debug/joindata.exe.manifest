@@ -4,7 +4,7 @@
   <description asmv2:iconFile="Exeicon.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
   <application />
   <entryPoint>
-    <assemblyIdentity name="joindata" version="1.9.5.0" language="neutral" processorArchitecture="x86" />
+    <assemblyIdentity name="joindata" version="2.0.0.0" language="neutral" processorArchitecture="x86" />
     <commandLine file="joindata.exe" parameters="" />
   </entryPoint>
   <trustInfo>
@@ -116,13 +116,13 @@
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="490496">
-      <assemblyIdentity name="joindata" version="1.9.5.0" language="neutral" processorArchitecture="x86" />
+      <assemblyIdentity name="joindata" version="2.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>/o0HjzjQ6WQOBgFKDKqjdKEsT74=</dsig:DigestValue>
+        <dsig:DigestValue>gMPofKP82swM8UBRYoZt0xx49BE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

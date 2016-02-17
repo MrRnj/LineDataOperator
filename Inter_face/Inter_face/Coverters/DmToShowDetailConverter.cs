@@ -24,7 +24,13 @@ namespace Inter_face.Coverters
                         {
                             signalmode = (StationDataMode)idm;
                             if (signalmode.StationNameProperty.StartsWith("Q"))
+                            {
+                                if (signalmode.StationNameProperty.Split('+')[1].StartsWith("3"))
+                                {
+                                    return (signalmode.LengthProperty * idm.ScaleProperty).ToString("F0");
+                                }
                                 return (signalmode.RealLength * idm.ScaleProperty).ToString("F0");
+                            }                                
                             return string.Empty;
                         }
                     case DataType.Station:

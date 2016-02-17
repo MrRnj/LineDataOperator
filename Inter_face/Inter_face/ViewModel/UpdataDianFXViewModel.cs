@@ -868,6 +868,7 @@ namespace Inter_face.ViewModel
                 ScaleProperty = 10,
                 SectionNumProperty = middleSecnum,
                 SelectedProperty = false,
+                //标记类型：分相名称：分相左端里程：分相中心里程：分相右侧里程：分相长度
                 StationNameProperty = string.Format("3:{0}:{1}+{2}:{3}+{4}:{5}+{6}:{7}",
                 Name,
                 leftedgepos.ToString("F3"),

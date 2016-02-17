@@ -27,6 +27,11 @@ namespace Inter_face.Coverters
                             sdm = (StationDataMode)idm;
                             if (sdm.StationNameProperty.StartsWith("Q"))
                             {
+                                if (sdm.StationNameProperty.Split('+')[1].StartsWith("3"))
+                                {
+                                    return string.Format("信号机间距(km)：{0}",
+                                    ((sdm.LengthProperty * sdm.ScaleProperty) / 1000).ToString("#0.000"));
+                                }
                                 return string.Format("信号机间距(km)：{0}",
                                     ((sdm.RealLength * sdm.ScaleProperty) / 1000).ToString("#0.000"));
                             }
@@ -42,10 +47,11 @@ namespace Inter_face.Coverters
                                 }
                                 else
                                 {
-                                    return string.Format("无电区中心里程：{0} {1}\r\n无电区长度：{2}",
+                                    return string.Format("无电区中心里程：{0} {1}\r\n无电区长度：{2}\r\n分相名称：{3}",
                                         sdm.HatProperty,
                                         sdm.StationNameProperty.Split(':')[3].Split('+')[0],
-                                        (sdm.RealLength * sdm.ScaleProperty).ToString("#0.000"));
+                                        (sdm.RealLength * sdm.ScaleProperty).ToString("#0.000"),
+                                        sdm.StationNameProperty.Split(':')[1]);
                                 }
                             }
                         }                     
