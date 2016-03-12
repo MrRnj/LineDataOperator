@@ -417,7 +417,10 @@ namespace Inter_face
                 {
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        System.Windows.MessageBox.Show(lee.ErrorMesssage);
+                        //System.Windows.MessageBox.Show(lee.ErrorMesssage);
+                        string[] errors = lee.ErrorMesssage.Split('?');
+                        string errormessage = errors[0];
+                        AddInfobox(errormessage, lee.Sourcepath, errors[1], lee.Rowindex, "1");
                     }));
                 }
 

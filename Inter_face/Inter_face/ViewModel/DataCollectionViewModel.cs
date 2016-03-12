@@ -5180,7 +5180,9 @@ namespace Inter_face.ViewModel
             }
 
             IniSheets.CleanXhDataFile();
+            
         }
+
         #region Commands
        
         private RelayCommand _showdataChangedCommand;
