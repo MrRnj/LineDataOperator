@@ -107,6 +107,8 @@ namespace Inter_face.ViewModel
         {
             int index = SeletedItem;
             CdlCollectionProperty.RemoveAt(SeletedItem);
+            if (CdlCollectionProperty.Count == 0)
+                index = -1;
             SeletedItem = index;
         }
 
@@ -132,7 +134,7 @@ namespace Inter_face.ViewModel
         {
             if (!CdlCollection.Contains(content))
             {
-                int index = SeletedItem;
+                int index = SeletedItem == -1 ? 0 : SeletedItem;
                 CdlCollectionProperty.Insert(index, content);
                 SeletedItem = index;
             }                
@@ -210,8 +212,8 @@ namespace Inter_face.ViewModel
                                           () =>
                                           {
                                               Savecdldata();
-                                          },
-                                          () => CdlCollectionProperty.Count == 0 ? false : true));
+                                          }
+                                          ));
             }
         }
 
