@@ -8,46 +8,48 @@
 	Title="修改长短链"
 	Width="485" Height="435" WindowStyle="ToolWindow">
     <Window.Resources>
-    	<Inter_face_Coverters:ClddataToShowStyleConverter x:Key="ClddataToShowStyleConverter"/>
-    	<vm:ModifyCdlViewModel x:Key="ModifycdlViewModelDataSource"/>
-    	<DataTemplate x:Key="CdlDataTemplate">
-    		<Grid x:Name="grid" Height="50">
-    			<TextBox x:Name="CdlDataTextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Converter={StaticResource ClddataToShowStyleConverter}, Mode=OneWay}" VerticalAlignment="Center" FontSize="18.667" BorderBrush="{x:Null}" IsReadOnly="True" Background="#00000000"/>
-    		</Grid>
-    	</DataTemplate>
+        <Inter_face_Coverters:ClddataToShowStyleConverter x:Key="ClddataToShowStyleConverter"/>
+        <vm:ModifyCdlViewModel x:Key="ModifycdlViewModelDataSource"/>
+        <DataTemplate x:Key="CdlDataTemplate">
+            <Grid x:Name="grid" Height="50">
+                <TextBox x:Name="CdlDataTextBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="{Binding Converter={StaticResource ClddataToShowStyleConverter}, Mode=OneWay}" VerticalAlignment="Center" FontSize="18.667" BorderBrush="{x:Null}" IsReadOnly="True" Background="#00000000"/>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
     <Window.DataContext>
         <Binding Source="{StaticResource ModifycdlViewModelDataSource}"/>
     </Window.DataContext>
-	<i:Interaction.Triggers>
-		<i:EventTrigger>
-			<Custom:EventToCommand x:Name="LoadToCommand" Command="{Binding LoadDataCommand, Mode=OneWay}"/>
-		</i:EventTrigger>
-	</i:Interaction.Triggers>
-	<Grid x:Name="LayoutRoot">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="50"/>
-			<ColumnDefinition Width="0.562*"/>
-			<ColumnDefinition Width="5"/>
-			<ColumnDefinition Width="0.3*"/>
-		</Grid.ColumnDefinitions>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="30"/>
-			<RowDefinition Height="50"/>
-			<RowDefinition Height="50"/>
-			<RowDefinition Height="50"/>
-			<RowDefinition Height="50"/>
-			<RowDefinition Height="*"/>			
-			<RowDefinition Height="50"/>
-			<RowDefinition Height="50"/>
-		</Grid.RowDefinitions>
-		<ListBox x:Name="cdllistbox" Margin="8,8,2.7,8" Grid.Row="1" Grid.RowSpan="7" ItemsSource="{Binding CdlCollectionProperty}" SelectedIndex="{Binding SeletedItem, Mode=TwoWay}" ItemTemplate="{DynamicResource CdlDataTemplate}" Grid.ColumnSpan="2"/>
-		<Button x:Name="UpButton" Content="上移" Grid.Column="3" Margin="8" Grid.Row="1" Command="{Binding UpcdlDataCommand, Mode=OneWay}"/>
-		<Button x:Name="DownButton" Content="下移" Grid.Column="3" Margin="8" Grid.Row="2" Command="{Binding DowncdlDataCommand, Mode=OneWay}"/>
-		<Button x:Name="DeleteButton" Content="删除" Grid.Column="3" Margin="8" Grid.Row="3" Command="{Binding DeletedataCommand, Mode=OneWay}"/>
-		<Button x:Name="AddButton" Content="插入" Grid.Column="3" Margin="8" Grid.Row="4" Command="{Binding InsertCdlDataCommand, Mode=OneWay}"/>
-		<Button x:Name="SaveButton" Content="保存" Grid.Column="3" Margin="8" Grid.Row="6" Command="{Binding SaveDataCommand, Mode=OneWay}"/>
-		<Button x:Name="CancelButton" Content="取消" Grid.Column="3" Margin="8" Grid.Row="7"/>
-		<GridSplitter Grid.Column="2" HorizontalAlignment="Stretch" Grid.RowSpan="8"/>
-	</Grid>
+    <i:Interaction.Triggers>
+        <i:EventTrigger>
+            <Custom:EventToCommand x:Name="LoadToCommand" Command="{Binding LoadDataCommand, Mode=OneWay}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid x:Name="LayoutRoot">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="0.75*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="0.25*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <ListBox x:Name="cdllistbox" Margin="8,8,2.7,8" Grid.Row="1" Grid.RowSpan="8" ItemsSource="{Binding CdlCollectionProperty}" SelectedIndex="{Binding SeletedItem, Mode=TwoWay}" ItemTemplate="{DynamicResource CdlDataTemplate}" Grid.ColumnSpan="2"/>
+        <Button x:Name="UpButton" Content="上移" Grid.Column="3" Margin="8" Grid.Row="1" Command="{Binding UpcdlDataCommand, Mode=OneWay}"/>
+        <Button x:Name="DownButton" Content="下移" Grid.Column="3" Margin="8" Grid.Row="2" Command="{Binding DowncdlDataCommand, Mode=OneWay}"/>
+        <Button x:Name="DeleteButton" Content="删除" Grid.Column="3" Margin="8" Grid.Row="3" Command="{Binding DeletedataCommand, Mode=OneWay}"/>
+        <Button x:Name="ModifyButton" Content="修改" Grid.Column="3" Margin="8" Grid.Row="4" Command="{Binding ChangeCdlCommand, Mode=OneWay}"/>
+        <Button x:Name="AddButton" Content="插入" Grid.Column="3" Margin="8" Grid.Row="5" Command="{Binding InsertCdlDataCommand, Mode=OneWay}"/>
+        <Button x:Name="SaveButton" Content="保存" Grid.Column="3" Margin="8" Grid.Row="7" Command="{Binding SaveDataCommand, Mode=OneWay}"/>
+        <Button x:Name="CancelButton" Content="取消" Grid.Column="3" Margin="8" Grid.Row="8"/>
+        <GridSplitter Grid.Column="2" HorizontalAlignment="Stretch" Grid.RowSpan="9"/>
+    </Grid>
 </Window>

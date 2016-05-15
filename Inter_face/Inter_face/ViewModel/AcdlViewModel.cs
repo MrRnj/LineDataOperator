@@ -19,6 +19,7 @@ namespace Inter_face.ViewModel
     /// </summary>
     public class AcdlViewModel : ViewModelBase
     {
+        private bool _isModify;
         /// <summary>
         /// Initializes a new instance of the AcdlViewModel class.
         /// </summary>
@@ -205,6 +206,25 @@ namespace Inter_face.ViewModel
         }
         public AcdlViewModel()
         {
+            _isModify = false;
+            MessengerInstance.Register<string>(this, "Mcdl",
+                (p) =>
+                {
+                    string[] parts = p.Split(':');
+                    _isModify = true;
+
+                    Hat_Front = parts[0].Split('+')[0];
+                    Hat_After = parts[1].Split('+')[0];
+
+                    decimal first = decimal.Parse((float.Parse(parts[0].Split('+')[1]) / 1000).ToString("#0.000000"));
+                    decimal secend = decimal.Parse((float.Parse(parts[1].Split('+')[1]) / 1000).ToString("#0.000000"));
+
+                    Fst_Front = Math.Floor(first).ToString();
+                    Fst_After = Math.Floor(secend).ToString();
+
+                    Sec_Front = ((first - Math.Floor(first)) * 1000).ToString("F3");
+                    Sec_After = ((secend - Math.Floor(secend)) * 1000).ToString("F3");
+                });
         }
 
         private void AddCdl()
@@ -214,7 +234,16 @@ namespace Inter_face.ViewModel
                 (decimal.Parse(Fst_Front) * 1000 + decimal.Parse(float.Parse(Sec_Front).ToString("#0.000"))).ToString(),
                 Hat_After,
                 (decimal.Parse(Fst_After) * 1000 + decimal.Parse(float.Parse(Sec_After).ToString("#0.000"))).ToString());
-            MessengerInstance.Send(msg, "cdl");
+            if (!_isModify)
+            {
+                MessengerInstance.Send(msg, "cdl");
+                _isModify = false;
+            }                
+            else
+            {
+                MessengerInstance.Send(msg, "Changecdl");
+                _isModify = false;
+            }
         }
 
         private bool CanAddCdl()

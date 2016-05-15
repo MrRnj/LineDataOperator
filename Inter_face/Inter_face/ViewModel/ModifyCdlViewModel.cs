@@ -19,6 +19,7 @@ namespace Inter_face.ViewModel
     /// </summary>
     public class ModifyCdlViewModel : ViewModelBase
     {
+        private bool _isModify ;
         ACdlWindow acwindow;
         
         /// <summary>
@@ -66,6 +67,7 @@ namespace Inter_face.ViewModel
 
         public ModifyCdlViewModel()
         {
+            _isModify = false;
             CdlCollectionProperty = new ObservableCollection<string>();
            /* string _currentdir = Environment.CurrentDirectory;
             gdo = GraphyDataOper.CreatOper(Path.Combine(_currentdir, @"excelmodels\接坡面数据_Single.xlsx"),
@@ -74,6 +76,7 @@ namespace Inter_face.ViewModel
                 Path.Combine(_currentdir, @"excelmodels\信号机数据_single.xlsx"));*/
 
             MessengerInstance.Register<string>(this, "cdl", P => { Insertcdldata(P); });
+            MessengerInstance.Register<string>(this, "Changecdl", P => { Changecdldata(P); });
             MessengerInstance.Register<ExtractData.GraphyDataOper>(this, "gdoInWindow", p => { gdo = p; });
         }
 
@@ -137,7 +140,30 @@ namespace Inter_face.ViewModel
                 int index = SeletedItem == -1 ? 0 : SeletedItem;
                 CdlCollectionProperty.Insert(index, content);
                 SeletedItem = index;
-            }                
+            }
+            acwindow.Close();               
+        }
+
+        public void Changecdldata(string content)
+        {
+            if (SeletedItem != -1)
+            {
+                int index = SeletedItem;
+                CdlCollectionProperty.RemoveAt(index);
+                CdlCollectionProperty.Insert(index, content);
+                SeletedItem = index;
+            }
+            acwindow.Close();
+        }
+
+        public void ModifyCdlData()
+        {
+            if (SeletedItem != -1)
+            {
+                acwindow = new ACdlWindow();
+                MessengerInstance.Send<string>(CdlCollectionProperty[SeletedItem], "Mcdl");                
+                acwindow.ShowDialog();
+            }
         }
 
         private RelayCommand _upcdldataCommand;
@@ -251,6 +277,25 @@ namespace Inter_face.ViewModel
                                               acwindow = new ACdlWindow();
                                               acwindow.ShowDialog();
                                           }));
+            }
+        }
+
+        private RelayCommand _changeCdlCommand;
+
+        /// <summary>
+        /// Gets the ChangeCdlCommand.
+        /// </summary>
+        public RelayCommand ChangeCdlCommand
+        {
+            get
+            {
+                return _changeCdlCommand
+                    ?? (_changeCdlCommand = new RelayCommand(
+                    () =>
+                    {
+                        ModifyCdlData();
+                    },
+                                          () => SeletedItem == -1 ? false : true));
             }
         }
     }

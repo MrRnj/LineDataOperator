@@ -686,112 +686,120 @@ namespace Inter_face.ViewModel
                             QuikSaveXhdataThread = null;
                         }
 
-                        QuikSaveXhdataThread = new Thread(() =>
+                        if (!string.IsNullOrEmpty(_xhdataPath))
                         {
-                            ISingleDataViewModel singledata = null;
-                            List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
-                            List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
-                            string[] parts;
-                            string bjData = string.Empty;
-
-                            try
+                            QuikSaveXhdataThread = new Thread(() =>
                             {
+                                ISingleDataViewModel singledata = null;
+                                List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
+                                List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
+                                string[] parts;
+                                string bjData = string.Empty;
 
-                                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
-                            }
-                            catch
-                            {
-                                singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
-                            }
-
-                            foreach (StationDataMode item in singledata.DataCollection.ToArray())
-                            {
-                                parts = item.StationNameProperty.Split(':');
-                                if (!parts[0].StartsWith("Q"))
+                                try
                                 {
-                                    switch (parts[0])
-                                    {
-                                        case "1":
-                                            bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
-                                            break;
-                                        case "2":
-                                            bjData = parts[1];
-                                            break;
-                                        case "3":
-                                            //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
-                                            bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
-                                            break;
-                                        default:
-                                            break;
-                                    }
 
-                                    xhs.Add(new ChangeToTxt.CheZhanOutputData()
-                                    {
-                                        Bjlx = parts[0],
-                                        Bjsj = bjData,
-                                        Gh = item.HatProperty,
-                                        Glb = item.PositionProperty.ToString("F3"),
-                                        Index = string.Empty,
-                                        Ldh = item.SectionNumProperty.ToString(),
-                                        Zjfx = "1"
-                                    });
+                                    singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
                                 }
-                            }
-
-                            bjData = string.Empty;
-                            try
-                            {
-
-                                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
-                            }
-                            catch
-                            {
-                                singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
-                            }
-
-                            foreach (StationDataMode item in singledata.DataCollection.ToArray())
-                            {
-                                parts = item.StationNameProperty.Split(':');
-                                if (!parts[0].StartsWith("Q"))
+                                catch
                                 {
-                                    switch (parts[0])
-                                    {
-                                        case "1":
-                                            bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
-                                            break;
-                                        case "2":
-                                            bjData = parts[1];
-                                            break;
-                                        case "3":
-                                            bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
-                                            break;
-                                        default:
-                                            break;
-                                    }
-
-                                    xhx.Add(new ChangeToTxt.CheZhanOutputData()
-                                    {
-                                        Bjlx = parts[0],
-                                        Bjsj = bjData,
-                                        Gh = item.HatProperty,
-                                        Glb = item.PositionProperty.ToString("F3"),
-                                        Index = string.Empty,
-                                        Ldh = item.SectionNumProperty.ToString(),
-                                        Zjfx = "1"
-                                    });
+                                    singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
                                 }
-                            }
+                                if (singledata != null)
+                                {
+                                    foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                                    {
+                                        parts = item.StationNameProperty.Split(':');
+                                        if (!parts[0].StartsWith("Q"))
+                                        {
+                                            switch (parts[0])
+                                            {
+                                                case "1":
+                                                    bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                                    break;
+                                                case "2":
+                                                    bjData = parts[1];
+                                                    break;
+                                                case "3":
+                                                    //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
+                                                    bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
 
-                            string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath), 
-                                                             Path.GetFileNameWithoutExtension(_xhdataPath) +
-                                                             ".xhbackup");
-                            if (!_xhdataPath.Equals(string.Empty))
-                            {
-                                GDoper.XhDataQuikSave(xhs, xhx, backupfile);
-                            }
-                        });
+                                            xhs.Add(new ChangeToTxt.CheZhanOutputData()
+                                            {
+                                                Bjlx = parts[0],
+                                                Bjsj = bjData,
+                                                Gh = item.HatProperty,
+                                                Glb = item.PositionProperty.ToString("F3"),
+                                                Index = string.Empty,
+                                                Ldh = item.SectionNumProperty.ToString(),
+                                                Zjfx = "1"
+                                            });
+                                        }
+                                    }
+                                }
 
-                        QuikSaveXhdataThread.Start();
+                                bjData = string.Empty;
+                                try
+                                {
+
+                                    singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                                }
+                                catch
+                                {
+                                    singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
+                                }
+
+                                if (singledata != null)
+                                {
+                                    foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                                    {
+                                        parts = item.StationNameProperty.Split(':');
+                                        if (!parts[0].StartsWith("Q"))
+                                        {
+                                            switch (parts[0])
+                                            {
+                                                case "1":
+                                                    bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                                    break;
+                                                case "2":
+                                                    bjData = parts[1];
+                                                    break;
+                                                case "3":
+                                                    bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+
+                                            xhx.Add(new ChangeToTxt.CheZhanOutputData()
+                                            {
+                                                Bjlx = parts[0],
+                                                Bjsj = bjData,
+                                                Gh = item.HatProperty,
+                                                Glb = item.PositionProperty.ToString("F3"),
+                                                Index = string.Empty,
+                                                Ldh = item.SectionNumProperty.ToString(),
+                                                Zjfx = "1"
+                                            });
+                                        }
+                                    }
+                                }
+
+                                string backupfile = Path.Combine(Path.GetDirectoryName(_xhdataPath),
+                                                                 Path.GetFileNameWithoutExtension(_xhdataPath) +
+                                                                 ".xhbackup");
+                                if (!_xhdataPath.Equals(string.Empty))
+                                {
+                                    GDoper.XhDataQuikSave(xhs, xhx, backupfile);
+                                }
+                            });
+
+                            QuikSaveXhdataThread.Start();
+                        }                        
                     }
                 }
 
@@ -2337,36 +2345,7 @@ namespace Inter_face.ViewModel
                     for (int i = starter; i < ender; i+=step)
                     {
                         lc = 0;
-                        pathes = string.Empty;
-
-                        if (i == starter)
-                        {
-                            int firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);                            
-                            pathes = string.Format("M0,25 L0,40 {0},40", lc);
-
-                            for (int j = (int)Math.Ceiling(firstl / 100d); j < 10; j++)
-                            {
-                                pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                lc += 100 / ScaleProperty;
-                            }
-
-                            sdvm.DataCollection.Add(new StationDataMode()
-                            {
-                                HatProperty = pdxlist[0].Gh,
-                                LengthProperty = (1000 - firstl) / ScaleProperty,
-                                PositionProperty = starter + firstl / 1000,
-                                Type = DataType.Position,
-                                SectionNumProperty = int.Parse(pdxlist[0].Ldh),
-                                ScaleProperty = ScaleProperty,
-                                SelectedProperty = false,
-                                PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
-                                StationNameProperty = string.Empty
-                            });
-
-                            step = 1;
-                            starter = -1;
-                            continue;
-                        }
+                        pathes = string.Empty;                        
                         
                         float le = 0;
                         float et = 0;                        
@@ -2484,7 +2463,36 @@ namespace Inter_face.ViewModel
                             }
 
                             if (parts != null && Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i) continue;
-                        }                        
+                        }
+
+                        if (i == starter)
+                        {
+                            int firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);
+                            pathes = string.Format("M0,25 L0,40 {0},40", lc);
+
+                            for (int j = (int)Math.Ceiling(firstl / 100d); j < 10; j++)
+                            {
+                                pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
+                                lc += 100 / ScaleProperty;
+                            }
+
+                            sdvm.DataCollection.Add(new StationDataMode()
+                            {
+                                HatProperty = pdxlist[0].Gh,
+                                LengthProperty = (1000 - firstl) / ScaleProperty,
+                                PositionProperty = starter + firstl / 1000,
+                                Type = DataType.Position,
+                                SectionNumProperty = int.Parse(pdxlist[0].Ldh),
+                                ScaleProperty = ScaleProperty,
+                                SelectedProperty = false,
+                                PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
+                                StationNameProperty = string.Empty
+                            });
+
+                            step = 1;
+                            starter = -1;
+                            continue;
+                        }
 
                         lc = 0;
                         pathes = string.Empty;
