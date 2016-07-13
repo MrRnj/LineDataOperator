@@ -382,6 +382,9 @@
                         <Fluent:MenuItem Header="单页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToUnBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.SingleClickCommand, Mode=OneWay}"/>
                     </Fluent:SplitButton>
                 </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox x:Name="testRibbonGroupBox" d:LayoutOverrides="Height" Header="测试">
+                    <Fluent:Button x:Name="testButton" Header="测试" ToolTip="新建信号机数据" Command="{Binding DatasCollectionProperty.TestCommand, Mode=OneWay}" LargeIcon="{DynamicResource creatsignals}" Height="Auto" />
+                </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
             <Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">
                 <Fluent:RibbonGroupBox x:Name="DetailRibbonGroupBox" d:LayoutOverrides="Height" Header="基本信息" Width="159">

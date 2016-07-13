@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Windows;
 using Inter_face.Views;
+using LocomotiveSim;
 
 namespace Inter_face.ViewModel
 {
@@ -588,6 +589,10 @@ namespace Inter_face.ViewModel
 
                 RaisePropertyChanging(SeletedXinhaoSPropertyName);
                 _seletedxinhaosProperty = value;
+                if (_seletedxinhaosProperty)
+                    Direction = 1;
+                else
+                    Direction = 0;
                 RaisePropertyChanged(SeletedXinhaoSPropertyName);
             }
         }
@@ -2350,20 +2355,34 @@ namespace Inter_face.ViewModel
                         float le = 0;
                         float et = 0;                        
                         int nearcount = 0;
+                        int index = 0;
+                        int firstl = 0;
 
                         if (p < cdlxlist.Count)
                         {
                             parts = cdlxlist[p].Split(':');
+                            if (i == starter)
+                            {
+                                firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);
+                                //pathes = string.Format("M0,25 L0,40 {0},40", lc);
+                                index = (int)Math.Ceiling(firstl / 100d);
+                            }
+                            else
+                            {
+                                firstl = 0;
+                                index = 0;
+                            }
+
                             if (Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i)
                             {
                                 offset -= (float.Parse(parts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1]));
                                 ender = (int)Math.Ceiling(rawender + offset / 1000);
 
-                                le = (float.Parse(parts[0].Split('+')[1]) - i * 1000) / ScaleProperty;
+                                le = (float.Parse(parts[0].Split('+')[1]) - (i * 1000 + firstl)) / ScaleProperty;
                                 nearcount = (int)Math.Ceiling((float.Parse(parts[0].Split('+')[1]) / 1000
                                 - i) * 10);
 
-                                for (int k = 0; k < nearcount; k++)
+                                for (int k = index; k < nearcount; k++)
                                 {
 
                                     if (k == 0)
@@ -2393,7 +2412,7 @@ namespace Inter_face.ViewModel
                                     {
                                         HatProperty = parts[0].Split('+')[0],
                                         LengthProperty = le,
-                                        PositionProperty = i,
+                                        PositionProperty = i + firstl / 1000,
                                         Type = DataType.Position,
                                         SectionNumProperty = p + 1,
                                         ScaleProperty = ScaleProperty,
@@ -2465,7 +2484,7 @@ namespace Inter_face.ViewModel
                             if (parts != null && Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i) continue;
                         }
 
-                        if (i == starter)
+                       /* if (i == starter)
                         {
                             int firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);
                             pathes = string.Format("M0,25 L0,40 {0},40", lc);
@@ -2492,12 +2511,12 @@ namespace Inter_face.ViewModel
                             step = 1;
                             starter = -1;
                             continue;
-                        }
+                        }*/
 
                         lc = 0;
                         pathes = string.Empty;
 
-                        for (int k = 0; k < 10; k++)
+                        for (int k = index; k < 10; k++)
                         {
                             if (k == 0)
                             {
@@ -2513,7 +2532,7 @@ namespace Inter_face.ViewModel
                         sdvm.DataCollection.Add(new StationDataMode()
                         {
                             HatProperty = pdxlist[0].Gh,
-                            LengthProperty = 1000 / ScaleProperty,
+                            LengthProperty = (1000 - firstl) / ScaleProperty,
                             PositionProperty = i,
                             Type = DataType.Position,
                             SectionNumProperty = int.Parse(pdxlist[0].Ldh),
@@ -5191,6 +5210,61 @@ namespace Inter_face.ViewModel
             
         }
 
+        private string getcurrentpos(string pos, int secnum)
+        {
+            float startpos = float.Parse(pdxlist[0].Qdglb) * 1000;
+            float offset = 0;
+            string[] parts = null;
+
+            for (int i = 1; i < secnum; i++)
+            {
+                parts = cdlxlist[i - 1].Split(':');
+                offset += (float.Parse(parts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1]));
+            }
+
+            float realcurrentpos = (float.Parse(pos) * 1000 - startpos) + offset;
+            return realcurrentpos.ToString("#0.000");
+        }
+
+        private string[] lineparts = null;
+        private void test()
+        {
+            Com_LocoModel cl = new Com_LocoModel();
+
+            /* cl.Weight = "474";
+             cl.Length = "106";
+             cl.BreakFuncfactors = "1.118:0.0054:0.00015";
+             cl.breakingAccTable = new List<string>();
+             cl.breakingAccTable.Add("200|0.457");
+             cl.breakingAccTable.Add("174|0.457");
+             cl.breakingAccTable.Add("140|0.457");
+             cl.breakingAccTable.Add("118|0.457");
+             cl.breakingAccTable.Add("109|0.457");
+             cl.breakingAccTable.Add("0|0.457");*/
+            cl.LoadMUfromFilepath("testTrain.txt");
+            List<ILoco_model> im = new List<ILoco_model>();
+            im.Add(cl);
+
+            ControlCenter cc = new ControlCenter(im, new List<ITrain_model>(), 2);
+            cc.ProtectDis = 120;
+            cc.TK = 3;
+            cc.Ypsilon = 0.11f;
+            
+            ChangeToTxt ctt = new ChangeToTxt();
+            if (lineparts == null)
+            {
+                lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
+            }
+            cc.FormatLinepartStruct(lineparts);
+            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            string crp = getcurrentpos(sdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+            float dis = cc.CalculateDisWithEndpos(int.Parse(Math.Round(float.Parse(crp)).ToString()), 200, Direction);
+            //cc.CalculateDisWithEndpos()
+            if (File.Exists("result.txt"))
+                File.Delete("result.txt");
+            File.AppendAllText("result.txt", cc.process);
+        }
+
         #region Commands
        
         private RelayCommand _showdataChangedCommand;
@@ -5849,6 +5923,24 @@ namespace Inter_face.ViewModel
                     }));
             }
         }
+
+        private RelayCommand _testCommand;
+
+        /// <summary>
+        /// Gets the TestCommand.
+        /// </summary>
+        public RelayCommand TestCommand
+        {
+            get
+            {
+                return _testCommand
+                    ?? (_testCommand = new RelayCommand(
+                    () =>
+                    {
+                        test();
+                    }));
+            }
+        }
        
         #endregion
 
@@ -5884,7 +5976,7 @@ namespace Inter_face.ViewModel
                 if (Disp != null)
                     Disp.BeginInvoke(new Action(() => { proceswindow.Close(); }));
             }
-        }         
-           
+        }        
+                 
     }
 }
