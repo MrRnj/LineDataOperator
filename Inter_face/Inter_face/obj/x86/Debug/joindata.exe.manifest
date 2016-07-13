@@ -67,14 +67,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExtractData.dll" size="228864">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExtractData.dll" size="229376">
       <assemblyIdentity name="ExtractData" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>uXE3TYOL6DrclP8wysjWa0ENfKc=</dsig:DigestValue>
+        <dsig:DigestValue>38RDEsiXoc/CymSlbY+/wZCW9vo=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="491008">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="492544">
       <assemblyIdentity name="joindata" version="2.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>p4v+CUMnFBUmHkKVpdkayZSB0KQ=</dsig:DigestValue>
+        <dsig:DigestValue>h//fhe4ehksSgry0p8zXTRv3O0o=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -135,6 +135,18 @@
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
         <dsig:DigestValue>oIuZKmjNEkOjMitTwhhYTjjVzAY=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LocomotiveSim.dll" size="26624">
+      <assemblyIdentity name="LocomotiveSim" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>ZY9XIuT7WcR6dfytkFfHN4mpi3w=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -92,6 +92,9 @@
     <Reference Include="LateBindingApi.Core">
       <HintPath>..\..\..\..\Visual Studio 2013\Projects\dAtaeXchangefRramwork\ExtractData_1010\ExtractData\ExtractData\bin\Debug\LateBindingApi.Core.dll</HintPath>
     </Reference>
+    <Reference Include="LocomotiveSim">
+      <HintPath>..\..\..\locomotive-model\LocomotiveSim\LocomotiveSim\bin\Debug\LocomotiveSim.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Drawing" />
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
