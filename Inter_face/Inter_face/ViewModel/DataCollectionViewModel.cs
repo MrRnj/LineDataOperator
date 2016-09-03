@@ -39,7 +39,9 @@ namespace Inter_face.ViewModel
         private float _startPos;
         private float _endPos;
         private string _xhdataPath;
-        private string _xhsavefilePath;       
+        private string _xhsavefilePath;
+        private string[] lineparts = null;
+        private ControlCenter _contrCen;
 
         private GraphyDataOper GDoper;
         private SignalDataExportor SDexportor;
@@ -80,6 +82,8 @@ namespace Inter_face.ViewModel
         DianFXWindow dianfxwindow;
         AdjustSignalDisWindow asdwindow;
         ProcessForm processform;
+        TrainInfoWindow tiWindow;
+        GetBreakDisWindow gbdWindow;
 
         System.Windows.Threading.Dispatcher dispatcher;
 
@@ -937,6 +941,7 @@ namespace Inter_face.ViewModel
             _startPos = -1;
             _endPos = -1;
             ExportXhText = "分页输出";
+            _contrCen = new ControlCenter();
 
             MessengerInstance.Register<GraphyDataOper>(this, "gdo", p => { gdo = p; });
             MessengerInstance.Register<System.Windows.Threading.Dispatcher>(this, "Dispatcher", p => { dispatcher = p; });
@@ -987,6 +992,7 @@ namespace Inter_face.ViewModel
                     _DataBin.Clear();
                     CountProperty = 0;
                     containpddata = false;
+                    lineparts = null;
                     _startPos = -1;
                     _endPos = -1;
                 });
@@ -1149,7 +1155,20 @@ namespace Inter_face.ViewModel
                         MessageBox.Show("高程自动调整失败，请手动调整！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 });
+            MessengerInstance.Register<string>(this, "formatMu",
+                p =>
+                {
+                    //trainame:filepath:protectdis:tk
+                    if (p != string.Empty)
+                    {
+                        string[] infos = p.Split('|');
+                        _contrCen = formatMu(infos[1], 
+                            float.Parse(infos[2]), int.Parse(infos[3]), int.Parse(infos[4]));
+                    }
 
+                });
+
+            MessengerInstance.Register<string>(this, "calculeteDis", p => { calculetedis(p); });        
         }
 
         private void ShowProcessWindow()
@@ -5226,44 +5245,124 @@ namespace Inter_face.ViewModel
             return realcurrentpos.ToString("#0.000");
         }
 
-        private string[] lineparts = null;
-        private void test()
+        private ControlCenter formatMu(string filepath, float protectdis, int tk,int oriv)
         {
             Com_LocoModel cl = new Com_LocoModel();
 
-            /* cl.Weight = "474";
-             cl.Length = "106";
-             cl.BreakFuncfactors = "1.118:0.0054:0.00015";
-             cl.breakingAccTable = new List<string>();
-             cl.breakingAccTable.Add("200|0.457");
-             cl.breakingAccTable.Add("174|0.457");
-             cl.breakingAccTable.Add("140|0.457");
-             cl.breakingAccTable.Add("118|0.457");
-             cl.breakingAccTable.Add("109|0.457");
-             cl.breakingAccTable.Add("0|0.457");*/
-            cl.LoadMUfromFilepath("testTrain.txt");
+            cl.LoadMUfromFilepath(filepath);
             List<ILoco_model> im = new List<ILoco_model>();
             im.Add(cl);
 
             ControlCenter cc = new ControlCenter(im, new List<ITrain_model>(), 2);
-            cc.ProtectDis = 120;
-            cc.TK = 3;
-            cc.Ypsilon = 0.11f;
-            
-            ChangeToTxt ctt = new ChangeToTxt();
-            if (lineparts == null)
-            {
-                lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
-            }
-            cc.FormatLinepartStruct(lineparts);
-            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
-            string crp = getcurrentpos(sdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
-            float dis = cc.CalculateDisWithEndpos(int.Parse(Math.Round(float.Parse(crp)).ToString()), 200, Direction);
-            //cc.CalculateDisWithEndpos()
-            if (File.Exists("result.txt"))
-                File.Delete("result.txt");
-            File.AppendAllText("result.txt", cc.process);
+            cc.ProtectDis = protectdis;
+            cc.TK = tk;
+            cc.Ypsilon = cl.Ypsilon;           
+            cc.Group.Path = filepath;
+            cc.OriSpeed = oriv;            
+
+            return cc;
         }
+
+        private void editTrain()
+        {
+            tiWindow = new TrainInfoWindow();
+            tiWindow.ShowDialog();
+        }
+
+        private void calculetUmBreakDis()
+        {
+            gbdWindow = new GetBreakDisWindow();
+
+            if (_contrCen.Group.Locomotives.Count == 0)
+            {
+                MessengerInstance.Send<string>(string.Empty, "iniTrain");
+            }
+            else
+            {
+                MessengerInstance.Send<string>(string.Format("{0}|{1}|{2}|{3}|{4}",
+                    ((MUGroup)(_contrCen.Group)).TrainName,
+                    _contrCen.Group.Path,
+                    _contrCen.ProtectDis.ToString(),
+                    _contrCen.TK.ToString(),
+                    _contrCen.OriSpeed.ToString()),
+                    "iniTrain");
+            }
+            gbdWindow.Show();
+        }               
+        
+        private void calculetedis(string info)
+        {
+            string[] add = info.Split(':');
+
+            try
+            {
+                if (_contrCen != null)
+                {
+                    ChangeToTxt ctt = new ChangeToTxt();
+
+                    if (lineparts == null)
+                    {
+                        lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());                        
+                    }
+
+                    _contrCen.FormatLinepartStruct(lineparts);
+                    StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+                    if (sdm.Type != DataType.Single && sdm.Type != DataType.SingleS)
+                    {
+                        MessengerInstance.Send("未选择信号机", "reciveDisinfos");
+                        return;
+                    }
+
+                    string[] parts = sdm.StationNameProperty.Split(':');
+                    if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
+                    {
+                        MessengerInstance.Send("未选择信号机", "reciveDisinfos");
+                        return;
+                    }
+                        
+                    string crp = getcurrentpos(sdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+
+                    _contrCen.ProtectDis = float.Parse(add[0]);
+                    _contrCen.TK = float.Parse(add[1]);
+                    _contrCen.ExportDetail = add[2].Equals("1") ? true : false;
+                    _contrCen.OriSpeed = int.Parse(add[3]);
+
+                    decimal dis = _contrCen.CalculateDisWithEndpos(int.Parse(Math.Round(float.Parse(crp)).ToString()), _contrCen.OriSpeed, Direction);
+                    string resultText = string.Format("制动距离(m)：{0}\r\n制动时间(s):{1}\r\n平均坡度(‰):{2}",
+                        dis.ToString("F3"),
+                        _contrCen.TotalBreakTime.ToString("F0"),
+                        _contrCen.AverHeightProperty.ToString("F3"));
+
+                    if (add[2].Equals("1"))
+                    {
+                        if (File.Exists("result.txt"))
+                            File.Delete("result.txt");
+                        File.AppendAllText("result.txt", _contrCen.process);
+                    }
+
+                    MessengerInstance.Send(resultText, "reciveDisinfos");
+                }
+            }
+            catch(ControlCenter.OverlineRangeException olre)
+            {
+                MessengerInstance.Send(olre.Message, "reciveDisinfos");
+            }
+            catch(NullReferenceException nre)
+            {
+                MessengerInstance.Send("无线路数据", "reciveDisinfos");
+            }
+            catch(ControlCenter.OverMaxSpeedException omse)
+            {
+                MessengerInstance.Send(omse.Message, "reciveDisinfos");
+            }
+            catch
+            {
+                MessengerInstance.Send("计算制动距离出错", "reciveDisinfos");
+            }           
+            
+        }
+
+        private void test() { }
 
         #region Commands
        
@@ -5920,6 +6019,42 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                        
+                    }));
+            }
+        }
+
+        private RelayCommand _editTrainInfoCommand;
+
+        /// <summary>
+        /// Gets the EditTrainInfoCommand.
+        /// </summary>
+        public RelayCommand EditTrainInfoCommand
+        {
+            get
+            {
+                return _editTrainInfoCommand
+                    ?? (_editTrainInfoCommand = new RelayCommand(
+                    () =>
+                    {
+                        editTrain();
+                    }));
+            }
+        }
+
+        private RelayCommand _calculetumbreakdisCommand;
+
+        /// <summary>
+        /// Gets the CalculetUmBreakDisCommand.
+        /// </summary>
+        public RelayCommand CalculetUmBreakDisCommand
+        {
+            get
+            {
+                return _calculetumbreakdisCommand
+                    ?? (_calculetumbreakdisCommand = new RelayCommand(
+                    () =>
+                    {
+                        calculetUmBreakDis();
                     }));
             }
         }

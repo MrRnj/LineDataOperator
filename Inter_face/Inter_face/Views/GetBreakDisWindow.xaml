@@ -1,0 +1,82 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inter_face.Views"
+        xmlns:vm="clr-namespace:Inter_face.ViewModel"
+        xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="Inter_face.Views.GetBreakDisWindow"
+        mc:Ignorable="d"
+        Title="获取制动距离" Height="300" Width="505" DataContext="{DynamicResource GetBreakDisViewModel}" WindowStyle="ToolWindow" ResizeMode="NoResize" Topmost="True">
+    <Window.Resources>
+        <vm:GetBreakDisViewModel x:Key="GetBreakDisViewModel"/>
+    </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <Custom:EventToCommand x:Name="CloseEventToCommand" Command="{Binding DisposeCommand, Mode=OneWay}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid Margin="0,0,2,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="72"/>
+            <ColumnDefinition Width="208"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="29*"/>
+            <RowDefinition Height="62*"/>
+            <RowDefinition Height="113*"/>
+            <RowDefinition Height="38*"/>
+            <RowDefinition Height="33*"/>
+        </Grid.RowDefinitions>
+        <GroupBox x:Name="AdditionalgroupBox" Grid.ColumnSpan="4" Header="制动附加" Margin="0,0,-35,5" Grid.Row="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin">
+            <Grid Margin="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label x:Name="DisLabel" Content="安全距离(m):" Grid.Column="0" Grid.Row="0"/>
+                <Label x:Name="KTLabel" Content="空走时间(s):" Grid.Column="3" Grid.Row="0"/>
+                <Label x:Name="ovLabel" Content="制动初速(v):" Grid.Column="6" Grid.Row="0"/>
+                <TextBox x:Name="DisTextBox" Text="{Binding ProtectedDis, Mode=TwoWay}"  Grid.Column="1" Grid.Row="0" Margin="4"/>
+                <TextBox x:Name="KTTextBox" Text="{Binding TK, Mode=TwoWay}"  Grid.Column="4" Grid.Row="0" Margin="4"/>
+                <TextBox x:Name="ovTextBox" Text="{Binding OriSpeed, Mode=TwoWay}"  Grid.Column="7" Grid.Row="0" Margin="4"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="TrainInfogroupBox" Grid.ColumnSpan="3" Header="车辆信息" Margin="10" Grid.Row="2" Grid.RowSpan="2" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin">
+            <Grid Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="191*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <Label x:Name="LenLabel" Content="车辆总长(m):" Grid.Column="0" Grid.Row="0"/>
+                <TextBox x:Name="LenTextBox" Text="{Binding TotalLength}"  Grid.Column="1" Grid.Row="0" Margin="4" VerticalContentAlignment="Center" IsReadOnly="True"/>
+                <Label x:Name="WeiLabel" Content="车辆总重(t):" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeiTextBox" Text="{Binding TotalWeight}"  Grid.Column="1" Grid.Row="1" Margin="4" VerticalContentAlignment="Center" IsReadOnly="True"/>
+                <Label x:Name="YLabel" Content="转动惯量:" Grid.Column="0" Grid.Row="2" Visibility="Collapsed"/>
+                <TextBox x:Name="YTextBox" Text=""  Grid.Column="1" Grid.Row="2" Margin="4" VerticalContentAlignment="Center" IsReadOnly="True" Visibility="Collapsed"/>
+            </Grid>
+        </GroupBox>
+        <Label x:Name="Pathlabel" Content="{Binding FilePath}" Margin="14,4,-37,4" Grid.Row="4" Grid.ColumnSpan="4" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" ToolTip="{Binding FilePath}"/>
+        <Button x:Name="loadtrainbutton" Content="载入车辆" Margin="4,3" Command="{Binding LoadTrainCommand, Mode=OneWay}"/>
+        <TextBox x:Name="ResulttextBox" Grid.Column="3" Margin="5,10,-35,5" Grid.Row="2" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" Text="{Binding ContentText}" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" FontSize="16"/>
+        <Button x:Name="calculetebutton" Content="计算制动距离" Grid.Column="3" Margin="5,5,-35,5" Grid.Row="3" Command="{Binding CalculeteDisCommand, Mode=OneWay}" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+
+        <CheckBox x:Name="ResultcheckBox" Content="是否记录过程" Grid.Column="3" Margin="0,6.082,-35,5.585" HorizontalAlignment="Right" Width="98.333" IsChecked="{Binding SaveProcess, Mode=TwoWay}" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+        <Label x:Name="trainamelabel" Content="车辆名称：" Grid.Column="1" Margin="2" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+        <TextBox x:Name="trainameTextBox" Grid.Column="2" Margin="2" Text="{Binding TrainName}" IsReadOnly="True" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+    </Grid>
+</Window>

@@ -180,16 +180,19 @@
     <Compile Include="Models\DianFXneededInfosMode.cs" />
     <Compile Include="Models\LdhinfoModel.cs" />
     <Compile Include="Models\SignalDataViewModel.cs" />
+    <Compile Include="Models\Speed_breakMode.cs" />
     <Compile Include="Models\StationDataMode.cs" />
     <Compile Include="ModifyCdldataWindow.xaml.cs">
       <DependentUpon>ModifyCdldataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\AcdlViewModel.cs" />
     <Compile Include="ViewModel\AdjustSignalsDisAsSameViewMode.cs" />
+    <Compile Include="ViewModel\GetBreakDisViewModel.cs" />
     <Compile Include="ViewModel\ModifyCdlViewModel.cs" />
     <Compile Include="ViewModel\ModifyFilePosViewModel.cs" />
     <Compile Include="ViewModel\ProcessViewModel.cs" />
     <Compile Include="ViewModel\ShowLdhViewModel.cs" />
+    <Compile Include="ViewModel\SpeedBreakOperateViewModel.cs" />
     <Compile Include="ViewModel\StationSignaleDataModel.cs" />
     <Compile Include="ModifyQujianWindow.xaml.cs">
       <DependentUpon>ModifyQujianWindow.xaml</DependentUpon>
@@ -210,6 +213,7 @@
     <Compile Include="ViewModel\MoveXinhaoFormViewModel.cs" />
     <Compile Include="ViewModel\SingleDataViewModel.cs" />
     <Compile Include="ViewModel\StationSignalViewModel.cs" />
+    <Compile Include="ViewModel\TrainInfoOperatorViewModel.cs" />
     <Compile Include="ViewModel\UpdataDianFXViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="Views\AdjustSignalDisWindow.xaml.cs">
@@ -221,6 +225,9 @@
     <Compile Include="Views\DivSpinner.xaml.cs">
       <DependentUpon>DivSpinner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\GetBreakDisWindow.xaml.cs">
+      <DependentUpon>GetBreakDisWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LdhInfoWindow.xaml.cs">
       <DependentUpon>LdhInfoWindow.xaml</DependentUpon>
     </Compile>
@@ -230,8 +237,14 @@
     <Compile Include="Views\ProcessWindow.xaml.cs">
       <DependentUpon>ProcessWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\SpeedBreakWindow.xaml.cs">
+      <DependentUpon>SpeedBreakWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\StationSignalWindow.xaml.cs">
       <DependentUpon>StationSignalWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TrainInfoWindow.xaml.cs">
+      <DependentUpon>TrainInfoWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="ACdlWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -281,6 +294,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\GetBreakDisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LdhInfoWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -293,9 +310,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\SpeedBreakWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\StationSignalWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TrainInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -495,6 +520,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Readme.MvvmlightSnippet.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\UmTrain.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\stop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

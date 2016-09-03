@@ -1,0 +1,59 @@
+﻿<Window x:Class="Inter_face.Views.TrainInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inter_face.Views"
+        xmlns:vm="clr-namespace:Inter_face.ViewModel"
+        mc:Ignorable="d"
+        Title="车辆信息" Height="296" Width="375.5" DataContext="{DynamicResource TrainInfoOperatorViewModel}">
+    <Window.Resources>
+        <vm:TrainInfoOperatorViewModel x:Key="TrainInfoOperatorViewModel"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="148*"/>
+            <RowDefinition Height="35"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="80*"/>
+            <ColumnDefinition Width="30*"/>
+            <ColumnDefinition Width="30*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox x:Name="groupBox" Header="基本信息" Grid.RowSpan="3" Margin="0,0,0.001,0" Grid.Row="1" Grid.ColumnSpan="2">
+            <Grid Margin="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10*"/>
+                    <ColumnDefinition Width="15*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="30*"/>
+                    <RowDefinition Height="30*"/>
+                    <RowDefinition Height="30*"/>
+                    <RowDefinition Height="34*"/>
+                    <RowDefinition Height="28*"/>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="TotalLenTextblock" Margin="1" Grid.Row="1" Text="总长：" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16"/>
+                <TextBlock x:Name="TotalWeiTextblock" Margin="1" Grid.Row="2" Text="总重：" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16"/>
+                <TextBlock x:Name="BasicBreakTextblock" Grid.Row="3" Text="阻力系数：" TextAlignment="Center" VerticalAlignment="Center" FontSize="16" HorizontalAlignment="Left"/>
+                <TextBlock x:Name="YTextblock" Grid.Row="4" Text="转动惯量：" TextAlignment="Center" VerticalAlignment="Center" FontSize="16" Margin="0,9.736" HorizontalAlignment="Left"/>
+                <TextBox x:Name="TotalLenTextBox" Margin="1" Grid.Row="1" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Text="{Binding TotalLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}"/>
+                <TextBox x:Name="TotalweiTextBox" Margin="1" Grid.Row="2" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Text="{Binding TotalWeightProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}"/>
+                <TextBox x:Name="BasicBreakTextBox" Margin="1" Grid.Row="3" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Text="{Binding BasicalBreakFactors, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}"/>
+                <TextBox x:Name="YTextBox" Margin="1" Grid.Row="4" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="1" Text="{Binding YFactors, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="sbbutton" Content="速度减速度表" Grid.Column="2" Margin="4,8" Grid.Row="1" Grid.ColumnSpan="2" Command="{Binding BeginEditS_BCommand, Mode=OneWay}"/>
+        <Button x:Name="openbutton" Content="打开" Grid.Column="2" Margin="4,8" Command="{Binding OpenDataCommand, Mode=OneWay}"/>
+        <Button x:Name="newbutton" Content="新建" Grid.Column="3" Margin="4,8" Command="{Binding NewDataCommand, Mode=OneWay}"/>
+        <Button x:Name="savebutton" Content="保存" Grid.Column="2" Margin="4" Grid.Row="3" Command="{Binding SaveDataCommand, Mode=OneWay}"/>
+        <TextBlock x:Name="NametextBlock" Margin="4,6,0,5" TextWrapping="Wrap" Text="名称："/>
+        <TextBox x:Name="NametextBox" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding TrainName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}"/>
+        <Button x:Name="editbutton" Content="编辑" Grid.Column="3" Margin="4" Grid.Row="3" Command="{Binding EditDataCommand, Mode=OneWay}"/>
+
+    </Grid>
+</Window>

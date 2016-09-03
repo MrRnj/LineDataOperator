@@ -92,6 +92,8 @@
         <Image x:Key="opensignals" Source="icons/opensignals.png" Stretch="Fill"/>
         <Image x:Key="opentrack" Source="icons/opentrack.png" Stretch="Uniform"/>
         <Image x:Key="creatsignals" Source="icons/creatsignals.png" Stretch="None"/>
+        <Image x:Key="editUm" Source="icons/UmTrain.png" Stretch="UniformToFill"/>
+        <Image x:Key="UmBdis" Source="icons/stop.png" Stretch="Uniform"/>
         <ToolTip x:Key="NewSheetTip">
             <Grid>
                 <Grid.RowDefinitions>
@@ -181,7 +183,7 @@
                 </Grid.ToolTip>
                 <Viewbox x:Name="DeTailViewbox" Stretch="Fill" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="2">
 
-                    <Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">                        
+                    <Canvas x:Name="canvas" Height="40" Width="{Binding Converter={StaticResource AdjustLengthConverter}, Mode=OneWay}">
                         <Path Data="{Binding ConverterParameter=4, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Stroke="{Binding ConverterParameter=3, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" Width="{Binding ActualWidth, ElementName=canvas}" Stretch="{Binding Converter={StaticResource DmToStretchConverter}, Mode=OneTime}" Height="50" Fill="{Binding ConverterParameter=2, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeThickness="{Binding ConverterParameter=0, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashArray="{Binding ConverterParameter=1, Converter={StaticResource DmToPathDataConverter}, Mode=OneWay}" StrokeDashCap="Square" />
                     </Canvas>
                 </Viewbox>
@@ -381,9 +383,12 @@
                         <Fluent:MenuItem Header="分页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.ManyClickCommand, Mode=OneWay}"/>
                         <Fluent:MenuItem Header="单页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToUnBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.SingleClickCommand, Mode=OneWay}"/>
                     </Fluent:SplitButton>
-                </Fluent:RibbonGroupBox>
-                <Fluent:RibbonGroupBox x:Name="testRibbonGroupBox" d:LayoutOverrides="Height" Header="测试">
-                    <Fluent:Button x:Name="testButton" Header="测试" ToolTip="新建信号机数据" Command="{Binding DatasCollectionProperty.TestCommand, Mode=OneWay}" LargeIcon="{DynamicResource creatsignals}" Height="Auto" />
+                </Fluent:RibbonGroupBox>                
+            </Fluent:RibbonTabItem>
+            <Fluent:RibbonTabItem x:Name="CheckDataRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Header="检算" IsSelected="True">
+                <Fluent:RibbonGroupBox x:Name="MuRibbonGroupBox" d:LayoutOverrides="Height" Header="动车组检算">
+                    <Fluent:Button x:Name="BulitTrainbutton" Content="编辑车辆" ToolTip="编辑车辆数据" Height="Auto" Margin="5,5,10,5" Command="{Binding DatasCollectionProperty.EditTrainInfoCommand, Mode=OneWay}" LargeIcon="{DynamicResource editUm}" Header="编辑车辆"/>
+                    <Fluent:Button x:Name="CheckUmDisbutton" Content="计算制动距离" ToolTip="计算制动距离"  Height="Auto" Margin="5,5,0,5" Command="{Binding DatasCollectionProperty.CalculetUmBreakDisCommand, Mode=OneWay}" LargeIcon="{DynamicResource UmBdis}" Header="计算制动距离"/>
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
             <Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">
