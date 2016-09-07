@@ -106,7 +106,6 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Expression.Drawing.xml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Microsoft.Practices.ServiceLocation.xml
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\System.Windows.Interactivity.xml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\DataCatcher.pdb
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ProcessForm.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\App.baml
@@ -157,4 +156,7 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\TrainInfoWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\GetBreakDisWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\GetBreakDisWindow.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\Fluent.pdb
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\ControlzEx.dll
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\ControlzEx.pdb
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Inter_face.csprojResolveAssemblyReference.cache

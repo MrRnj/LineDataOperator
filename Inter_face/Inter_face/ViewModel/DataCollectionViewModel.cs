@@ -5293,6 +5293,8 @@ namespace Inter_face.ViewModel
         private void calculetedis(string info)
         {
             string[] add = info.Split(':');
+            int containsignals = 0;
+            float d = 0;
 
             try
             {
@@ -5328,10 +5330,62 @@ namespace Inter_face.ViewModel
                     _contrCen.OriSpeed = int.Parse(add[3]);
 
                     decimal dis = _contrCen.CalculateDisWithEndpos(int.Parse(Math.Round(float.Parse(crp)).ToString()), _contrCen.OriSpeed, Direction);
-                    string resultText = string.Format("制动距离(m)：{0}\r\n制动时间(s):{1}\r\n平均坡度(‰):{2}",
+                    int currentindex = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+
+                    if (Direction == 0)
+                    {
+                        for (int i = currentindex; i < CurrentDatasProperty.DataCollection.Count; i++)
+                        {
+                            sdm = CurrentDatasProperty.DataCollection[i] as StationDataMode;
+                            parts = sdm.StationNameProperty.Split(':');
+
+                            if ((parts[0].StartsWith("1") || parts[0].StartsWith("2")))
+                            {
+                                containsignals++;
+                                continue;
+                            }
+
+                            if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
+                            {
+                                d += (sdm.RealLength * sdm.ScaleProperty);
+                            }
+
+                            if (d > (float)dis)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = currentindex; i >= 0; i--)
+                        {
+                            sdm = CurrentDatasProperty.DataCollection[i] as StationDataMode;
+                            parts = sdm.StationNameProperty.Split(':');
+
+                            if ((parts[0].StartsWith("1") || parts[0].StartsWith("2")))
+                            {
+                                containsignals++;
+                                continue;
+                            }
+
+                            if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
+                            {
+                                d += (sdm.RealLength * sdm.ScaleProperty);
+                            }
+
+                            if (d > (float)dis)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    string resultText = string.Format("制动距离(m)：{0}\r\n制动时间(s):{1}\r\n平均坡度(‰):{2}\r\n共包含{3}个闭塞分区\r\n",
                         dis.ToString("F3"),
                         _contrCen.TotalBreakTime.ToString("F0"),
-                        _contrCen.AverHeightProperty.ToString("F3"));
+                        _contrCen.AverHeightProperty.ToString("F3"),
+                        containsignals.ToString());
 
                     if (add[2].Equals("1"))
                     {

@@ -43,6 +43,18 @@
     </dependentAssembly>
   </dependency>
   <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ControlzEx.dll" size="164352">
+      <assemblyIdentity name="ControlzEx" version="2.0.1.61" publicKeyToken="F08B075E934B7045" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>kucLz9elC1ZBiia2V7aGCcRu+AI=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="DataCatcher.dll" size="8704">
       <assemblyIdentity name="DataCatcher" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -79,14 +91,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Fluent.dll" size="774144">
-      <assemblyIdentity name="Fluent" version="2.0.0.0" publicKeyToken="3E436E32A8C5546F" language="neutral" processorArchitecture="msil" />
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Fluent.dll" size="1463808">
+      <assemblyIdentity name="Fluent" version="4.0.3.0" publicKeyToken="3E436E32A8C5546F" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>8zQEqJZhTtoKxuygO+H79gydjHc=</dsig:DigestValue>
+        <dsig:DigestValue>URdM7vt42BQn22bgFAnKov/2tAQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -115,14 +127,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="535040">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="535552">
       <assemblyIdentity name="joindata" version="2.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>e1awZEULyuZe2HU2rKZ9pD281Js=</dsig:DigestValue>
+        <dsig:DigestValue>NpQ+XLm82TwsjVa3mD41A68qXno=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

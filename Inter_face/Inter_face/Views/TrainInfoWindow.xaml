@@ -51,8 +51,8 @@
         <Button x:Name="openbutton" Content="打开" Grid.Column="2" Margin="4,8" Command="{Binding OpenDataCommand, Mode=OneWay}"/>
         <Button x:Name="newbutton" Content="新建" Grid.Column="3" Margin="4,8" Command="{Binding NewDataCommand, Mode=OneWay}"/>
         <Button x:Name="savebutton" Content="保存" Grid.Column="2" Margin="4" Grid.Row="3" Command="{Binding SaveDataCommand, Mode=OneWay}"/>
-        <TextBlock x:Name="NametextBlock" Margin="4,6,0,5" TextWrapping="Wrap" Text="名称："/>
-        <TextBox x:Name="NametextBox" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding TrainName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}"/>
+        <TextBlock x:Name="NametextBlock" Margin="9,16,0,16" TextWrapping="Wrap" Text="名称：" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBox x:Name="NametextBox" Grid.Column="1" Margin="2" TextWrapping="Wrap" Text="{Binding TrainName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}" VerticalAlignment="Center"/>
         <Button x:Name="editbutton" Content="编辑" Grid.Column="3" Margin="4" Grid.Row="3" Command="{Binding EditDataCommand, Mode=OneWay}"/>
 
     </Grid>
