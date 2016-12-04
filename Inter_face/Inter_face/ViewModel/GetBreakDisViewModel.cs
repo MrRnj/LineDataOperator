@@ -283,6 +283,36 @@ namespace Inter_face.ViewModel
             }
         }
 
+        /// <summary>
+        /// The <see cref="BreakRange" /> property's name.
+        /// </summary>
+        public const string BreakRangePropertyName = "BreakRange";
+
+        private float _breakrangeProperty = 1;
+
+        /// <summary>
+        /// Sets and gets the BreakRange property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public float BreakRange
+        {
+            get
+            {
+                return _breakrangeProperty;
+            }
+
+            set
+            {
+                if (_breakrangeProperty == value)
+                {
+                    return;
+                }
+
+                _breakrangeProperty = value;
+                RaisePropertyChanged(BreakRangePropertyName);
+            }
+        }
+
         public GetBreakDisViewModel()
         {
             MessengerInstance.Register<string>(this, "iniTrain", 
@@ -292,7 +322,7 @@ namespace Inter_face.ViewModel
                     {
                         //trainame:filepath:protectdis:tk:oriV
                         string[] infos = p.Split('|');
-                        fullfillInfos(infos[1], infos[2], infos[3], infos[4]);
+                        fullfillInfos(infos[1], infos[2], infos[3], infos[4], infos[5]);
                     }
                 });
 
@@ -303,7 +333,7 @@ namespace Inter_face.ViewModel
                 });
         }
 
-        private void fullfillInfos(string path, string protectdis, string tk,string orispeed)
+        private void fullfillInfos(string path, string protectdis, string tk,string orispeed,string breakrange)
         {
             string[] lines = File.ReadAllLines(path);
 
@@ -332,6 +362,7 @@ namespace Inter_face.ViewModel
             TK = tk;
             OriSpeed = orispeed;
             ProtectedDis = protectdis;
+            BreakRange = float.Parse(breakrange);
         }
 
         private void loadtrain()
@@ -342,7 +373,7 @@ namespace Inter_face.ViewModel
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                fullfillInfos(ofd.FileName, "0", "0", "0");
+                fullfillInfos(ofd.FileName, "0", "0", "0", "1");
 
                 formatMu();
             }           
@@ -350,8 +381,8 @@ namespace Inter_face.ViewModel
 
         private void formatMu()
         {
-            MessengerInstance.Send(string.Format("{0}|{1}|{2}|{3}|{4}", 
-                TrainName, FilePath, ProtectedDis, TK, OriSpeed), "formatMu");
+            MessengerInstance.Send(string.Format("{0}|{1}|{2}|{3}|{4}|{5}",
+                TrainName, FilePath, ProtectedDis, TK, OriSpeed, BreakRange.ToString()), "formatMu");
         }
 
         private void unformatMu()
@@ -361,8 +392,8 @@ namespace Inter_face.ViewModel
         
         private void calculeteDis()
         {
-            MessengerInstance.Send(string.Format("{0}:{1}:{2}:{3}", 
-                ProtectedDis, TK, SaveProcess ? "1" : "0", OriSpeed.ToString()), "calculeteDis");
+            MessengerInstance.Send(string.Format("{0}:{1}:{2}:{3}:{4}",
+                ProtectedDis, TK, SaveProcess ? "1" : "0", OriSpeed.ToString(), BreakRange.ToString()), "calculeteDis");
         }      
 
         private void dispose()

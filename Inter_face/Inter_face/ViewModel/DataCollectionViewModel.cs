@@ -12,6 +12,7 @@ using System.Threading;
 using System.Windows;
 using Inter_face.Views;
 using LocomotiveSim;
+using Inter_face.BackUps;
 
 namespace Inter_face.ViewModel
 {
@@ -47,8 +48,10 @@ namespace Inter_face.ViewModel
         private SignalDataExportor SDexportor;
         private AutoBuildOperator ABoper;
         private GraphyDataOper gdo;
-        List<ExtractData.ChangeToTxt.PoduOutputData> pdxlist;
-        List<ExtractData.ChangeToTxt.PoduOutputData> pdslist;
+        private DianFXInfos existDfxInfos;
+
+        List<ChangeToTxt.PoduOutputData> pdxlist;
+        List<ChangeToTxt.PoduOutputData> pdslist;
 
         List<ChangeToTxt.QuxianOutputData> qxxlist;
         List<ChangeToTxt.QuxianOutputData> qxslist;
@@ -57,7 +60,10 @@ namespace Inter_face.ViewModel
         List<ChangeToTxt.CheZhanOutputData> czslist;
 
         List<ChangeToTxt.CheZhanOutputData> xhxlist;
-        List<ChangeToTxt.CheZhanOutputData> xhslist;        
+        List<ChangeToTxt.CheZhanOutputData> xhslist;
+
+        List<DianFXModel> dfxinfoxlist;
+        List<DianFXModel> dfxinfoslist;
 
         List<string> cdlxlist;
         List<string> cdlslist;
@@ -84,6 +90,8 @@ namespace Inter_face.ViewModel
         ProcessForm processform;
         TrainInfoWindow tiWindow;
         GetBreakDisWindow gbdWindow;
+        CalDfxWindow cdfWindow;
+        InfoWindow ifWindow;
 
         System.Windows.Threading.Dispatcher dispatcher;
 
@@ -942,6 +950,8 @@ namespace Inter_face.ViewModel
             _endPos = -1;
             ExportXhText = "分页输出";
             _contrCen = new ControlCenter();
+            existDfxInfos = null;
+            ifWindow = new InfoWindow();
 
             MessengerInstance.Register<GraphyDataOper>(this, "gdo", p => { gdo = p; });
             MessengerInstance.Register<System.Windows.Threading.Dispatcher>(this, "Dispatcher", p => { dispatcher = p; });
@@ -1158,17 +1168,26 @@ namespace Inter_face.ViewModel
             MessengerInstance.Register<string>(this, "formatMu",
                 p =>
                 {
-                    //trainame:filepath:protectdis:tk
+                    //trainame:filepath:protectdis:tk:breakRange
                     if (p != string.Empty)
                     {
                         string[] infos = p.Split('|');
-                        _contrCen = formatMu(infos[1], 
-                            float.Parse(infos[2]), int.Parse(infos[3]), int.Parse(infos[4]));
+                        _contrCen = formatMu(infos[1],
+                            float.Parse(infos[2]), int.Parse(infos[3]), int.Parse(infos[4]), float.Parse(infos[5]));
                     }
 
                 });
 
-            MessengerInstance.Register<string>(this, "calculeteDis", p => { calculetedis(p); });        
+            MessengerInstance.Register<string>(this, "calculeteDis", p => { calculetedis(p); });
+
+
+
+            MessengerInstance.Register<DianFXInfos>(this, "CaculeteDianfx",
+                p =>
+                {
+                    existDfxInfos = p;
+                    dianfxCal(p);
+                });     
         }
 
         private void ShowProcessWindow()
@@ -2615,19 +2634,50 @@ namespace Inter_face.ViewModel
         private float ChangeToOdd(float data, bool odd)
         {
             data = (int)Math.Round(data * 10, 0);
+
+            ISingleDataViewModel singledata;
+            if (!SeletedXinhaoS)
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+            else
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+
             //odd false为下行
             if (!odd)
             {
-                if (data % 2 != 0)
-                    return data;
-                return data + 1;
+                if (data % 2 == 0)
+                    data = data + 1;
+
+                if(singledata.DataCollection.Select((p) => { return (StationDataMode)p; }).
+                    Count((q) =>
+                    {
+                        string[] parts = q.StationNameProperty.Split(':');
+                        if (parts.Length > 1)
+                            return parts[1].Equals(data.ToString("F0"));
+                        return false;
+                    }) > 0)
+                {
+                    data = data + 2;
+                }            
             }
             else
             {
-                if (data % 2 == 0)
-                    return data;
-                return data + 1;
+                if (data % 2 != 0)
+                    data = data + 1;
+
+                if (singledata.DataCollection.Select((p) => { return (StationDataMode)p; }).
+                    Count((q) =>
+                    {
+                        string[] parts = q.StationNameProperty.Split(':');
+                        if (parts.Length > 1)
+                            return parts[1].Equals(data.ToString("F0"));
+                        return false;
+                    }) > 0)
+                {
+                    data = data - 2;
+                }
             }
+
+            return data;
         }
 
         private void AddXinhaoX(string taken, int numbers)
@@ -2816,6 +2866,7 @@ namespace Inter_face.ViewModel
                 sdm.PositionProperty = pos + (offset + adding) / 1000;
                 sdm.SectionNumProperty = sectionum;
                 parts = sdm.StationNameProperty.Split(':');
+
                 if (parts[0].Equals("1"))
                 {
                     sdm.StationNameProperty = string.Format("{0}:{1}:{2}:{3}:{4}", parts[0], newSignal, parts[2], parts[3], parts[4]);
@@ -2826,6 +2877,7 @@ namespace Inter_face.ViewModel
                         string.Format("{0}:{1}", sdm.StationNameProperty.Split(':')[0], ChangeToOdd(sdm.PositionProperty, false)) :
                         string.Format("{0}:{1}", sdm.StationNameProperty.Split(':')[0], ChangeToOdd(sdm.PositionProperty, true));
                 }
+
                 singledata.DataCollection.RemoveAt(index);
                 singledata.DataCollection.Insert(index, sdm);
                 currentqj.PositionProperty = sdm.PositionProperty;
@@ -2897,6 +2949,7 @@ namespace Inter_face.ViewModel
             }
             _datascollection_CollectionChanged(null, null);
         }
+
         private void MoveSignals(float offset)
         {
             List<StationDataMode> signals = new List<StationDataMode>();
@@ -3589,6 +3642,7 @@ namespace Inter_face.ViewModel
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
             else
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+
             StationDataMode sdm = (StationDataMode)singledata.DataCollection.
                 Single(q => ((StationDataMode)q).StationNameProperty.Equals(taken));
 
@@ -3762,11 +3816,11 @@ namespace Inter_face.ViewModel
                     }
 
                     Swindow = new StationWindow();
-                    MessengerInstance.Send<System.Collections.Generic.List<string>>(cdlxlist, "cdl");
+                    MessengerInstance.Send(cdlxlist, "cdl");
                     if (!SeletedXinhaoS)
                         stationSignallist.Reverse();
 
-                    MessengerInstance.Send<List<StationDataMode>>(stationSignallist, "stationsignal");
+                    MessengerInstance.Send(stationSignallist, "stationsignal");
                     Swindow.ShowDialog();
                 }
             }
@@ -3790,12 +3844,40 @@ namespace Inter_face.ViewModel
         private void UpdataStationSignals(List<StationDataMode> stationsignalcollection)
         {
             ISingleDataViewModel singledata;
+            string[] parts;
+            StationDataMode matchedmode;
+            List<string> removedtakens = new List<string>();
+
             if (!SeletedXinhaoS)
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
             else
-                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
-            string[] parts;
-            StationDataMode matchedmode;
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);            
+
+            IEnumerable<StationDataMode> oriStaions = singledata.DataCollection.
+                Where(p => ((StationDataMode)p).StationNameProperty.StartsWith("1")).Select(q => (StationDataMode)q);
+
+            foreach (StationDataMode station in oriStaions)
+            {
+                if (stationsignalcollection.Count(
+                     p =>
+                     {
+                         parts = p.StationNameProperty.Split(':');
+                         return parts[2].Equals(station.StationNameProperty.Split(':')[2]) &&
+                                parts[3].Equals(station.StationNameProperty.Split(':')[3]) &&
+                                p.PositionProperty == -1;
+                     }) == 1)
+                {
+                    removedtakens.Add(station.StationNameProperty);                   
+                }
+            }
+
+            foreach (string taken in removedtakens)
+            {
+                DeleteXinhao(taken);
+            }     
+
+            oriStaions = singledata.DataCollection.
+               Where(p => ((StationDataMode)p).StationNameProperty.StartsWith("1")).Select(q => (StationDataMode)q);
 
             foreach (StationDataMode item in stationsignalcollection)
             {
@@ -3804,11 +3886,10 @@ namespace Inter_face.ViewModel
                 parts = item.StationNameProperty.Split(':');
                 try
                 {
-                    matchedmode = singledata.DataCollection.Single
-                        (p => (!((StationDataMode)p).StationNameProperty.StartsWith("Q") &&
-                            ((StationDataMode)p).StationNameProperty.Split(':').Length > 2 &&
-                            ((StationDataMode)p).StationNameProperty.Split(':')[2].Equals(parts[2]) &&
-                            ((StationDataMode)p).StationNameProperty.Split(':')[3].Equals(parts[3]))) as StationDataMode;
+                    matchedmode = oriStaions.Single
+                        (p => (p.StationNameProperty.Split(':')[2].Equals(parts[2]) &&
+                               p.StationNameProperty.Split(':')[3].Equals(parts[3]))) as StationDataMode;
+
                     float offset = (item.PositionProperty - matchedmode.PositionProperty) * 1000;
 
                     if (item.SectionNumProperty != matchedmode.SectionNumProperty)
@@ -3823,6 +3904,7 @@ namespace Inter_face.ViewModel
                     if (Math.Abs(offset) > 1)
                         moveXinhaoX(matchedmode.StationNameProperty, offset, parts[1]);
                 }
+
                 catch(System.InvalidOperationException ioe)
                 {
                     InsertXinhaoX(item.PositionProperty, item.SectionNumProperty, "1", item);
@@ -4249,6 +4331,7 @@ namespace Inter_face.ViewModel
                     }
                 }
 
+                //输出下行
                 offset = 0;
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
 
@@ -5245,7 +5328,7 @@ namespace Inter_face.ViewModel
             return realcurrentpos.ToString("#0.000");
         }
 
-        private ControlCenter formatMu(string filepath, float protectdis, int tk,int oriv)
+        private ControlCenter formatMu(string filepath, float protectdis, int tk,int oriv,float br)
         {
             Com_LocoModel cl = new Com_LocoModel();
 
@@ -5258,7 +5341,26 @@ namespace Inter_face.ViewModel
             cc.TK = tk;
             cc.Ypsilon = cl.Ypsilon;           
             cc.Group.Path = filepath;
-            cc.OriSpeed = oriv;            
+            cc.OriSpeed = oriv;
+            cc.BreakRange = br;         
+
+            return cc;
+        }
+
+        private ControlCenter formatNomal(string filepath, float protectdis, int tk, int oriv)
+        {
+            Com_LocoModel cl = new Com_LocoModel();
+
+            cl.LoadNomallocoFromFilepath(filepath);
+            List<ILoco_model> im = new List<ILoco_model>();
+            im.Add(cl);
+
+            ControlCenter cc = new ControlCenter(im, new List<ITrain_model>(), 1);
+            cc.ProtectDis = protectdis;
+            cc.TK = tk;
+            cc.Ypsilon = cl.Ypsilon;
+            cc.Group.Path = filepath;
+            cc.OriSpeed = oriv;
 
             return cc;
         }
@@ -5275,20 +5377,21 @@ namespace Inter_face.ViewModel
 
             if (_contrCen.Group.Locomotives.Count == 0)
             {
-                MessengerInstance.Send<string>(string.Empty, "iniTrain");
+                MessengerInstance.Send(string.Empty, "iniTrain");
             }
             else
             {
-                MessengerInstance.Send<string>(string.Format("{0}|{1}|{2}|{3}|{4}",
+                MessengerInstance.Send(string.Format("{0}|{1}|{2}|{3}|{4}|{5}",
                     ((MUGroup)(_contrCen.Group)).TrainName,
                     _contrCen.Group.Path,
                     _contrCen.ProtectDis.ToString(),
                     _contrCen.TK.ToString(),
-                    _contrCen.OriSpeed.ToString()),
-                    "iniTrain");
+                    _contrCen.OriSpeed.ToString(),
+                    _contrCen.BreakRange.ToString(),                    
+                    "iniTrain"));
             }
             gbdWindow.Show();
-        }               
+        }          
         
         private void calculetedis(string info)
         {
@@ -5328,6 +5431,7 @@ namespace Inter_face.ViewModel
                     _contrCen.TK = float.Parse(add[1]);
                     _contrCen.ExportDetail = add[2].Equals("1") ? true : false;
                     _contrCen.OriSpeed = int.Parse(add[3]);
+                    _contrCen.BreakRange = float.Parse(add[4]);
 
                     decimal dis = _contrCen.CalculateDisWithEndpos(int.Parse(Math.Round(float.Parse(crp)).ToString()), _contrCen.OriSpeed, Direction);
                     int currentindex = CurrentDatasProperty.DataCollection.IndexOf(sdm);
@@ -5347,7 +5451,17 @@ namespace Inter_face.ViewModel
 
                             if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
                             {
-                                d += (sdm.RealLength * sdm.ScaleProperty);
+                                if (parts[0].StartsWith("Q"))
+                                {
+                                    if (parts[0].Split('+')[1].Equals("3"))
+                                    {
+                                        d += (sdm.LengthProperty * sdm.ScaleProperty);
+                                    }
+                                    else
+                                        d += (sdm.RealLength * sdm.ScaleProperty);
+                                }
+                                else
+                                    d += (sdm.RealLength * sdm.ScaleProperty);
                             }
 
                             if (d > (float)dis)
@@ -5371,7 +5485,17 @@ namespace Inter_face.ViewModel
 
                             if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
                             {
-                                d += (sdm.RealLength * sdm.ScaleProperty);
+                                if (parts[0].StartsWith("Q"))
+                                {
+                                    if (parts[0].Split('+')[1].Equals("3"))
+                                    {
+                                        d += (sdm.LengthProperty * sdm.ScaleProperty);
+                                    }
+                                    else
+                                        d += (sdm.RealLength * sdm.ScaleProperty);
+                                }
+                                else
+                                    d += (sdm.RealLength * sdm.ScaleProperty);
                             }
 
                             if (d > (float)dis)
@@ -5416,7 +5540,307 @@ namespace Inter_face.ViewModel
             
         }
 
-        private void test() { }
+        private void dianfxCal(DianFXInfos dfx)
+        {
+            //牵引
+            float time_r;
+            float speed_r;
+            //惰行
+            float time_l;
+            float speed_l;
+            //结果
+            string result_s = "无结果";
+            string result_x = "无结果";
+            float caldis = 0;
+            int index = 0;
+            ISingleDataViewModel singledata;
+            StationDataMode currentsignal;
+
+            try
+            {
+                //trainame: filepath: resistenceRange: frontDis: backDis: frontTime: backTime: Index
+                string[] infos = dfx.OtherInfos.Split('|');
+                index = int.Parse(infos[7]);
+                _contrCen = formatMu(infos[1], 0, 0, 0, 1);
+                _contrCen.TrackRange = float.Parse(infos[2]);
+                _contrCen.TrainIndex = index;
+
+                if (_contrCen != null)
+                {
+                    ChangeToTxt ctt = new ChangeToTxt();
+
+                    if (lineparts == null)
+                    {
+                        lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
+                    }
+                    _contrCen.FormatLinepartStruct(lineparts);
+
+                    
+                        singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
+
+                        if (singledata != null)
+                        {
+                            foreach (DianFXModel dfxs in dfx.DfxS)
+                            {
+                                try
+                                {
+                                    currentsignal =
+                                        singledata.DataCollection.Single(p
+                                        => ((StationDataMode)p).StationNameProperty.Equals(dfxs.FxNane)) as StationDataMode;
+
+                                    for (int i = singledata.DataCollection.IndexOf(currentsignal) + 1; i < singledata.DataCollection.Count; i++)
+                                    {
+                                        if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.StartsWith("1") ||
+                                            (singledata.DataCollection[i] as StationDataMode).StationNameProperty.StartsWith("2"))
+                                        {
+                                            currentsignal = singledata.DataCollection[i] as StationDataMode;
+                                            break;
+                                        }
+                                    }
+
+                                    string crp = getcurrentpos(currentsignal.PositionProperty.ToString(), currentsignal.SectionNumProperty);
+                                    caldis = float.Parse(crp) - float.Parse(dfxs.FrontPosition);
+
+                                _contrCen.TractionState(
+                            int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, caldis, Direction, out speed_r, out time_r, index);
+
+                                    result_s += string.Format("信号机 {0} 距电分相 {1} {2}米,{3}秒后入分相，入分相速度{4}km/h\r\n\r\n",
+                                        currentsignal.StationNameProperty.Split(':')[1],
+                                        dfxs.FxNane.Split(':')[1],
+                                        caldis.ToString(),
+                                        time_r.ToString("F0"),
+                                        speed_r.ToString("F1"));
+
+                                }
+
+                                catch
+                                {
+                                    continue;
+                                }
+                            }
+                        }                       
+                                    
+
+                    singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
+
+                    if (singledata != null)
+                    {
+                        foreach (DianFXModel dfxx in dfx.DfxX)
+                        {
+                            try
+                            {
+                                currentsignal =
+                                    singledata.DataCollection.Single(p
+                                    => ((StationDataMode)p).StationNameProperty.Equals(dfxx.FxNane)) as StationDataMode;
+
+                                for (int i = singledata.DataCollection.IndexOf(currentsignal) - 1; i > 0; i--)
+                                {
+                                    if ((singledata.DataCollection[i] as StationDataMode).StationNameProperty.StartsWith("1") ||
+                                        (singledata.DataCollection[i] as StationDataMode).StationNameProperty.StartsWith("2"))
+                                    {
+                                        currentsignal = singledata.DataCollection[i] as StationDataMode;
+                                        break;
+                                    }
+                                }
+
+                                string crp = getcurrentpos(currentsignal.PositionProperty.ToString(), currentsignal.SectionNumProperty);
+                                caldis = float.Parse(dfxx.FrontPosition) - float.Parse(crp);
+
+                                _contrCen.TractionState(
+                            int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, caldis, Direction, out speed_r, out time_r, index);
+
+                                result_x += string.Format("信号机{0}距电分相{1}{2}米,{3}秒后入分相，入分相速度{4}km/h\r\n\r\n",
+                                    currentsignal.StationNameProperty.Split(':')[1],
+                                    dfxx.FxNane.Split(':')[1],
+                                    caldis.ToString(),
+                                    time_r.ToString("F0"),
+                                    speed_r.ToString("F1"));
+                            }
+
+                            catch
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
+                    ifWindow = InfoWindow.GetInstance();
+
+                    MessengerInstance.Send(result_s + result_x, "showinfos");
+
+                    ifWindow.Show();
+                }
+            }
+
+            catch
+            {
+
+            }
+        }
+
+        private void beginCaldianfx()
+        {
+            if (existDfxInfos == null)
+            {
+                getdianfxinfos();
+                existDfxInfos = new DianFXInfos()
+                {
+                    DfxS = dfxinfoslist,
+                    DfxX = dfxinfoxlist,
+                    OtherInfos = string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}",
+                    string.Empty,
+                    string.Empty,
+                    "1", "0", "0", "0", "0", "0")
+                };
+            }
+
+            cdfWindow = new CalDfxWindow();
+            MessengerInstance.Send(existDfxInfos, "Ca_DianfxInfos");
+            cdfWindow.ShowDialog();
+        }
+
+        private void getdianfxinfos()
+        {
+            ISingleDataViewModel singledata = null;
+
+            if (dfxinfoslist == null || dfxinfoslist.Count == 0)
+            {
+                //从右到左
+                try
+                {
+                    singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                    dfxinfoslist = new List<DianFXModel>();
+
+                    foreach (StationDataMode item in
+                        singledata.DataCollection.Where(p => ((StationDataMode)p).StationNameProperty.Split(':')[0].Equals("3")).
+                                                  Select(q => (StationDataMode)q))
+                    {
+                        string[] infos = item.StationNameProperty.Split(':');
+
+                        string mid = getcurrentpos(infos[3].Split('+')[0], int.Parse(infos[3].Split('+')[1]));
+                        //合
+                        string end = getcurrentpos(infos[2].Split('+')[0], int.Parse(infos[2].Split('+')[1]));
+                        //断
+                        string frt = getcurrentpos(infos[4].Split('+')[0], int.Parse(infos[4].Split('+')[1]));
+
+                        dfxinfoslist.Add(new DianFXModel()
+                        {
+                            BackPosition = end,
+                            BackTime = "0",
+                            FrontPosition = frt,
+                            FrontTime = "0",
+                            FxNane = item.StationNameProperty,
+                            MidPosition = mid,
+                            BackDis = (float.Parse(mid)- float.Parse(end)).ToString(),
+                            FrontDis = (float.Parse(frt)- float.Parse(mid)).ToString()
+                        });
+                    }
+                    dfxinfoslist.Reverse();
+                }
+                catch
+                {
+                    dfxinfoslist = new List<DianFXModel>();
+                }
+            }
+
+            if (dfxinfoxlist == null || dfxinfoxlist.Count == 0)
+            {
+                //从左到右
+                try
+                {
+                    singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                    dfxinfoxlist = new List<DianFXModel>();
+
+                    foreach (StationDataMode item in
+                       singledata.DataCollection.Where(
+                           p => ((StationDataMode)p).StationNameProperty.Split(':')[0].Equals("3")).
+                                                 Select(
+                           q => (StationDataMode)q))
+                    {
+                        string[] infos = item.StationNameProperty.Split(':');
+
+                        string mid = getcurrentpos(infos[3].Split('+')[0], int.Parse(infos[3].Split('+')[1]));
+                        //合
+                        string end = getcurrentpos(infos[4].Split('+')[0], int.Parse(infos[4].Split('+')[1]));
+                        //断
+                        string frt = getcurrentpos(infos[2].Split('+')[0], int.Parse(infos[2].Split('+')[1]));
+
+                        dfxinfoxlist.Add(new DianFXModel()
+                        {
+                            BackPosition = end,
+                            BackTime = "0",
+                            FrontPosition = frt,
+                            FrontTime = "0",
+                            FxNane = item.StationNameProperty,
+                            MidPosition = mid,
+                            BackDis = (float.Parse(end) - float.Parse(mid)).ToString(),
+                            FrontDis = (float.Parse(mid) - float.Parse(frt)).ToString()
+                        });
+                    }
+                }
+                catch
+                {
+                    dfxinfoxlist = new List<DianFXModel>();
+                }                
+            }
+        }
+
+        private void test()
+        {
+            beginCaldianfx();
+            /* float t;
+            float endv;
+
+            try
+            {
+                _contrCen = formatMu("testTrain.tr", 0, 0, 0, 1);
+
+                if (_contrCen != null)
+                {
+                    ChangeToTxt ctt = new ChangeToTxt();
+
+                    if (lineparts == null)
+                    {
+                        lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
+                    }
+                    _contrCen.FormatLinepartStruct(lineparts);
+
+                    StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+                    if (sdm.Type != DataType.Single && sdm.Type != DataType.SingleS)
+                    {
+                        MessengerInstance.Send("未选择信号机", "reciveDisinfos");
+                        return;
+                    }
+
+                    string[] parts = sdm.StationNameProperty.Split(':');
+                    if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
+                    {
+                        MessengerInstance.Send("未选择信号机", "reciveDisinfos");
+                        return;
+                    }
+
+                    string crp = getcurrentpos(sdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+                    _contrCen.TractionState(
+                        int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, 500, Direction, out endv, out t);
+                    if (Direction == 1)
+                    {
+                        _contrCen.CoastState(float.Parse(crp) + 500, endv, 500, Direction, out endv, out t);
+                        float ev = endv;
+                    }
+                    else
+                    {
+                        _contrCen.CoastState(float.Parse(crp) - 1000, endv, 500, Direction, out endv, out t);
+                        float ev = endv;
+                    }
+                }
+            }
+
+            catch (Exception)
+            {
+
+                throw;
+            }*/
+        }
 
         #region Commands
        
@@ -5653,6 +6077,7 @@ namespace Inter_face.ViewModel
                                               }
 
                                               mqjwindow = new ModifyQujianWindow();
+                                              
                                               GalaSoft.MvvmLight.Messaging.Messenger.Default.Send<string>
                                                   (string.Format("{0};{1};{2};{3};{4};{5}",
                                                   sdm.PositionProperty, newposition,

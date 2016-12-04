@@ -1,0 +1,103 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Inter_face.Views"
+        xmlns:vm="clr-namespace:Inter_face.ViewModel"
+        xmlns:Coverters="clr-namespace:Inter_face.Coverters" x:Class="Inter_face.Views.CalDfxWindow"
+        mc:Ignorable="d"
+        Title="电分相检算" Height="399" Width="381.5" DataContext="{DynamicResource CalculeteDianFXViewModel}">
+    <Window.Resources>
+        <Coverters:ToFxNameConverter x:Key="ToFxNameConverter"/>
+        <vm:CalculeteDianFXViewModel x:Key="CalculeteDianFXViewModel"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="80"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="55*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <TabControl x:Name="DfxtabControl" Grid.ColumnSpan="2" Margin="2,0" Grid.Row="4" SelectedIndex="{Binding DianfxIndex, Mode=OneWayToSource}">
+            <TabItem Header="上行">
+                <Grid Background="#FFE5E5E5">
+                    <DataGrid x:Name="DfxSdataGrid" ItemsSource="{Binding DianfxColectionS}" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding FxNane, Converter={StaticResource ToFxNameConverter}}" ClipboardContentBinding="{Binding DianfxColectionS/FxNane}" Header="分相名称" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding FrontDis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColectionS/FrontDis}" Header="距断标距离"/>
+                            <DataGridTextColumn Binding="{Binding BackDis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColectionS/BackDis}" Header="距合标距离"/>
+                            <DataGridTextColumn Binding="{Binding FrontTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColectionS/FrontTime}" Header="提前断"/>
+                            <DataGridTextColumn Binding="{Binding BackTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColectionS/BackTime}" Header="延后合" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="下行">
+                <Grid Background="#FFE5E5E5">
+                    <DataGrid x:Name="DfxXdataGrid" ItemsSource="{Binding DianfxColection}" AutoGenerateColumns="False" CanUserReorderColumns="False" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding FxNane, Converter={StaticResource ToFxNameConverter}}" ClipboardContentBinding="{Binding DianfxColection/FxNane}" Header="分相名称" IsReadOnly="True"/>
+                            <DataGridTextColumn Binding="{Binding FrontDis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColection/FrontDis}" Header="距断标距离"/>
+                            <DataGridTextColumn Binding="{Binding BackDis, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColection/BackDis}" Header="距合标距离"/>
+                            <DataGridTextColumn Binding="{Binding FrontTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColection/FrontTime}" Header="提前断"/>
+                            <DataGridTextColumn Binding="{Binding BackTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ClipboardContentBinding="{Binding DianfxColection/BackTime}" Header="延后合" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Label x:Name="Trainlabel" Content="{Binding TrainName}" HorizontalAlignment="Left" Margin="10,2,0,2" Width="202"/>
+        <Button x:Name="LoadTrainbutton" Content="载入车辆" Grid.Column="1" Margin="7,3" Command="{Binding LoadTrainCommand}"/>
+        <Button x:Name="SetDisbutton" Content="设置" Grid.Column="1" Grid.Row="1" Margin="7,3" Command="{Binding SetDisCommand}"/>
+        <Button x:Name="SetTimebutton" Content="设置" Grid.Column="1" Grid.Row="2" Margin="7,3" Command="{Binding SetTimeCommand}"/>
+        <Button x:Name="Calbutton" Content="计算" Grid.Column="1" Grid.Row="6" Margin="7,3" Command="{Binding CalculateCommand}"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="endDistextBlock" Margin="2,4" TextWrapping="Wrap" Text="距断标：" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="frtDistextBlock" Margin="2,4" TextWrapping="Wrap" Text="距合标：" Grid.Column="2" d:LayoutOverrides="Width"/>
+            <TextBox x:Name="endDistextBox" Grid.Column="1" Margin="2,4,4,4" TextWrapping="Wrap" FontSize="10.667" Text="{Binding FrontDis}"/>
+            <TextBox x:Name="frtDistextBox" Grid.Column="3" Margin="2,4,4,4" TextWrapping="Wrap" FontSize="10.667" Text="{Binding BackDis}"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="endTimetextBlock" Margin="2,4" TextWrapping="Wrap" Text="提前断：" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="frtTimetextBlock" Margin="2,4" TextWrapping="Wrap" Text="延后合：" Grid.Column="2" d:LayoutOverrides="Width"/>
+            <TextBox x:Name="endTimetextBox" Grid.Column="1" Margin="2,4,4,4" TextWrapping="Wrap" FontSize="10.667" Text="{Binding FrontTime}"/>
+            <TextBox x:Name="frtTimetextBox" Grid.Column="3" Margin="2,4,4,4" TextWrapping="Wrap" FontSize="10.667" Text="{Binding BackTime}"/>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.ColumnSpan="2" Margin="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="ResistenceRangetextBlock" Margin="0,4,41.75,4" TextWrapping="Wrap" Text="牵引力使用系数："/>
+                <TextBox x:Name="ResistenceRangetextBox" Margin="0,4,7,4" TextWrapping="Wrap" FontSize="10.667" Text="{Binding ResistenceRange, Mode=TwoWay}" HorizontalAlignment="Right" Width="34.75"/>
+                <TextBlock x:Name="BrtextBlock" Grid.Column="1" Margin="2.75,5,0,4" TextWrapping="Wrap" Text="制动把位："/>
+                <ComboBox x:Name="BaweicomboBox" Grid.Column="2" Margin="2" ItemsSource="{Binding IndexList}" SelectedIndex="{Binding CurrentTrainIndex, Mode=TwoWay}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

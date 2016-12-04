@@ -201,12 +201,7 @@
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="SingleDataTemplate">
-            <Grid Height="60">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger>
-                        <Custom:EventToCommand x:Name="DoubleClickEventToCommand"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
+            <Grid Height="60">                
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="100"/>
@@ -221,11 +216,13 @@
                             <TranslateTransform/>
                         </TransformGroup>
                     </CheckBox.RenderTransform>
+                    
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <Custom:EventToCommand x:Name="CheckChangedEventToCommand" Command="{Binding ShowDataChangedCommand, Mode=OneWay}"/>
                         </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                    </i:Interaction.Triggers>   
+                    
                 </CheckBox>
                 <Label x:Name="TypeLabel" Content="{Binding TypeNameProperty}" Grid.Column="1" Margin="4,10" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                 <ListBox x:Name="DetailListBox" ScrollViewer.CanContentScroll="False"  VirtualizingStackPanel.IsVirtualizing="True"  Grid.Column="2" ItemsPanel="{DynamicResource DetailItemsPanelTemplate}" BorderThickness="0" ItemsSource="{Binding DataCollection}" ItemTemplate="{DynamicResource DetailDataTemplate}" FontSize="26.667" FontWeight="Bold" SelectedItem="{Binding CurrentDataProperty}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" SelectionMode="{Binding TypeNum, Converter={StaticResource ISDToSelectionModeConverter}}" >
@@ -240,11 +237,13 @@
                             <MenuItem Header="编辑电分相" Visibility="{Binding DfxMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="ModifyDFX"/>
                         </ContextMenu>
                     </ListBox.ContextMenu>
+                    
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <Custom:EventToCommand x:Name="SelectionChangedEventToCommand" Command="{Binding SelectionChangedCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
+                   
                 </ListBox>
             </Grid>
         </DataTemplate>
@@ -284,13 +283,13 @@
             </Setter>
         </Style>
     </Fluent:RibbonWindow.Resources>
-    <!--
+    
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
-            <Custom:EventToCommand x:Name="ClosedEventToCommand" Command="{Binding DatasCollectionProperty.DisposeCommand, Mode=OneWay}"/>
+            <i:InvokeCommandAction x:Name="ClosedEventToCommand" Command="{Binding DatasCollectionProperty.DisposeCommand, Mode=OneWay}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    -->
+   
     <Fluent:RibbonWindow.Cursor>
         <Binding Converter="{StaticResource intTocursorstyleConverter}" Path="DatasCollectionProperty.Cursor"/>
     </Fluent:RibbonWindow.Cursor>
@@ -339,8 +338,7 @@
                 <Fluent:RibbonGroupBox Header="保存数据">
                     <Fluent:Button x:Name="SaveSourcedata" Click="SaveSourcedata_Click"  Header="保存原始数据" LargeIcon="{StaticResource sbopicon}" ToolTip="{StaticResource SaveResourceTip}"/>
                     <Fluent:Button x:Name="SaveOpdata" Click="SaveOpdata_Click"  Header="保存处理后数据" LargeIcon="{StaticResource saopicon}" ToolTip="{StaticResource SaveOperatedTip}"/>
-                    <Fluent:Button x:Name="ExportToSvg" Header="输出数据" LargeIcon="{StaticResource ExportToSvg}" ToolTip="{DynamicResource ExportToSvgTip}" Command="{Binding DatasCollectionProperty.ExportToSvgCommand, Mode=OneWay}">
-                        
+                    <Fluent:Button x:Name="ExportToSvg" Header="输出数据" LargeIcon="{StaticResource ExportToSvg}" ToolTip="{DynamicResource ExportToSvgTip}" Command="{Binding DatasCollectionProperty.ExportToSvgCommand, Mode=OneWay}">                        
                     </Fluent:Button>
                 </Fluent:RibbonGroupBox>
 
@@ -394,7 +392,12 @@
                     <Fluent:Button x:Name="opensignalButton" Header="打开数据" ToolTip="打开信号机数据" Command="{Binding DatasCollectionProperty.OpenXhDataCommand, Mode=OneWay}" LargeIcon="{DynamicResource opensignals}" Height="Auto" />
                     <Fluent:Button x:Name="SaveStationsignalButton" Header="保存" ToolTip="保存信号机" Command="{Binding DatasCollectionProperty.SaveXhDataCommand, Mode=OneWay}" LargeIcon="{StaticResource SaveXH}" Height="Auto" IsEnabled="{Binding DatasCollectionProperty.IsXinhaoChanged}"/>
                     <Fluent:Button x:Name="SaveothersignalButton" Header="另存" ToolTip="另存" Command="{Binding DatasCollectionProperty.SaveXhdataToAntherFileCommand, Mode=OneWay}" LargeIcon="{DynamicResource saveother}" Height="Auto"/>
-                    <Fluent:SplitButton x:Name="exportSplitButton" d:LayoutOverrides="Height" LargeIcon="{StaticResource exportsignaldataicon}" Header="{Binding DatasCollectionProperty.ExportXhText}" >
+                    <Fluent:SplitButton x:Name="exportSplitButton" d:LayoutOverrides="Height" LargeIcon="{StaticResource exportsignaldataicon}" Header="{Binding DatasCollectionProperty.ExportXhText}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Custom:EventToCommand x:Name="ClickEventToCommand" Command="{Binding DatasCollectionProperty.ExportSignalDataCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <Fluent:MenuItem Header="分页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.ManyClickCommand, Mode=OneWay}"/>
                         <Fluent:MenuItem Header="单页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToUnBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.SingleClickCommand, Mode=OneWay}"/>
                     </Fluent:SplitButton>
@@ -404,6 +407,9 @@
                 <Fluent:RibbonGroupBox x:Name="MuRibbonGroupBox" d:LayoutOverrides="Height" Header="动车组检算">
                     <Fluent:Button x:Name="BulitTrainbutton" Content="编辑车辆" ToolTip="编辑车辆数据" Height="Auto" Margin="5,5,10,5" Command="{Binding DatasCollectionProperty.EditTrainInfoCommand, Mode=OneWay}" LargeIcon="{DynamicResource editUm}" Header="编辑车辆"/>
                     <Fluent:Button x:Name="CheckUmDisbutton" Content="计算制动距离" ToolTip="计算制动距离"  Height="Auto" Margin="5,5,0,5" Command="{Binding DatasCollectionProperty.CalculetUmBreakDisCommand, Mode=OneWay}" LargeIcon="{DynamicResource UmBdis}" Header="计算制动距离"/>
+                </Fluent:RibbonGroupBox>
+                <Fluent:RibbonGroupBox  x:Name="testGroupBox" Header="测试">
+                    <Fluent:Button x:Name="test" Content="测试" Command="{Binding DatasCollectionProperty.TestCommand}"/>
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
             <Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">

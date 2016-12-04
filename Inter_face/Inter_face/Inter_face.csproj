@@ -74,17 +74,13 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="ControlzEx, Version=2.0.1.61, Culture=neutral, PublicKeyToken=f08b075e934b7045, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ControlzEx.2.0.1.61\lib\net40\ControlzEx.dll</HintPath>
-    </Reference>
     <Reference Include="ExtractData, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Visual Studio 2013\Projects\dAtaeXchangefRramwork\ExtractData_1010\ExtractData\ExtractData\bin\Debug\ExtractData.dll</HintPath>
     </Reference>
-    <Reference Include="Fluent, Version=4.0.3.394, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
+    <Reference Include="Fluent, Version=4.0.3.0, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Lenovo\Downloads\Fluent.Ribbon-4.0.3\build\obj\NET 4.0\Debug\Fluent.dll</HintPath>
+      <HintPath>D:\Program Files (x86)\接牵引计算数据\Fluent.dll</HintPath>
     </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.2.0.37223, Culture=neutral, PublicKeyToken=0e453835af4ee6ce, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.2.0.0\lib\net40\GalaSoft.MvvmLight.dll</HintPath>
@@ -109,8 +105,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\ControlzEx.2.0.1.61\lib\net40\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\Lenovo\Desktop\906\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -137,6 +133,7 @@
       <DependentUpon>ACdlWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="BackUps\CustomeSelectionItems.cs" />
+    <Compile Include="BackUps\DianFXInfos.cs" />
     <Compile Include="Coverters\ActrueLengthToShowLengthConverter.cs" />
     <Compile Include="Coverters\AdjustLengthConverter.cs" />
     <Compile Include="Coverters\BoolenConverter.cs" />
@@ -178,24 +175,31 @@
     <Compile Include="Coverters\PosToPart1LenConverter.cs" />
     <Compile Include="Coverters\PosToPart2LenConverter.cs" />
     <Compile Include="Coverters\StationDataToBoolenConverter.cs" />
+    <Compile Include="Coverters\StringToFloatConverter.cs" />
     <Compile Include="Coverters\StringToIntConverter.cs" />
+    <Compile Include="Coverters\ToFxNameConverter.cs" />
     <Compile Include="Coverters\TypeToMenuVisibilityConvertercs.cs" />
     <Compile Include="Coverters\ValueToLengthConverter.cs" />
     <Compile Include="DataType.cs" />
+    <Compile Include="Models\DianFXModel.cs" />
     <Compile Include="Models\DianFXneededInfosMode.cs" />
     <Compile Include="Models\LdhinfoModel.cs" />
     <Compile Include="Models\SignalDataViewModel.cs" />
     <Compile Include="Models\Speed_breakMode.cs" />
     <Compile Include="Models\StationDataMode.cs" />
+    <Compile Include="Models\TractionPowerModel.cs" />
     <Compile Include="ModifyCdldataWindow.xaml.cs">
       <DependentUpon>ModifyCdldataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\AcdlViewModel.cs" />
     <Compile Include="ViewModel\AdjustSignalsDisAsSameViewMode.cs" />
+    <Compile Include="ViewModel\CalculeteDianFXViewModel.cs" />
+    <Compile Include="ViewModel\FormatTractionPowerViewModel.cs" />
     <Compile Include="ViewModel\GetBreakDisViewModel.cs" />
     <Compile Include="ViewModel\ModifyCdlViewModel.cs" />
     <Compile Include="ViewModel\ModifyFilePosViewModel.cs" />
     <Compile Include="ViewModel\ProcessViewModel.cs" />
+    <Compile Include="ViewModel\ShowInfosViewModel.cs" />
     <Compile Include="ViewModel\ShowLdhViewModel.cs" />
     <Compile Include="ViewModel\SpeedBreakOperateViewModel.cs" />
     <Compile Include="ViewModel\StationSignaleDataModel.cs" />
@@ -218,11 +222,15 @@
     <Compile Include="ViewModel\MoveXinhaoFormViewModel.cs" />
     <Compile Include="ViewModel\SingleDataViewModel.cs" />
     <Compile Include="ViewModel\StationSignalViewModel.cs" />
+    <Compile Include="ViewModel\TractionPowerArrayViewModel.cs" />
     <Compile Include="ViewModel\TrainInfoOperatorViewModel.cs" />
     <Compile Include="ViewModel\UpdataDianFXViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="Views\AdjustSignalDisWindow.xaml.cs">
       <DependentUpon>AdjustSignalDisWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CalDfxWindow.xaml.cs">
+      <DependentUpon>CalDfxWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\DianFXWindow.xaml.cs">
       <DependentUpon>DianFXWindow.xaml</DependentUpon>
@@ -232,6 +240,9 @@
     </Compile>
     <Compile Include="Views\GetBreakDisWindow.xaml.cs">
       <DependentUpon>GetBreakDisWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InfoWindow.xaml.cs">
+      <DependentUpon>InfoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\LdhInfoWindow.xaml.cs">
       <DependentUpon>LdhInfoWindow.xaml</DependentUpon>
@@ -247,6 +258,9 @@
     </Compile>
     <Compile Include="Views\StationSignalWindow.xaml.cs">
       <DependentUpon>StationSignalWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TractionPowerOpWindow.xaml.cs">
+      <DependentUpon>TractionPowerOpWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TrainInfoWindow.xaml.cs">
       <DependentUpon>TrainInfoWindow.xaml</DependentUpon>
@@ -291,6 +305,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\CalDfxWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\DianFXWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -300,6 +318,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\GetBreakDisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InfoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -322,6 +344,10 @@
     <Page Include="Views\StationSignalWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TractionPowerOpWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TrainInfoWindow.xaml">
       <SubType>Designer</SubType>

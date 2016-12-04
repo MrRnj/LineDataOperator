@@ -16,10 +16,12 @@ namespace Inter_face.ViewModel
         private OpenFileDialog ofd;
         private SaveFileDialog sfd;
         private SpeedBreakWindow sbwindow;
+        private TractionPowerOpWindow tpowindow;
 
-        private ObservableCollection<Models.Speed_breakMode> s_bPair;
+        private ObservableCollection<Speed_breakMode> s_bPair;
+        private ObservableCollection<TractionPowerArrayViewModel> tpArray = null;
 
-        public ObservableCollection<Models.Speed_breakMode> S_BPair
+        public ObservableCollection<Speed_breakMode> S_BPair
         {
             get { return s_bPair; }
             set { s_bPair = value; }
@@ -265,6 +267,66 @@ namespace Inter_face.ViewModel
             }
         }
 
+        /// <summary>
+        /// The <see cref="StartingPower" /> property's name.
+        /// </summary>
+        public const string StartingPowerPropertyName = "StartingPower";
+
+        private string _startingPower = "0";
+
+        /// <summary>
+        /// Sets and gets the StartingPower property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string StartingPower
+        {
+            get
+            {
+                return _startingPower;
+            }
+
+            set
+            {
+                if (_startingPower == value)
+                {
+                    return;
+                }
+
+                _startingPower = value;
+                RaisePropertyChanged(StartingPowerPropertyName);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="StartingResisdengce" /> property's name.
+        /// </summary>
+        public const string StartingResisdengcePropertyName = "StartingResisdengce";
+
+        private string _startingResisdence = "0";
+
+        /// <summary>
+        /// Sets and gets the StartingResisdengce property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public string StartingResisdengce
+        {
+            get
+            {
+                return _startingResisdence;
+            }
+
+            set
+            {
+                if (_startingResisdence == value)
+                {
+                    return;
+                }
+
+                _startingResisdence = value;
+                RaisePropertyChanged(StartingResisdengcePropertyName);
+            }
+        }
+
         public TrainInfoOperatorViewModel()
         {
             S_BPair = new ObservableCollection<Models.Speed_breakMode>();
@@ -277,6 +339,12 @@ namespace Inter_face.ViewModel
                     {
                         s_bPair.Add(item);
                     }                    
+                });
+
+            MessengerInstance.Register<ObservableCollection<TractionPowerArrayViewModel>>(this, "sendTpArray",
+                p => 
+                {
+                    tpArray = p;
                 });
         }        
 
@@ -301,40 +369,111 @@ namespace Inter_face.ViewModel
                 CurrentFilePath = filename;
                 infos = System.IO.File.ReadAllLines(filename);
 
-                foreach (string info in infos)
+                try
                 {
-                    switch (info.Split(':')[0])
+                    foreach (string info in infos)
                     {
-                        case "车辆名称":
-                            TrainName = info.Split(':')[1];
-                            break;
-                        case "总长":
-                            TotalLength = info.Split(':')[1];
-                            break;
-                        case "总重量":
-                            TotalWeightProperty = info.Split(':')[1];
-                            break;
-                        case "基本摩擦系数":
-                            BasicalBreakFactors = info.Split(':')[1];
-                            break;
-                        case "制动加速度表":
-                            parts = info.Split(':')[1].Split(',');
-                            foreach (string part in parts)
-                            {
-                                pairs = part.Split('|');
-                                S_BPair.Add(new Models.Speed_breakMode() { Break = pairs[1], Speed = pairs[0] });
-                            }
-                            break;
-                        case "转动惯量":
-                            YFactors = info.Split(':')[1];
-                            break;
-                        default:
-                            break;
+                        switch (info.Split(':')[0])
+                        {
+                            case "车辆名称":
+                                TrainName = info.Split(':')[1];
+                                break;
+                            case "总长":
+                                TotalLength = info.Split(':')[1];
+                                break;
+                            case "总重量":
+                                TotalWeightProperty = info.Split(':')[1];
+                                break;
+                            case "基本摩擦系数":
+                                BasicalBreakFactors = info.Split(':')[1];
+                                break;
+                            case "制动加速度表":
+                                parts = info.Split(':')[1].Split(',');
+                                foreach (string part in parts)
+                                {
+                                    pairs = part.Split('|');
+                                    S_BPair.Add(new Speed_breakMode() { Break = pairs[1], Speed = pairs[0] });
+                                }
+                                break;
+                            case "转动惯量":
+                                YFactors = info.Split(':')[1];
+                                break;
+                            case "启动牵引力":
+                                StartingPower = info.Split(':')[1];
+                                break;
+                            case "启动阻力":
+                                StartingResisdengce = info.Split(':')[1];
+                                break;
+                            case "牵引特性曲线":
+                                formatTpArray(info.Split(':')[1]);
+                                break;
+                            default:
+                                break;
+                        }
                     }
+
+                    CanEdit = false;
+                }
+                catch
+                {
+
+                }
+                
+            }
+        }
+
+        private ObservableCollection<TractionPowerArrayViewModel> formatTpArray(string rawString)
+        {
+            tpArray = new ObservableCollection<TractionPowerArrayViewModel>();
+            TractionPowerArrayViewModel newtp;                  
+
+            /************************************************
+            speedarray:0/t10/t20|
+            powerarray:index/tRotation/t1/t2,
+                       index/tRotation/t1/t2|
+            inflectionpoint:index/tRotation/t1/t2,
+                            index/tRotation/t1/t2
+            *************************************************/
+
+            string[] datas = rawString.Split('|');
+            string[] speedinfo = datas[0].Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] powerinfo = datas[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] extrainfo = datas[2].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (int i = 0; i < powerinfo.Count(); i++)
+            {
+                newtp = new TractionPowerArrayViewModel();
+                string[] parts = powerinfo[i].Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] infs = extrainfo[i].Split(new char[] { '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                newtp.Index = parts[0];
+                bool isinfs = false;
+
+                for (int j = 2; j < parts.Count(); j++)
+                {
+                    for (int k = 2; k < infs.Count(); k++)
+                    {
+                        if (speedinfo[j].Equals(infs[k]))
+                        {
+                            isinfs = true;
+                            break;
+                        }
+                    }
+
+                    newtp.TpModel.Add(new TractionPowerModel()
+                    {
+                        Power = parts[j],
+                        Speed = speedinfo[j],
+                        IsinflectionPoint = isinfs
+                    });
+
+                    isinfs = false;
                 }
 
-                CanEdit = false;
+                tpArray.Add(newtp);
             }
+
+            return tpArray;
         }
 
         private void newTrain()
@@ -346,6 +485,7 @@ namespace Inter_face.ViewModel
             CurrentFilePath = string.Empty;
             CanEdit = true;
             S_BPair.Clear();
+            tpArray = new ObservableCollection<TractionPowerArrayViewModel>();
         }
 
         private void saveTrain()
@@ -357,14 +497,20 @@ namespace Inter_face.ViewModel
             content += string.Format("总长:{0}\r\n", TotalLength);
             content += string.Format("总重量:{0}\r\n", TotalWeightProperty);
             content += string.Format("基本摩擦系数:{0}\r\n", BasicalBreakFactors);
+            content += string.Format("启动牵引力:{0}\r\n", StartingPower);
+            content += string.Format("启动阻力:{0}\r\n", StartingResisdengce);
             content += string.Format("转动惯量:{0}\r\n", YFactors);
             content += "\r\n";
-            foreach (Models.Speed_breakMode item in S_BPair)
+
+            foreach (Speed_breakMode item in S_BPair)
             {
                 sbpair += string.Format("{0}|{1},", item.Speed, item.Break);
             }
-            sbpair=sbpair.TrimEnd(',');
+            sbpair = sbpair.TrimEnd(',');
             content += string.Format("制动加速度表:{0}", sbpair);
+            content += "\r\n";
+
+            content += string.Format("牵引特性曲线:{0}", formatSaveTplines());
 
             if (CurrentFilePath.Equals(string.Empty))
             {
@@ -389,6 +535,52 @@ namespace Inter_face.ViewModel
             }
         }
 
+        private string formatSaveTplines()
+        {
+            string speedline = "0\t0\t";
+            string powerline = string.Empty;
+            string inflectionsline = string.Empty;
+
+            foreach (TractionPowerModel tp in tpArray[0].TpModel)
+            {
+                speedline += string.Format("{0}\t", tp.Speed);
+            }
+
+            speedline.TrimEnd('\t');
+
+            foreach (TractionPowerArrayViewModel item in tpArray)
+            {
+                powerline += string.Format("{0}\t{1}\t", item.Index, item.Index);
+                inflectionsline += string.Format("{0}\t{1}\t",
+                    item.Index,
+                    item.TpModel.Count(
+                        p =>
+                        {
+                            return p.IsinflectionPoint;
+                        }).ToString());
+
+                foreach (TractionPowerModel tp in item.TpModel)
+                {
+                    powerline += string.Format("{0}\t", tp.Power);
+                    if (tp.IsinflectionPoint)
+                    {
+                        inflectionsline += string.Format("{0}\t", tp.Speed);
+                    }
+                }
+
+                powerline.TrimEnd('\t');
+                inflectionsline.TrimEnd('\t');
+
+                powerline += ",";
+                inflectionsline += ",";
+            }
+
+            powerline.TrimEnd(',');
+            inflectionsline.TrimEnd(',');
+
+            return string.Format("{0}|{1}|{2}", speedline, powerline, inflectionsline);
+        }
+
         private void editSpeedBreaktable()
         {
             sbwindow = new SpeedBreakWindow();
@@ -396,6 +588,14 @@ namespace Inter_face.ViewModel
             MessengerInstance.Send(CanEdit, "canEdit");
             MessengerInstance.Send(S_BPair, "sb");
             sbwindow.ShowDialog();
+        }
+
+        private void editSpeedPowertable()
+        {
+            tpowindow = new TractionPowerOpWindow();
+
+            MessengerInstance.Send(tpArray, "getTpArray");
+            tpowindow.ShowDialog();
         }
         
         private void unregist()
@@ -490,6 +690,24 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                         editSpeedBreaktable();
+                    }));
+            }
+        }
+
+        private RelayCommand _beginEditTpCommand;
+
+        /// <summary>
+        /// Gets the BeginEditTpCommand.
+        /// </summary>
+        public RelayCommand BeginEditTpCommand
+        {
+            get
+            {
+                return _beginEditTpCommand
+                    ?? (_beginEditTpCommand = new RelayCommand(
+                    () =>
+                    {
+                        editSpeedPowertable();
                     }));
             }
         }        
