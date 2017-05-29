@@ -409,7 +409,7 @@
                     <Fluent:Button x:Name="CheckUmDisbutton" Content="计算制动距离" ToolTip="计算制动距离"  Height="Auto" Margin="5,5,0,5" Command="{Binding DatasCollectionProperty.CalculetUmBreakDisCommand, Mode=OneWay}" LargeIcon="{DynamicResource UmBdis}" Header="计算制动距离"/>
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox  x:Name="testGroupBox" Header="测试">
-                    <Fluent:Button x:Name="test" Content="测试" Command="{Binding DatasCollectionProperty.TestCommand}"/>
+                    <Fluent:Button x:Name="test" Content="测试" Command="{Binding DatasCollectionProperty.BegincCalculateAverageGradeCommand}"/>
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
             <Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">

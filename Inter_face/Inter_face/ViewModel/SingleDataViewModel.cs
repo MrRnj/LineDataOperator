@@ -14,7 +14,7 @@ namespace Inter_face.ViewModel
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public class SingleDataViewModel : ViewModelBase, Inter_face.ViewModel.ISingleDataViewModel
+    public class SingleDataViewModel : ViewModelBase, ISingleDataViewModel
     {
         /// <summary>
         /// The <see cref="ShowDataProperty" /> property's name.
@@ -112,7 +112,7 @@ namespace Inter_face.ViewModel
                     }
 
                     value.SelectedProperty = true;
-                    MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
+                    MessengerInstance.Send((DataType)TypeNum, "SelectedChanged");
                    
                 }
                 else
@@ -472,6 +472,32 @@ namespace Inter_face.ViewModel
             return false;
         }
 
+        private void sendSignalInfo()
+        {
+            if (TypeNum == (int)DataType.SingleS || TypeNum == (int)DataType.Single)
+            {
+                if (SelectedItems == null)
+                    MessengerInstance.Send("未选择信号机^f", "GetSignalInfo");
+                if (SelectedItems.Count == 0 || SelectedItems.Count > 1)
+                    MessengerInstance.Send("未选择信号机或选择多个信号机^f", "GetSignalInfo");
+
+                string[] parts;
+                foreach (StationDataMode item in SelectedItems)
+                {
+                    parts = item.StationNameProperty.Split(':');
+                    if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
+                    {
+                        MessengerInstance.Send("未选择信号机^f", "GetSignalInfo");
+                        return;
+                    }                       
+
+                    MessengerInstance.Send(string.Format("{0}^t", item.StationNameProperty), "GetSignalInfo");
+                }
+                return;
+            }
+            MessengerInstance.Send("未选择信号机^f", "GetSignalInfo"); 
+        }
+
         private bool checkQujian()
         {
             if (TypeNum == (int)DataType.SingleS || TypeNum == (int)DataType.Single)
@@ -621,7 +647,7 @@ namespace Inter_face.ViewModel
             }
             
         }
-        private GalaSoft.MvvmLight.Command.RelayCommand _showdatachangedCommand;
+        private RelayCommand _showdatachangedCommand;
 
         /// <summary>
         /// Gets the ShowDataChangedCommand.
@@ -666,7 +692,8 @@ namespace Inter_face.ViewModel
                         IsShowSignale = checkSignal();
                         IsShowQujian = checkQujian();
                         IsShowDianFX = checkDianfx();
-                        checkMenuFunc(selectedItems);                                                
+                        checkMenuFunc(selectedItems);
+                        sendSignalInfo();                                               
                     }));
             }
         }
@@ -702,7 +729,7 @@ namespace Inter_face.ViewModel
                     ?? (_exCommand = new RelayCommand<string>(
                     p =>
                     {
-                        MessengerInstance.Send<string>(p, "ExCommand");
+                        MessengerInstance.Send(p, "ExCommand");
                     }));
             }
         }

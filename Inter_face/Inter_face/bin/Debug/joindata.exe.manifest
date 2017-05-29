@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="581120">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="591872">
       <assemblyIdentity name="joindata" version="2.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>3D+TzqBcSIuzfDzA3IKW2yBCLXM=</dsig:DigestValue>
+        <dsig:DigestValue>0fDXFEodwUL0wWUjOxJj3JM4f3U=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -139,14 +139,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LocomotiveSim.dll" size="38400">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="LocomotiveSim.dll" size="39936">
       <assemblyIdentity name="LocomotiveSim" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>NmfmXt+GwxWO2bhOC708VAtoENo=</dsig:DigestValue>
+        <dsig:DigestValue>P8QJoGqwTs5Yh7QE8s3uTZZVRHs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -6,8 +6,8 @@ namespace Inter_face.ViewModel
     public interface ISingleDataViewModel
     {
         Inter_face.Models.IDataModel CurrentDataProperty { get; set; }
-        System.Collections.ObjectModel.ObservableCollection<Inter_face.Models.IDataModel> DataCollection { get; set; }
-        System.Collections.ObjectModel.ObservableCollection<Inter_face.Models.IDataModel> SelectedItems { get; set; }
+        System.Collections.ObjectModel.ObservableCollection<Models.IDataModel> DataCollection { get; set; }
+        System.Collections.ObjectModel.ObservableCollection<Models.IDataModel> SelectedItems { get; set; }
         System.Windows.Visibility MenuVisibility { get; set; }
         System.Windows.Visibility QjMenuVisibility { get; set; }
         System.Windows.Visibility XhMenuVisibility { get; set; }

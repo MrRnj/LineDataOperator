@@ -1446,6 +1446,7 @@ namespace Inter_face
                 last_star_pos = csds.Last_star_pos;
 
                 OnChecksignChanged(this, new ChecksignChangedEventArgs("正在合并坡度文件"));
+                //此处存在问题：当长短链的数目大于首页的数据时则会出现错误
                 pddata = rsi.GetPdInfo(pdfilepath, last_star_pos);
                 if (!MergeSheet.MergePd(pdtempfilepath, pddata, pdfilepath, adjust))
                 {

@@ -510,7 +510,8 @@ namespace Inter_face.ViewModel
             content += string.Format("制动加速度表:{0}", sbpair);
             content += "\r\n";
 
-            content += string.Format("牵引特性曲线:{0}", formatSaveTplines());
+            if (tpArray.Count != 0)
+                content += string.Format("牵引特性曲线:{0}", formatSaveTplines());
 
             if (CurrentFilePath.Equals(string.Empty))
             {

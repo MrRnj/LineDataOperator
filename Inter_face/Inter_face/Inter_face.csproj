@@ -193,6 +193,7 @@
     </Compile>
     <Compile Include="ViewModel\AcdlViewModel.cs" />
     <Compile Include="ViewModel\AdjustSignalsDisAsSameViewMode.cs" />
+    <Compile Include="ViewModel\CalculeteAverageGradeViewModel.cs" />
     <Compile Include="ViewModel\CalculeteDianFXViewModel.cs" />
     <Compile Include="ViewModel\FormatTractionPowerViewModel.cs" />
     <Compile Include="ViewModel\GetBreakDisViewModel.cs" />
@@ -228,6 +229,9 @@
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="Views\AdjustSignalDisWindow.xaml.cs">
       <DependentUpon>AdjustSignalDisWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AverageGradeWindow.xaml.cs">
+      <DependentUpon>AverageGradeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CalDfxWindow.xaml.cs">
       <DependentUpon>CalDfxWindow.xaml</DependentUpon>
@@ -302,6 +306,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AdjustSignalDisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AverageGradeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

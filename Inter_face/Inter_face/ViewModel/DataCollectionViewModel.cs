@@ -67,6 +67,7 @@ namespace Inter_face.ViewModel
 
         List<string> cdlxlist;
         List<string> cdlslist;
+        private List<LinepartStruct> linePartsData = null;
         string[] colors = 
         { "#990033",
             "#FF3399", 
@@ -92,6 +93,7 @@ namespace Inter_face.ViewModel
         GetBreakDisWindow gbdWindow;
         CalDfxWindow cdfWindow;
         InfoWindow ifWindow;
+        AverageGradeWindow agWindow;
 
         System.Windows.Threading.Dispatcher dispatcher;
 
@@ -99,7 +101,7 @@ namespace Inter_face.ViewModel
         /// The <see cref="Direction" /> property's name.
         /// </summary>
         public const string DirectionPropertyName = "Direction";
-        //0:上行  1：下行
+        //0:上行(从右至左）  1：下行（从左至右）
         private int _directionProperty = 0;
 
         /// <summary>
@@ -1180,14 +1182,19 @@ namespace Inter_face.ViewModel
 
             MessengerInstance.Register<string>(this, "calculeteDis", p => { calculetedis(p); });
 
-
-
             MessengerInstance.Register<DianFXInfos>(this, "CaculeteDianfx",
                 p =>
                 {
                     existDfxInfos = p;
                     dianfxCal(p);
-                });     
+                });
+
+            MessengerInstance.Register<string>(this, "sendCB&PTZ", 
+                p =>
+                {
+                    string[] infos = p.Split(':');
+                    calculateAverageGrade(int.Parse(infos[0]), infos[1].Equals("1") ? true : false);
+                });    
         }
 
         private void ShowProcessWindow()
@@ -4916,7 +4923,7 @@ namespace Inter_face.ViewModel
         private void ModifyCdldata()
         {
             mcdwindown = new ModifyCdldataWindow();
-            MessengerInstance.Send<GraphyDataOper>(gdo, "gdoInWindow");
+            MessengerInstance.Send(gdo, "gdoInWindow");
             mcdwindown.ShowDialog();
         }
 
@@ -5002,6 +5009,7 @@ namespace Inter_face.ViewModel
             GDoper.Dispose();
             SDexportor.Dispose();
             ABoper.Dispose();
+            Application.Current.Shutdown();
         }
 
         private void ExportToSvg()
@@ -5575,7 +5583,7 @@ namespace Inter_face.ViewModel
                     }
                     _contrCen.FormatLinepartStruct(lineparts);
 
-                    
+                    //从右至左
                         singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
 
                         if (singledata != null)
@@ -5601,15 +5609,19 @@ namespace Inter_face.ViewModel
                                     string crp = getcurrentpos(currentsignal.PositionProperty.ToString(), currentsignal.SectionNumProperty);
                                     caldis = float.Parse(crp) - float.Parse(dfxs.FrontPosition);
 
-                                _contrCen.TractionState(
-                            int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, caldis, Direction, out speed_r, out time_r, index);
+                                _contrCen.TractionStateWithTime(
+                            int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, caldis, 0, out speed_r, out time_r, index);
+                                _contrCen.CoastState((float)(Math.Round(float.Parse(crp)) + caldis), speed_r, 500, 0, out speed_l, out time_l);
 
-                                    result_s += string.Format("信号机 {0} 距电分相 {1} {2}米,{3}秒后入分相，入分相速度{4}km/h\r\n\r\n",
-                                        currentsignal.StationNameProperty.Split(':')[1],
-                                        dfxs.FxNane.Split(':')[1],
-                                        caldis.ToString(),
-                                        time_r.ToString("F0"),
-                                        speed_r.ToString("F1"));
+                                result_s += string.Format("信号机 {0} 距电分相 {1} {2}米,{3}秒后入分相，入分相速度{4}km/h，惰行{5}m后出分相速度为{6},用时{7}\r\n\r\n",
+                                    currentsignal.StationNameProperty.Split(':')[1],
+                                    dfxs.FxNane.Split(':')[1],
+                                    caldis.ToString(),
+                                    time_r.ToString("F0"),
+                                    speed_r.ToString("F1"),
+                                    "500",
+                                    speed_l.ToString(),
+                                    time_l.ToString());
 
                                 }
 
@@ -5620,7 +5632,7 @@ namespace Inter_face.ViewModel
                             }
                         }                       
                                     
-
+                        //从左至右
                     singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
 
                     if (singledata != null)
@@ -5646,15 +5658,19 @@ namespace Inter_face.ViewModel
                                 string crp = getcurrentpos(currentsignal.PositionProperty.ToString(), currentsignal.SectionNumProperty);
                                 caldis = float.Parse(dfxx.FrontPosition) - float.Parse(crp);
 
-                                _contrCen.TractionState(
-                            int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, caldis, Direction, out speed_r, out time_r, index);
+                                _contrCen.TractionStateWithTime(
+                            int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, caldis, 1, out speed_r, out time_r, index);
+                                _contrCen.CoastState((float)(Math.Round(float.Parse(crp)) + caldis), speed_r, 500, 1, out speed_l, out time_l);
 
-                                result_x += string.Format("信号机{0}距电分相{1}{2}米,{3}秒后入分相，入分相速度{4}km/h\r\n\r\n",
+                                result_x += string.Format("信号机{0}距电分相{1}{2}米,{3}秒后入分相，入分相速度{4}km/h，惰行{5}m后出分相速度为{6},用时{7}\r\n\r\n",
                                     currentsignal.StationNameProperty.Split(':')[1],
                                     dfxx.FxNane.Split(':')[1],
                                     caldis.ToString(),
                                     time_r.ToString("F0"),
-                                    speed_r.ToString("F1"));
+                                    speed_r.ToString("F1"),
+                                    "500",
+                                    speed_l.ToString(),
+                                    time_l.ToString());
                             }
 
                             catch
@@ -5676,6 +5692,265 @@ namespace Inter_face.ViewModel
             {
 
             }
+        }
+
+        private void begincalculateAverageGrade()
+        {
+            agWindow = new AverageGradeWindow();
+            agWindow.Show();            
+        }
+
+        private void calculateAverageGrade(int countOfBlocks, bool positiveToZero)
+        {
+            //ISingleDataViewModel singledata;
+
+            ChangeToTxt ctt = new ChangeToTxt();
+            if (lineparts == null)
+            {
+                lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
+            }
+            FormatLinepartStruct(lineparts);
+
+            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            if (sdm.Type != DataType.Single && sdm.Type != DataType.SingleS)
+            {
+                //MessengerInstance.Send("未选择信号机:f", "GetSignalInfo");
+                return;
+            }            
+
+            string[] parts = sdm.StationNameProperty.Split(':');
+            if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
+            {
+                //MessengerInstance.Send("未选择信号机", "GetSignalInfo");
+                return;
+            }
+
+            int currentindex = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+            int includeBlocks = 0;
+            int endindex = 0;
+
+            if (Direction == 0)
+            {
+                //singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
+                if (currentindex + countOfBlocks + 1 > CurrentDatasProperty.DataCollection.Count)
+                {
+                    MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
+                    return;
+                }
+
+                for (int i = currentindex + 1; i < CurrentDatasProperty.DataCollection.Count; i++)
+                {
+                    sdm = CurrentDatasProperty.DataCollection[i] as StationDataMode;
+                    parts = sdm.StationNameProperty.Split(':');
+
+                    if ((parts[0].StartsWith("1") || parts[0].StartsWith("2")))
+                    {
+                        includeBlocks++;
+                    }
+
+                    if (includeBlocks >= countOfBlocks)
+                    {
+                        endindex = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                //singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
+                if (currentindex - countOfBlocks < 0)
+                {
+                    MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
+                    return;
+                }
+
+
+                for (int i = currentindex - 1; i >= 0; i--)
+                {
+                    sdm = CurrentDatasProperty.DataCollection[i] as StationDataMode;
+                    parts = sdm.StationNameProperty.Split(':');
+
+                    if ((parts[0].StartsWith("1") || parts[0].StartsWith("2")))
+                    {
+                        includeBlocks++;
+                    }
+
+                    if (includeBlocks >= countOfBlocks)
+                    {
+                        endindex = i;
+                        break;
+                    }
+                }
+            }
+
+            StationDataMode endsdm = CurrentDatasProperty.DataCollection[endindex] as StationDataMode;
+            StationDataMode startsdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+
+            string crp = getcurrentpos(startsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+            string endcrp = getcurrentpos(endsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+
+            float averageGrade = GetAvrHeight((int)Math.Ceiling(decimal.Parse(crp)),
+                                                   Math.Abs(float.Parse(endcrp) - float.Parse(crp)),
+                                                   Direction, 
+                                                   positiveToZero);
+
+            MessengerInstance.Send(string.Format("总长为{0}m，平均坡度为{1}‰", 
+                                                 Math.Abs(float.Parse(endcrp) - float.Parse(crp)).ToString("#0.00"), 
+                                                 averageGrade.ToString("#0.000")), "GetMoreInfos");
+
+        }
+
+        private void FormatLinepartStruct(string[] lineparts)
+        {
+            linePartsData = new List<LinepartStruct>();
+            //坡度：曲线半径：分段长度：起点里程：路段号：是否为隧道(0 - 否；1 - 是）
+            string[] partinfo;
+
+            foreach (string part in lineparts)
+            {
+                partinfo = part.Split(':');
+                linePartsData.Add(new LinepartStruct()
+                {
+                    Istunel = partinfo[0].Equals("0") ? false : true,
+                    Length = partinfo[2],
+                    Ludh = partinfo[4],
+                    Podu = partinfo[0],
+                    QxBianj = partinfo[1],
+                    StartPos = (float.Parse(partinfo[3])).ToString("#0.000")
+                });
+            }
+
+        }
+
+        private float GetAvrHeight(int endpos, float dis, int directon, bool positiveTozero)
+        {
+            float currentHeight = 0f;
+            float totalLength = 0f;
+            float end = 0;
+            float averateGrade = 0f;
+            float podu = 0f;
+
+            for (int i = 0; i < linePartsData.Count(); i++)
+            {
+                if (directon == 0)
+                {
+                    end = endpos + dis;
+
+                    if (float.Parse(linePartsData[i].StartPos) >= (endpos))
+                    {
+                        totalLength = float.Parse(linePartsData[i].StartPos) - endpos;
+                        if (totalLength < dis)
+                        {
+                            if (positiveTozero)
+                                podu = float.Parse(linePartsData[i - 1].Podu) < 0 ? 0 : float.Parse(linePartsData[i - 1].Podu);
+                            else
+                                podu = float.Parse(linePartsData[i - 1].Podu);
+
+                            currentHeight += ((totalLength * podu) / 1000);
+                        }
+
+                        else
+                        {
+                            if (positiveTozero)
+                                podu = float.Parse(linePartsData[i].Podu) < 0 ? 0 : float.Parse(linePartsData[i].Podu);
+                            else
+                                podu = float.Parse(linePartsData[i].Podu);
+
+                            currentHeight += (((end - endpos) * podu) / 1000);
+                            averateGrade = -currentHeight / dis * 1000;
+                            break;
+                        }
+
+                        for (int j = i; j < linePartsData.Count(); j++)
+                        {
+                            totalLength += float.Parse(linePartsData[j].Length);
+                            if (totalLength < dis)
+                            {
+                                if (positiveTozero)
+                                    podu = float.Parse(linePartsData[j].Podu) < 0 ? 0 : float.Parse(linePartsData[j].Podu);
+                                else
+                                    podu = float.Parse(linePartsData[j].Podu);
+
+                                currentHeight += (float.Parse(linePartsData[j].Length) * podu / 1000);
+                            }
+                            else
+                            {
+                                if (positiveTozero)
+                                    podu = float.Parse(linePartsData[j].Podu) < 0 ? 0 : float.Parse(linePartsData[j].Podu);
+                                else
+                                    podu = float.Parse(linePartsData[j].Podu);
+
+                                currentHeight += ((end - float.Parse(linePartsData[j].StartPos)) * podu / 1000);
+                                break;
+                            }
+                        }
+
+                        averateGrade = -currentHeight / dis * 1000;
+                        break;
+                    }
+                }
+                else
+                {
+                    end = endpos - dis;
+
+                    if (float.Parse(linePartsData[i].StartPos) >= (endpos))
+                    {
+                        totalLength += (endpos - float.Parse(linePartsData[i - 1].StartPos));
+                        if (totalLength < dis)
+                        {
+                            if (positiveTozero)
+                                podu = float.Parse(linePartsData[i - 1].Podu) > 0 ? 0 : float.Parse(linePartsData[i - 1].Podu);
+                            else
+                                podu = float.Parse(linePartsData[i - 1].Podu);
+
+                            currentHeight += (totalLength * -podu / 1000);
+                        }
+
+                        else
+                        {
+                            if (positiveTozero)
+                                podu = float.Parse(linePartsData[i].Podu) > 0 ? 0 : float.Parse(linePartsData[i].Podu);
+                            else
+                                podu = float.Parse(linePartsData[i].Podu);
+
+                            currentHeight += ((endpos - end) * -podu / 1000);
+                            averateGrade = -currentHeight / dis * 1000;
+                            break;
+                        }
+
+                        for (int j = i - 1; j >= 0; j--)
+                        {
+                            totalLength += float.Parse(linePartsData[j - 1].Length);
+                            if (totalLength < dis)
+                            {
+                                if (positiveTozero)
+                                    podu = float.Parse(linePartsData[j - 1].Podu) > 0 ? 0 : float.Parse(linePartsData[j - 1].Podu);
+                                else
+                                    podu = float.Parse(linePartsData[j - 1].Podu);
+
+                                currentHeight += (float.Parse(linePartsData[j - 1].Length) * -podu / 1000);
+
+                            }
+                            else
+                            {
+                                if (positiveTozero)
+                                    podu = float.Parse(linePartsData[j - 1].Podu) > 0 ? 0 : float.Parse(linePartsData[j - 1].Podu);
+                                else
+                                    podu = float.Parse(linePartsData[j - 1].Podu);
+
+                                currentHeight += ((float.Parse(linePartsData[j].StartPos) - end) * -podu / 1000);
+                                break;
+                            }
+                        }
+
+                        averateGrade = -currentHeight / dis * 1000;
+                        break;
+                    }
+                }
+            }
+
+            return averateGrade;
+            //return currentHeight / dis * 1000;
         }
 
         private void beginCaldianfx()
@@ -5788,7 +6063,7 @@ namespace Inter_face.ViewModel
         private void test()
         {
             beginCaldianfx();
-            /* float t;
+            /*float t;
             float endv;
 
             try
@@ -5820,20 +6095,20 @@ namespace Inter_face.ViewModel
                     }
 
                     string crp = getcurrentpos(sdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
-                    _contrCen.TractionState(
-                        int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, 500, Direction, out endv, out t);
-                    if (Direction == 1)
-                    {
-                        _contrCen.CoastState(float.Parse(crp) + 500, endv, 500, Direction, out endv, out t);
-                        float ev = endv;
-                    }
-                    else
-                    {
-                        _contrCen.CoastState(float.Parse(crp) - 1000, endv, 500, Direction, out endv, out t);
-                        float ev = endv;
-                    }
-                }
-            }
+                    _contrCen.TractionStateWithTime(
+                        int.Parse(Math.Round(float.Parse(crp)).ToString()), 0, 800, Direction, out endv, out t);
+                     if (Direction == 1)
+                     {
+                         _contrCen.CoastState(float.Parse(crp) + 500, endv, 500, Direction, out endv, out t);
+                         float ev = endv;
+                     }
+                     else
+                     {
+                         _contrCen.CoastState(float.Parse(crp) - 1000, endv, 500, Direction, out endv, out t);
+                         float ev = endv;
+                     }
+        
+   
 
             catch (Exception)
             {
@@ -6555,6 +6830,24 @@ namespace Inter_face.ViewModel
                     }));
             }
         }
+
+        private RelayCommand _begincCalculateAverageGradeCommand;
+
+        /// <summary>
+        /// Gets the BegincCalculateAverageGradeCommand.
+        /// </summary>
+        public RelayCommand BegincCalculateAverageGradeCommand
+        {
+            get
+            {
+                return _begincCalculateAverageGradeCommand
+                    ?? (_begincCalculateAverageGradeCommand = new RelayCommand(
+                    () =>
+                    {
+                        begincalculateAverageGrade();
+                    }));
+            }
+        }
        
         #endregion
 
@@ -6590,7 +6883,17 @@ namespace Inter_face.ViewModel
                 if (Disp != null)
                     Disp.BeginInvoke(new Action(() => { proceswindow.Close(); }));
             }
-        }        
-                 
+        }
+
+        public struct LinepartStruct
+        {
+            public string Podu;
+            public string QxBianj;
+            public string Length;
+            //X米
+            public string StartPos;
+            public string Ludh;
+            public bool Istunel;
+        }
     }
 }
