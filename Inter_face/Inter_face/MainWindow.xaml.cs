@@ -83,7 +83,7 @@ namespace Inter_face
                 AddInfobox(msg, moreinfo[2], moreinfo[1], int.Parse(moreinfo[0]), "1", true);
             });
 
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, "ReadDataRight", p =>
+            Messenger.Default.Register<string>(this, "ReadDataRight", p =>
             {
                 Cursor = System.Windows.Input.Cursors.Arrow;
                 AddInfobox(p, string.Empty, string.Empty, 0, "0");

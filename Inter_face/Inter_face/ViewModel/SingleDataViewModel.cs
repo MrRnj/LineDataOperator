@@ -101,6 +101,7 @@ namespace Inter_face.ViewModel
                    // MessengerInstance.Send<DataType>((DataType)TypeNum, "SelectedChanged");
                 
                 RaisePropertyChanging(CurrentDataPropertyPropertyName);
+                _CurrentDataProperty = value;
 
                 if (value != null)
                 {
@@ -118,8 +119,7 @@ namespace Inter_face.ViewModel
                 else
                 {
                     SelectedIndex = -1;
-                }
-                _CurrentDataProperty = value;
+                }                
                 RaisePropertyChanged(CurrentDataPropertyPropertyName);
             }
         }
@@ -652,12 +652,12 @@ namespace Inter_face.ViewModel
         /// <summary>
         /// Gets the ShowDataChangedCommand.
         /// </summary>
-        public GalaSoft.MvvmLight.Command.RelayCommand ShowDataChangedCommand
+        public RelayCommand ShowDataChangedCommand
         {
             get
             {
                 return _showdatachangedCommand
-                    ?? (_showdatachangedCommand = new GalaSoft.MvvmLight.Command.RelayCommand(
+                    ?? (_showdatachangedCommand = new RelayCommand(
                                           () =>
                                           {
                                               MessengerInstance.Send<ISingleDataViewModel>(this, "DisapearData");

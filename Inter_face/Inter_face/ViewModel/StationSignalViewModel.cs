@@ -31,6 +31,13 @@ namespace Inter_face.ViewModel
                 (p) => 
                 {
                     cdlist = p;
+                    if (cdlist.Count == 1 && cdlist[0].Split(':')[1].Equals(cdlist[0].Split(':')[0]))
+                    {
+                        SectionNum.Add(1);
+                        return;
+                    }                        
+                    
+                    //问题出在此处，当没有长短链时，人为加了个“0+0：0+0”的长短链，这导致了路段号出错
                     for (int i = 0; i <= p.Count; i++)
                     {
                         SectionNum.Add(i + 1);
@@ -283,6 +290,9 @@ namespace Inter_face.ViewModel
             errorMsg = string.Empty;
 
             if (!sdvm.IsEnableProperty)
+                return true;
+
+            if (SectionNum.Count == 1)
                 return true;
 
             if (sdvm.PartImenber != -1 || sdvm.PartII != -1)

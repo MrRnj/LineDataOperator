@@ -298,19 +298,25 @@ namespace Inter_face.Models
 
         private void OutSectionumChanged()
         {
-            int sec = int.Parse(SectionNum);
-            if (sec > CdlInfoProperty.Count)
-                Guanhao = CdlInfoProperty[sec - 2].Split(':')[1].Split('+')[0];
-            else
-                Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
+            if (CdlInfoProperty.Count != 0)
+            {
+                int sec = int.Parse(SectionNum);
+                if (sec > CdlInfoProperty.Count)
+                    Guanhao = CdlInfoProperty[sec - 2].Split(':')[1].Split('+')[0];
+                else
+                    Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
+            }            
         }
         private void InSectionumChanged()
         {
-            int sec = int.Parse(SectionNum);
-            if (sec > CdlInfoProperty.Count)
-                Guanhao = CdlInfoProperty[sec - 2].Split(':')[1].Split('+')[0];
-            else
-                Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
+            if (CdlInfoProperty.Count != 0)
+            {
+                int sec = int.Parse(SectionNum);
+                if (sec > CdlInfoProperty.Count)
+                    Guanhao = CdlInfoProperty[sec - 2].Split(':')[1].Split('+')[0];
+                else
+                    Guanhao = CdlInfoProperty[sec - 1].Split(':')[0].Split('+')[0];
+            }
         }
 
     }

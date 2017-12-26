@@ -74,7 +74,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>38RDEsiXoc/CymSlbY+/wZCW9vo=</dsig:DigestValue>
+        <dsig:DigestValue>UMVMn21aTHnLWmmAgpix6ncbYmM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -115,14 +115,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="591872">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="joindata.exe" size="612864">
       <assemblyIdentity name="joindata" version="2.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>0fDXFEodwUL0wWUjOxJj3JM4f3U=</dsig:DigestValue>
+        <dsig:DigestValue>a1tI/BditXpA1AJgZrU7v5PewxM=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

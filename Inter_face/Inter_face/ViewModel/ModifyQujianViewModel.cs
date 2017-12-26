@@ -283,6 +283,14 @@ namespace Inter_face.ViewModel
                 float start = StartPosition;
                 currentsectionum = orisectionum;
 
+                if (infos.Length == 1 && infos[0].Split(':')[1].Equals(infos[0].Split(':')[0]))
+                {
+                    CurrentLC = string.Format("{0} {1}", infos[0].Split(':')[0].Split('+')[0],
+                        string.Format("{0}+{1}", (start + CurrentPosition / 1000).ToString("F3").Split('.')[0],
+                        (start + CurrentPosition / 1000).ToString("F3").Split('.')[1]));
+                    return;
+                }
+
                 for (int i = 0; i < infos.Length; i++)
                 {
                     if (float.Parse(infos[i].Split(':')[0].Split('+')[1]) >= start * 1000 + len)
@@ -294,9 +302,10 @@ namespace Inter_face.ViewModel
                     }
                     else
                     {
-                        len = (float)(CurrentPosition - 
+                        len = (float)(CurrentPosition -
                             (float.Parse(infos[i].Split(':')[0].Split('+')[1]) - start * 1000));
                         start = float.Parse(infos[i].Split(':')[1].Split('+')[1]) / 1000;
+                        //这存在问题
                         currentsectionum += 1;
                         if (i == infos.Length - 1)
                         {
@@ -304,9 +313,9 @@ namespace Inter_face.ViewModel
                         string.Format("{0}+{1}", (start + len / 1000).ToString("F3").Split('.')[0],
                         (start + len / 1000).ToString("F3").Split('.')[1]));
                             break;
-                        }                        
+                        }
                     }
-                }                
+                }
             }
         }
         private RelayCommand _InsertCommand;

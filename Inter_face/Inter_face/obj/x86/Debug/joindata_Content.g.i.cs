@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/stop.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/remind.png")]
 
 

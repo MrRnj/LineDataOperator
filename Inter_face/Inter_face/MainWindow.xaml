@@ -88,11 +88,14 @@
         <Image x:Key="InsertDfx" Source="icons/InsertDfx.png" Stretch="Fill"/>
         <Image x:Key="InsertSig" Source="icons/InsertSig.png" Stretch="Fill"/>
         <Image x:Key="saveother" Source="icons/saveother.png" Stretch="Fill"/>
+        <Image x:Key="TKtype" Source="icons/TK.png" Stretch="Fill"/>
+        <Image x:Key="BreakingDis" Source="icons/Breake_distance.png" Stretch="Fill"/>
         <Image x:Key="opensignals" Source="icons/opensignals.png" Stretch="Fill"/>
         <Image x:Key="opentrack" Source="icons/opentrack.png" Stretch="Uniform"/>
         <Image x:Key="creatsignals" Source="icons/creatsignals.png" Stretch="None"/>
         <Image x:Key="editUm" Source="icons/UmTrain.png" Stretch="UniformToFill"/>
         <Image x:Key="UmBdis" Source="icons/stop.png" Stretch="Uniform"/>
+        <Image x:Key="DetailInfo" Source="icons/remind.png" Stretch="Uniform"/>
         <ToolTip x:Key="NewSheetTip">
             <Grid>
                 <Grid.RowDefinitions>
@@ -208,6 +211,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <CheckBox x:Name="ShowDataCheckBox" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5" IsChecked="{Binding ShowDataProperty}">
+                    
+
                     <CheckBox.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
@@ -216,16 +221,16 @@
                             <TranslateTransform/>
                         </TransformGroup>
                     </CheckBox.RenderTransform>
-                    
+
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <Custom:EventToCommand x:Name="CheckChangedEventToCommand" Command="{Binding ShowDataChangedCommand, Mode=OneWay}"/>
                         </i:EventTrigger>
-                    </i:Interaction.Triggers>   
-                    
+                     </i:Interaction.Triggers>
+
                 </CheckBox>
-                <Label x:Name="TypeLabel" Content="{Binding TypeNameProperty}" Grid.Column="1" Margin="4,10" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-                <ListBox x:Name="DetailListBox" ScrollViewer.CanContentScroll="False"  VirtualizingStackPanel.IsVirtualizing="True"  Grid.Column="2" ItemsPanel="{DynamicResource DetailItemsPanelTemplate}" BorderThickness="0" ItemsSource="{Binding DataCollection}" ItemTemplate="{DynamicResource DetailDataTemplate}" FontSize="26.667" FontWeight="Bold" SelectedItem="{Binding CurrentDataProperty}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" SelectionMode="{Binding TypeNum, Converter={StaticResource ISDToSelectionModeConverter}}" >
+                <Label x:Name="TypeLabel" Content="{Binding TypeNameProperty}" Grid.Column="1" Margin="3,10,5,10" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <ListBox x:Name="DetailListBox" ScrollViewer.CanContentScroll="False"  VirtualizingStackPanel.IsVirtualizing="True"  Grid.Column="2" ItemsPanel="{DynamicResource DetailItemsPanelTemplate}" BorderThickness="0" ItemsSource="{Binding DataCollection}" ItemTemplate="{DynamicResource DetailDataTemplate}" FontSize="26.667" FontWeight="Bold" SelectedItem="{Binding CurrentDataProperty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" SelectionMode="{Binding TypeNum, Converter={StaticResource ISDToSelectionModeConverter}}" >
                     <ListBox.ContextMenu>
                         <ContextMenu Visibility="{Binding TypeNum, Converter={StaticResource TypeToMenuVisibilityConvertercs}}">
                             <MenuItem Header="插入信号机" Visibility="{Binding QjMenuVisibility}" Command="{Binding ExCommand, Mode=OneWay}" CommandParameter="InsertXH" IsEnabled="{Binding IsSingleQJ}" />
@@ -244,6 +249,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                    
+
                 </ListBox>
             </Grid>
         </DataTemplate>
@@ -381,6 +387,7 @@
                     <Fluent:ToggleButton x:Name="LoadQXToggleButton" Content="曲线数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsQuXianLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadQuXianDataCommand, Mode=OneWay}" ToolTip="显示曲线" Header="曲线数据" LargeIcon="{StaticResource curveicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
                     <Fluent:ToggleButton x:Name="LoadCZToggleButton" Content="车站数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsCheZhanLoadedProperty, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadStationCommand, Mode=OneWay}" ToolTip="显示车站数据" Header="车站数据" LargeIcon="{StaticResource stationicon}" Margin="6,0" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
                     <Fluent:ToggleButton x:Name="PositionToggleButton" Content="里程数据" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsLiChengLoadedProperty, Mode=TwoWay, UpdateSourceTrigger=Default}" Command="{Binding DatasCollectionProperty.LoadPositionCommand, Mode=OneWay}" LargeIcon="{StaticResource ruleicon}" Header="里程数据" ToolTip="显示里程数据" IsEnabled="{Binding DatasCollectionProperty.containpddata}"/>
+                    <Fluent:ToggleButton x:Name="DetailInfoToggleButton" Content="元素信息" d:LayoutOverrides="Height" IsChecked="{Binding DatasCollectionProperty.IsDetailInfoLoaded, Mode=TwoWay}" Command="{Binding DatasCollectionProperty.LoadDetailInfoCommand}" LargeIcon="{DynamicResource DetailInfo}" Header="元素信息" ToolTip="显示元素信息"/>
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox x:Name="SingleRibbonGroupBox" Header="信号机布置">
                     <Fluent:ToggleButton x:Name="loadxhdataButton" Header="载入上行" LargeIcon="{StaticResource Downway}" Command="{Binding DatasCollectionProperty.LoadXinhaoCommand, Mode=OneWay}" IsChecked="{Binding DatasCollectionProperty.IsXinhaoLoadedProperty, Mode=TwoWay}" FontSize="11" IsEnabled="{Binding DatasCollectionProperty.CanloadxhProperty}"/>
@@ -401,15 +408,17 @@
                         <Fluent:MenuItem Header="分页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.ManyClickCommand, Mode=OneWay}"/>
                         <Fluent:MenuItem Header="单页输出" IsCheckable="True" IsChecked="{Binding DatasCollectionProperty.exPortTypeIndex, Converter={StaticResource IntToUnBoolenConverter}, Mode=OneWay}" Command="{Binding DatasCollectionProperty.SingleClickCommand, Mode=OneWay}"/>
                     </Fluent:SplitButton>
+                    <Fluent:Button x:Name="ExportToBjButton" Header="铁科格式" ToolTip="转换为铁科格式" Command="{Binding DatasCollectionProperty.ExportToTkBjFormatCommand}" Height="Auto" LargeIcon="{DynamicResource TKtype}"/>
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
             <Fluent:RibbonTabItem x:Name="CheckDataRibbonTabItem" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Header="检算" IsSelected="True">
                 <Fluent:RibbonGroupBox x:Name="MuRibbonGroupBox" d:LayoutOverrides="Height" Header="动车组检算">
                     <Fluent:Button x:Name="BulitTrainbutton" Content="编辑车辆" ToolTip="编辑车辆数据" Height="Auto" Margin="5,5,10,5" Command="{Binding DatasCollectionProperty.EditTrainInfoCommand, Mode=OneWay}" LargeIcon="{DynamicResource editUm}" Header="编辑车辆"/>
-                    <Fluent:Button x:Name="CheckUmDisbutton" Content="计算制动距离" ToolTip="计算制动距离"  Height="Auto" Margin="5,5,0,5" Command="{Binding DatasCollectionProperty.CalculetUmBreakDisCommand, Mode=OneWay}" LargeIcon="{DynamicResource UmBdis}" Header="计算制动距离"/>
+                    <Fluent:Button x:Name="CheckUmDisbutton" Content="计算制动距离" ToolTip="计算制动距离"  Height="Auto" Margin="5,5,0,5" Command="{Binding DatasCollectionProperty.CalculetUmBreakDisCommand, Mode=OneWay}" LargeIcon="{DynamicResource BreakingDis}" Header="计算制动距离"/>
+                    <Fluent:Button x:Name="CalculetAveragePdbutton" Content="计算换算坡度" ToolTip="计算换算坡度"  Height="Auto" Margin="5,5,0,5" Command="{Binding DatasCollectionProperty.BegincCalculateAverageGradeCommand}" LargeIcon="{DynamicResource UmBdis}" Header="计算换算坡度"/>
                 </Fluent:RibbonGroupBox>
                 <Fluent:RibbonGroupBox  x:Name="testGroupBox" Header="测试">
-                    <Fluent:Button x:Name="test" Content="测试" Command="{Binding DatasCollectionProperty.BegincCalculateAverageGradeCommand}"/>
+                    <Fluent:Button x:Name="test" Content="测试" Command="{Binding DatasCollectionProperty.TestCommand}"/>
                 </Fluent:RibbonGroupBox>
             </Fluent:RibbonTabItem>
             <Fluent:RibbonTabItem x:Name="ModifyXinhaoRibbonTabItem" d:LayoutOverrides="Height" Header="修改信号机" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Group="{Binding ElementName=XinhaoContextualTabGroup}" IsSelected="True">

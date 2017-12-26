@@ -17,6 +17,8 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ExpressionBlendVersion>4.0.20621.0</ExpressionBlendVersion>
+    <Utf8Output>true</Utf8Output>
     <PublishUrl>C:\Users\Lenovo\Desktop\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -35,8 +37,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <ExpressionBlendVersion>4.0.20621.0</ExpressionBlendVersion>
-    <Utf8Output>true</Utf8Output>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -200,6 +200,7 @@
     <Compile Include="ViewModel\ModifyCdlViewModel.cs" />
     <Compile Include="ViewModel\ModifyFilePosViewModel.cs" />
     <Compile Include="ViewModel\ProcessViewModel.cs" />
+    <Compile Include="ViewModel\ShowCellDetailInfoViewModel.cs" />
     <Compile Include="ViewModel\ShowInfosViewModel.cs" />
     <Compile Include="ViewModel\ShowLdhViewModel.cs" />
     <Compile Include="ViewModel\SpeedBreakOperateViewModel.cs" />
@@ -256,6 +257,9 @@
     </Compile>
     <Compile Include="Views\ProcessWindow.xaml.cs">
       <DependentUpon>ProcessWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShowDetailInfoWindow.xaml.cs">
+      <DependentUpon>ShowDetailInfoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SpeedBreakWindow.xaml.cs">
       <DependentUpon>SpeedBreakWindow.xaml</DependentUpon>
@@ -344,6 +348,10 @@
     <Page Include="Views\ProcessWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ShowDetailInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SpeedBreakWindow.xaml">
       <SubType>Designer</SubType>
@@ -565,6 +573,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icons\stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\TK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\Breake_distance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icons\remind.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

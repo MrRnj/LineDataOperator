@@ -55,7 +55,7 @@ namespace Inter_face.ViewModel
 
         List<ChangeToTxt.QuxianOutputData> qxxlist;
         List<ChangeToTxt.QuxianOutputData> qxslist;
-        
+
         List<ChangeToTxt.CheZhanOutputData> czxlist;
         List<ChangeToTxt.CheZhanOutputData> czslist;
 
@@ -68,16 +68,16 @@ namespace Inter_face.ViewModel
         List<string> cdlxlist;
         List<string> cdlslist;
         private List<LinepartStruct> linePartsData = null;
-        string[] colors = 
+        string[] colors =
         { "#990033",
-            "#FF3399", 
-            "#660099", 
-            "#0099FF", 
-            "#CC6600", 
-            "#66FF00", 
+            "#FF3399",
+            "#660099",
+            "#0099FF",
+            "#CC6600",
+            "#66FF00",
             "#CCFF00",
-            "#FF0000", 
-            "#996666", 
+            "#FF0000",
+            "#996666",
             "#99FF66" };
 
         MoveXinhaoWindow mxwindow;
@@ -94,6 +94,7 @@ namespace Inter_face.ViewModel
         CalDfxWindow cdfWindow;
         InfoWindow ifWindow;
         AverageGradeWindow agWindow;
+        ShowDetailInfoWindow sdiWindow;
 
         System.Windows.Threading.Dispatcher dispatcher;
 
@@ -127,7 +128,7 @@ namespace Inter_face.ViewModel
                 RaisePropertyChanged(DirectionPropertyName);
             }
         }
-        
+
         /// <summary>
         /// The <see cref="ScaleProperty" /> property's name.
         /// </summary>
@@ -185,13 +186,13 @@ namespace Inter_face.ViewModel
                 }
 
                 RaisePropertyChanging(CountPropertyPropertyName);
-                _countProperty = value;               
+                _countProperty = value;
                 RaisePropertyChanged(CountPropertyPropertyName);
             }
         }
 
         List<ISingleDataViewModel> _DataBin;
-        
+
         ObservableCollection<ISingleDataViewModel> _datascollection;
         public ObservableCollection<ISingleDataViewModel> DatasCollection
         {
@@ -236,12 +237,12 @@ namespace Inter_face.ViewModel
                     else if (value.TypeNum == (int)DataType.SingleS)
                         SeletedXinhaoS = true;
                 }
-                
-                _CurrentDatasProperty = value;
+
+                _CurrentDatasProperty = value;                
                 RaisePropertyChanged(CurrentDatasPropertyPropertyName);
             }
         }
-       
+
         /// <summary>
         /// The <see cref="IsLdhMapLoadedProperty" /> property's name.
         /// </summary>
@@ -452,6 +453,36 @@ namespace Inter_face.ViewModel
                 _isxinhaosProperty = value;
                 Direction = 1;
                 RaisePropertyChanged(IsXinhaoSLoadedPropertyName);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="IsDetailInfoLoaded" /> property's name.
+        /// </summary>
+        public const string IsDetailInfoLoadedPropertyName = "IsDetailInfoLoaded";
+
+        private bool _isDetailInfoLoaded = false;
+
+        /// <summary>
+        /// Sets and gets the IsDetailInfoLoaded property.
+        /// Changes to that property's value raise the PropertyChanged event. 
+        /// </summary>
+        public bool IsDetailInfoLoaded
+        {
+            get
+            {
+                return _isDetailInfoLoaded;
+            }
+
+            set
+            {
+                if (_isDetailInfoLoaded == value)
+                {
+                    return;
+                }
+
+                _isDetailInfoLoaded = value;
+                RaisePropertyChanged(IsDetailInfoLoadedPropertyName);
             }
         }
 
@@ -696,7 +727,7 @@ namespace Inter_face.ViewModel
             {
                 if (value)
                 {
-                    
+
                     if (GDoper != null)
                     {
                         if (QuikSaveXhdataThread != null && QuikSaveXhdataThread.IsAlive)
@@ -818,7 +849,7 @@ namespace Inter_face.ViewModel
                             });
 
                             QuikSaveXhdataThread.Start();
-                        }                        
+                        }
                     }
                 }
 
@@ -829,7 +860,7 @@ namespace Inter_face.ViewModel
 
                 RaisePropertyChanging(IsXinhaoChangedPropertyName);
                 _isxinhaochangedProperty = value;
-                RaisePropertyChanged(IsXinhaoChangedPropertyName);                
+                RaisePropertyChanged(IsXinhaoChangedPropertyName);
             }
         }
 
@@ -945,6 +976,7 @@ namespace Inter_face.ViewModel
             GDoper = GraphyDataOper.CreatOper(_Pdpath, _Bjpath, _Qxpath, _XhPath);
             ABoper = AutoBuildOperator.CreatOper(_prePdpath, _preBjpath, _preQxpath);
             SDexportor = SignalDataExportor.CreatOper(_XHEPath);
+            linePartsData = new List<LinepartStruct>();
             _DataBin = new List<ISingleDataViewModel>();
             _takenOfcurrentDFX = string.Empty;
             _xhdataPath = string.Empty;
@@ -1012,12 +1044,21 @@ namespace Inter_face.ViewModel
                 (p) =>
                 {
                     int n = 0;
+                    string detailInfo = string.Empty;
+                    string[] datas;
+                    StationDataMode sdm;
+                    StationDataMode endsdm = null;
+                    StationDataMode startsdm = null;
+                    LineDataModel ldm;
+                    List<IDataModel> signalCollection;
+                    ChangeToTxt ctt = null;                    
+                    int currentindex = 0;
+
                     foreach (ISingleDataViewModel item in DatasCollection)
                     {
                         if (item.TypeNum == (int)p)
                         {
-                            SelectedIndex = n;                            
-                            //break;
+                            SelectedIndex = n;
                         }
                         else
                         {
@@ -1025,6 +1066,185 @@ namespace Inter_face.ViewModel
                         }
                         n++;
                     }
+
+                    if (IsDetailInfoLoaded)
+                    {
+                        if (CurrentDatasProperty.CurrentDataProperty != null)
+                        {
+                            IDataModel idm = CurrentDatasProperty.CurrentDataProperty;
+
+                            switch (idm.Type)
+                            {
+                                case DataType.SingleS:
+                                case DataType.Single:
+                                    {
+                                        sdm = (StationDataMode)idm;
+                                        currentindex = CurrentDatasProperty.DataCollection.IndexOf(sdm);
+
+                                        if (currentindex != 0)
+                                        {
+                                            if (sdm.StationNameProperty.StartsWith("Q"))
+                                            {
+                                                if (lineparts == null)
+                                                {
+                                                    ctt = new ChangeToTxt();
+                                                    lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
+                                                }
+                                                FormatLinepartStruct(lineparts);
+
+                                                signalCollection = CurrentDatasProperty.DataCollection.ToList();
+
+                                                //从右至左
+                                                if (Direction == 0)
+                                                {
+                                                    for (int i = currentindex; i < CurrentDatasProperty.DataCollection.Count; i++)
+                                                    {
+                                                        datas = (signalCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                                                        if (datas[0].StartsWith("1") || datas[0].StartsWith("2"))
+                                                        {
+                                                            endsdm = signalCollection[i] as StationDataMode;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    for (int i = currentindex; i >= 0; i--)
+                                                    {
+                                                        datas = (signalCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                                                        if (datas[0].StartsWith("1") || datas[0].StartsWith("2"))
+                                                        {
+                                                            startsdm = signalCollection[i] as StationDataMode;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    for (int i = currentindex; i < CurrentDatasProperty.DataCollection.Count; i++)
+                                                    {
+                                                        datas = (signalCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                                                        if (datas[0].StartsWith("1") || datas[0].StartsWith("2"))
+                                                        {
+                                                            startsdm = signalCollection[i] as StationDataMode;
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    for (int i = currentindex; i >= 0; i--)
+                                                    {
+                                                        datas = (signalCollection[i] as StationDataMode).StationNameProperty.Split(':');
+                                                        if (datas[0].StartsWith("1") || datas[0].StartsWith("2"))
+                                                        {
+                                                            endsdm = signalCollection[i] as StationDataMode;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+
+                                                string crp = getcurrentpos(startsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+                                                string endcrp = getcurrentpos(endsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+
+                                                float averageGrade = GetAvrHeight((int)Math.Ceiling(decimal.Parse(crp)),
+                                                               Math.Abs(float.Parse(endcrp) - float.Parse(crp)),
+                                                               Direction,
+                                                               false);
+
+                                                float averageGrade_positiveToZero = GetAvrHeight((int)Math.Ceiling(decimal.Parse(crp)),
+                                                               Math.Abs(float.Parse(endcrp) - float.Parse(crp)),
+                                                               Direction,
+                                                               true);
+                                                detailInfo = string.Format("闭塞分区数据：\r\n分区长度为：{0}m\r\n平均坡度为：{1}‰\r\n平均坡度（上坡转为平坡）为：{2}‰",
+                                                                         Math.Abs(float.Parse(endcrp) - float.Parse(crp)).ToString("#0.00"),
+                                                                         averageGrade.ToString("#0.000"),
+                                                                         averageGrade_positiveToZero.ToString("#0.000"));
+                                                break;
+
+                                                /* if (sdm.StationNameProperty.Split('+')[1].StartsWith("3"))
+                                                 {
+                                                     detailInfo = string.Format("信号机间距(km)：{0}",
+                                                     ((sdm.LengthProperty * sdm.ScaleProperty) / 1000).ToString("#0.000"));
+                                                     break;
+                                                 }
+                                                 detailInfo = string.Format("信号机间距(km)：{0}",
+                                                     ((sdm.RealLength * sdm.ScaleProperty) / 1000).ToString("#0.000"));
+                                                 break;*/
+                                            }
+                                            else
+                                            {
+                                                datas = sdm.StationNameProperty.Split(':');
+
+                                                if (!datas[0].Equals("3"))
+                                                {
+                                                    detailInfo = string.Format("信号机信息：\r\n信号机位置：{0}\r\n信号机类型：{1}\r\n信号机编号：{2}\r\n路段号：{3}",
+                                                        string.Format("{0} {1}", sdm.HatProperty, sdm.PositionProperty.ToString("#0.000")),
+                                                      datas[0].Equals("1") ? "车站信号机" : "通过信号机",
+                                                    datas[1], sdm.SectionNumProperty.ToString());
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                    detailInfo = string.Format("电分相信息：\r\n无电区中心里程：{0} {1}\r\n无电区长度：{2}\r\n分相名称：{3}",
+                                                        sdm.HatProperty,
+                                                        sdm.StationNameProperty.Split(':')[3].Split('+')[0],
+                                                        (sdm.RealLength * sdm.ScaleProperty).ToString("#0.000"),
+                                                        sdm.StationNameProperty.Split(':')[1]);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case DataType.Station:
+                                    sdm = (StationDataMode)idm;
+                                    if (!sdm.StationNameProperty.Equals("区间"))
+                                    {
+                                        detailInfo = string.Format("车站信息：\r\n车站名:{0}\r\n中心里程(km):{1}{2}\r\n路段号{3}\r\n",
+                                            sdm.StationNameProperty, sdm.HatProperty,
+                                            sdm.PositionProperty.ToString("#0.000"),
+                                            sdm.SectionNumProperty.ToString());
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        detailInfo = string.Format("区间信息：\r\n区间长度(m)：{0}",
+                                            (sdm.RealLength * sdm.ScaleProperty).ToString("#0.000"));
+                                        break;
+                                    }
+                                case DataType.Bridge:
+                                    detailInfo = "未定义数据";
+                                    break;
+                                case DataType.Tunel:
+                                    detailInfo = "未定义数据";
+                                    break;
+                                case DataType.Podu:
+                                    ldm = (LineDataModel)idm;
+                                    detailInfo = string.Format("纵断面数据：\r\n起点公里标(km):{0}{1}\r\n坡长(m):{2}\r\n坡度(‰):{3}\r\n路段号{4}\r\n",
+                                        ldm.HatProperty, ldm.PositionProperty.ToString("#0.000"),
+                                        (ldm.LengthProperty * ldm.ScaleProperty).ToString("#0.000"), ldm.AngleProperty.ToString(),
+                                        ldm.SectionNumProperty.ToString());
+                                    break;
+                                case DataType.Quxian:
+                                    ldm = (LineDataModel)idm;
+                                    detailInfo = string.Format("平面数据\r\n起点公里标(km):{0}{1}\r\n曲线长(m):{2}\r\n曲线半径(m):{3}\r\n路段号{4}\r\n",
+                                        ldm.HatProperty, ldm.PositionProperty.ToString("#0.000"),
+                                         (ldm.LengthProperty * ldm.ScaleProperty).ToString("#0.000"), ldm.RadioProperty.ToString(),
+                                        ldm.SectionNumProperty.ToString());
+                                    break;
+                                case DataType.Break:
+                                    sdm = (StationDataMode)idm;
+                                    detailInfo = string.Format("路段号数据：\r\n路段号：{0}\r\n路段范围{1}",
+                                        sdm.SectionNumProperty, sdm.StationNameProperty);
+                                    break;
+                                case DataType.Position:
+                                    detailInfo = "";
+                                    break;
+                                default:
+                                    detailInfo = "未定义数据";
+                                    break;
+                            }
+
+                            MessengerInstance.Send(detailInfo, "CellDetailInfo");
+                        }
+                    }                    
                 });
             /*MessengerInstance.Register<int>(this, "SelectedTabItem",
                 (p) =>
@@ -1189,12 +1409,12 @@ namespace Inter_face.ViewModel
                     dianfxCal(p);
                 });
 
-            MessengerInstance.Register<string>(this, "sendCB&PTZ", 
+            MessengerInstance.Register<string>(this, "sendCB&PTZ",
                 p =>
                 {
                     string[] infos = p.Split(':');
                     calculateAverageGrade(int.Parse(infos[0]), infos[1].Equals("1") ? true : false);
-                });    
+                });
         }
 
         private void ShowProcessWindow()
@@ -1213,7 +1433,7 @@ namespace Inter_face.ViewModel
                        processform.Close();
                        processform = null;
                    }
-               }));            
+               }));
         }
 
         private void CommitMenuCommand(string cmd)
@@ -1257,7 +1477,7 @@ namespace Inter_face.ViewModel
                 {
                     if (item.TypeNum == (int)DataType.Break)
                     {
-                        DatasCollection.Remove(item);                       
+                        DatasCollection.Remove(item);
                         break;
                     }
                 }
@@ -1266,7 +1486,7 @@ namespace Inter_face.ViewModel
             }
 
             SingleDataViewModel sdvm = null;
-            
+
             if (sdvm == null)
             {
 
@@ -1319,7 +1539,7 @@ namespace Inter_face.ViewModel
                                     HatProperty = parts[1].Split('+')[0],
                                     LengthProperty = !isAnyDatashowed() ? 1000 / ScaleProperty :
                                     (_endPos * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
-                                    RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty : 
+                                    RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty :
                                     (_endPos * 1000 - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
                                     PositionProperty = float.Parse(parts[1].Split('+')[1]) / 1000,
                                     Type = DataType.Break,
@@ -1337,9 +1557,9 @@ namespace Inter_face.ViewModel
                             sdvm.DataCollection.Add(new StationDataMode()
                             {
                                 HatProperty = parts[1].Split('+')[0],
-                                LengthProperty = !isAnyDatashowed() ? 1000 / ScaleProperty : 
+                                LengthProperty = !isAnyDatashowed() ? 1000 / ScaleProperty :
                                 (float.Parse(nextparts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
-                                RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty : 
+                                RealLength = !isAnyDatashowed() ? 1000 / ScaleProperty :
                                 (float.Parse(nextparts[0].Split('+')[1]) - float.Parse(parts[1].Split('+')[1])) / ScaleProperty,
                                 PositionProperty = float.Parse(parts[1].Split('+')[1]) / 1000,
                                 Type = DataType.Break,
@@ -1354,7 +1574,7 @@ namespace Inter_face.ViewModel
                             });
                         }
                         Cursor = 0;
-                    }                   
+                    }
                 }
 
                 catch (NullReferenceException ure)
@@ -1397,6 +1617,28 @@ namespace Inter_face.ViewModel
             return IsPoduLoadedProperty || IsQuXianLoadedProperty || IsCheZhanLoadedProperty || IsLiChengLoadedProperty
                    || IsXinhaoSLoaded || IsXinhaoSLoaded;
         }
+        public void LoadDetailInfo()
+        {            
+            if (!IsDetailInfoLoaded)
+            {
+                if (sdiWindow != null)
+                {
+                    sdiWindow.Close();
+                }
+                sdiWindow = null;
+                return;
+            }
+
+            sdiWindow = new ShowDetailInfoWindow();
+            sdiWindow.Closed += SdiWindow_Closed;
+            sdiWindow.Show();
+        }
+
+        private void SdiWindow_Closed(object sender, EventArgs e)
+        {
+            IsDetailInfoLoaded = false;
+        }
+
         public void LoadPoduXData()
         {
             if (!IsPoduLoadedProperty)
@@ -1450,7 +1692,7 @@ namespace Inter_face.ViewModel
                     cdlxlist = pdxlist.TakeWhile(p => p.Cdl != "+:+").Select(q => q.Cdl).ToList();
                     if (cdlxlist.Count == 0)
                     {
-                        cdlxlist.Add("0+0:0+0");
+                        cdlxlist.Add(string.Format("{0}+0:{0}+0", pdxlist[0].Gh, pdxlist[0].Gh));
                     }
                     part = (int)(pdxlist.Count() / 5);
                     _startPos = float.Parse(pdxlist[0].Qdglb);
@@ -1475,7 +1717,7 @@ namespace Inter_face.ViewModel
                             "3:1 0:#00DC5625:#FF35F30E:M0,500 L500,0" : float.Parse(item.Pd) == 0 ?
                             "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0" : "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,500"
                             });
-                        }                        
+                        }
                     }
                     Cursor = 0;
                     //MessengerInstance.Send<int>(100, "processes");
@@ -1527,7 +1769,7 @@ namespace Inter_face.ViewModel
                 removeAdataItem((int)DataType.Quxian);
                 return;
             }
-            
+
             SingleDataViewModel sdvm = null;
 
             foreach (ISingleDataViewModel Singleitem in _DataBin)
@@ -1540,129 +1782,129 @@ namespace Inter_face.ViewModel
                 }
             }
 
-             if (sdvm == null)
-             {                 
+            if (sdvm == null)
+            {
 
-                 try
-                 {
-                     GDoper.GetQuxianData(out qxxlist, out qxslist);
-                     sdvm = new SingleDataViewModel();
-                     sdvm.TypeNameProperty = "曲线";
-                     sdvm.ShowDataProperty = true;
-                     sdvm.TypeNum = (int)DataType.Quxian;
+                try
+                {
+                    GDoper.GetQuxianData(out qxxlist, out qxslist);
+                    sdvm = new SingleDataViewModel();
+                    sdvm.TypeNameProperty = "曲线";
+                    sdvm.ShowDataProperty = true;
+                    sdvm.TypeNum = (int)DataType.Quxian;
 
-                     int n = 0;
-                     string[] parts = { };                    
-                     float offset = 0;
+                    int n = 0;
+                    string[] parts = { };
+                    float offset = 0;
 
-                     float len = (float.Parse(qxxlist[0].Qdglb) - float.Parse(pdxlist[0].Qdglb)) * 1000 / ScaleProperty;
-                     float pos = float.Parse(pdxlist[0].Qdglb);                    
-                     
-                     for (int i = int.Parse(pdxlist[0].Ldh); i < int.Parse(qxxlist[0].Ldh); i++)
-                     {
-                         parts = cdlxlist[n].Split(':');
-                         offset += float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);                                           
-                         n++;
-                     }
+                    float len = (float.Parse(qxxlist[0].Qdglb) - float.Parse(pdxlist[0].Qdglb)) * 1000 / ScaleProperty;
+                    float pos = float.Parse(pdxlist[0].Qdglb);
 
-                     len = ((float.Parse(qxxlist[0].Qdglb) -
-                             float.Parse(pdxlist[0].Qdglb)) * 1000 - offset) / ScaleProperty;  
+                    for (int i = int.Parse(pdxlist[0].Ldh); i < int.Parse(qxxlist[0].Ldh); i++)
+                    {
+                        parts = cdlxlist[n].Split(':');
+                        offset += float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
+                        n++;
+                    }
 
-                     sdvm.DataCollection.Add(new LineDataModel()
-                     {
-                         HatProperty = qxxlist[0].Gh,
-                         LengthProperty = len,
-                         PositionProperty = pos,                        
-                         RadioProperty = 0,
-                         Type = DataType.Quxian,
-                         SectionNumProperty = int.Parse(pdxlist[0].Ldh),
-                         ScaleProperty = ScaleProperty,
-                         SelectedProperty = false,
-                         PathDataProperty = "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0"
-                     });                     
+                    len = ((float.Parse(qxxlist[0].Qdglb) -
+                            float.Parse(pdxlist[0].Qdglb)) * 1000 - offset) / ScaleProperty;
 
-                     foreach (ChangeToTxt.QuxianOutputData item in qxxlist)
-                     {                         
-                         sdvm.DataCollection.Add(new LineDataModel()
-                         {
-                             HatProperty = item.Gh,
-                             LengthProperty = (float.Parse(item.Qxc)) / ScaleProperty,
-                             PositionProperty = float.Parse(item.Qdglb),
-                             RadioProperty = int.Parse(item.Qxbj),
-                             Type = DataType.Quxian,
-                             SectionNumProperty = int.Parse(item.Ldh),
-                             ScaleProperty = ScaleProperty,
-                             SelectedProperty = false,
-                             PathDataProperty = int.Parse(item.Qxbj) == 0 ? "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0" :
-                             int.Parse(item.Qxwq) == 1 ?
-                             "3:1 0:#00DC5625:#FF35F30E:M0,500 L0,400 500,300 2000,300 2500,400 2500,500" :
-                             "3:1 0:#00DC5625:#FF35F30E:M0,0 L0,150 500,300 2000,300 2500,150 2500,0"
-                         });
+                    sdvm.DataCollection.Add(new LineDataModel()
+                    {
+                        HatProperty = qxxlist[0].Gh,
+                        LengthProperty = len,
+                        PositionProperty = pos,
+                        RadioProperty = 0,
+                        Type = DataType.Quxian,
+                        SectionNumProperty = int.Parse(pdxlist[0].Ldh),
+                        ScaleProperty = ScaleProperty,
+                        SelectedProperty = false,
+                        PathDataProperty = "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0"
+                    });
 
-                         if (sdvm.DataCollection.Count > 2)
-                         {
-                             LineDataModel preldm = (LineDataModel)sdvm.DataCollection[sdvm.DataCollection.Count - 2];
-                             LineDataModel curldm = (LineDataModel)sdvm.DataCollection[sdvm.DataCollection.Count - 1];
+                    foreach (ChangeToTxt.QuxianOutputData item in qxxlist)
+                    {
+                        sdvm.DataCollection.Add(new LineDataModel()
+                        {
+                            HatProperty = item.Gh,
+                            LengthProperty = (float.Parse(item.Qxc)) / ScaleProperty,
+                            PositionProperty = float.Parse(item.Qdglb),
+                            RadioProperty = int.Parse(item.Qxbj),
+                            Type = DataType.Quxian,
+                            SectionNumProperty = int.Parse(item.Ldh),
+                            ScaleProperty = ScaleProperty,
+                            SelectedProperty = false,
+                            PathDataProperty = int.Parse(item.Qxbj) == 0 ? "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0" :
+                            int.Parse(item.Qxwq) == 1 ?
+                            "3:1 0:#00DC5625:#FF35F30E:M0,500 L0,400 500,300 2000,300 2500,400 2500,500" :
+                            "3:1 0:#00DC5625:#FF35F30E:M0,0 L0,150 500,300 2000,300 2500,150 2500,0"
+                        });
 
-                             int currentldh = preldm.SectionNumProperty;
-                             offset = 0;
+                        if (sdvm.DataCollection.Count > 2)
+                        {
+                            LineDataModel preldm = (LineDataModel)sdvm.DataCollection[sdvm.DataCollection.Count - 2];
+                            LineDataModel curldm = (LineDataModel)sdvm.DataCollection[sdvm.DataCollection.Count - 1];
 
-                             pos = preldm.PositionProperty +
-                                     preldm.LengthProperty * preldm.ScaleProperty / 1000;
-                             for (int i = currentldh - 1; i < cdlxlist.Count; i++)
-                             {
-                                 parts = cdlxlist[i].Split(':');
-                                 if (preldm.LengthProperty * preldm.ScaleProperty + preldm.PositionProperty * 1000 + offset >
-                                     float.Parse(parts[0].Split('+')[1]))
-                                 {
-                                     offset += (float)Math.Round(float.Parse(parts[1].Split('+')[1]) -
-                                             float.Parse(parts[0].Split('+')[1]), 3);
-                                     currentldh++;
-                                     continue;
-                                 }
-                                 break;
-                             }
-                             pos = pos + offset / 1000;
-                             len = (curldm.PositionProperty - pos) * 1000;
+                            int currentldh = preldm.SectionNumProperty;
+                            offset = 0;
 
-                             if (len != 0)
-                             {
+                            pos = preldm.PositionProperty +
+                                    preldm.LengthProperty * preldm.ScaleProperty / 1000;
+                            for (int i = currentldh - 1; i < cdlxlist.Count; i++)
+                            {
+                                parts = cdlxlist[i].Split(':');
+                                if (preldm.LengthProperty * preldm.ScaleProperty + preldm.PositionProperty * 1000 + offset >
+                                    float.Parse(parts[0].Split('+')[1]))
+                                {
+                                    offset += (float)Math.Round(float.Parse(parts[1].Split('+')[1]) -
+                                            float.Parse(parts[0].Split('+')[1]), 3);
+                                    currentldh++;
+                                    continue;
+                                }
+                                break;
+                            }
+                            pos = pos + offset / 1000;
+                            len = (curldm.PositionProperty - pos) * 1000;
 
-                                 for (int i = currentldh - 1; i < curldm.SectionNumProperty - 1; i++)
-                                 {
-                                     parts = cdlxlist[i].Split(':');
-                                     offset += (float)Math.Round(float.Parse(parts[1].Split('+')[1]) -
-                                             float.Parse(parts[0].Split('+')[1]), 3);
-                                 }
+                            if (len != 0)
+                            {
 
-                                 len = (len - offset) / ScaleProperty;
+                                for (int i = currentldh - 1; i < curldm.SectionNumProperty - 1; i++)
+                                {
+                                    parts = cdlxlist[i].Split(':');
+                                    offset += (float)Math.Round(float.Parse(parts[1].Split('+')[1]) -
+                                            float.Parse(parts[0].Split('+')[1]), 3);
+                                }
 
-                                 LineDataModel insertldm = new LineDataModel()
-                                 {
-                                     HatProperty = currentldh - 1 == cdlxlist.Count ? 
-                                                                     cdlxlist[currentldh - 2].Split(':')[1].Split('+')[0] :
-                                                                     cdlxlist[currentldh - 1].Split(':')[0].Split('+')[0],
-                                     LengthProperty = len,
-                                     PositionProperty = pos,
-                                     RadioProperty = 0,
-                                     Type = DataType.Quxian,
-                                     SectionNumProperty = currentldh,
-                                     ScaleProperty = ScaleProperty,
-                                     SelectedProperty = false,
-                                     PathDataProperty = "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0"
-                                 };
+                                len = (len - offset) / ScaleProperty;
 
-                                 sdvm.DataCollection.Insert(sdvm.DataCollection.Count - 1, insertldm);
-                             }                          
-                         }
-                     }
-                 }
+                                LineDataModel insertldm = new LineDataModel()
+                                {
+                                    HatProperty = currentldh - 1 == cdlxlist.Count ?
+                                                                    cdlxlist[currentldh - 2].Split(':')[1].Split('+')[0] :
+                                                                    cdlxlist[currentldh - 1].Split(':')[0].Split('+')[0],
+                                    LengthProperty = len,
+                                    PositionProperty = pos,
+                                    RadioProperty = 0,
+                                    Type = DataType.Quxian,
+                                    SectionNumProperty = currentldh,
+                                    ScaleProperty = ScaleProperty,
+                                    SelectedProperty = false,
+                                    PathDataProperty = "3:1 0:#00DC5625:#FF35F30E:M0,0 L500,0"
+                                };
 
-                 catch (NullReferenceException ure)
-                 {                    
+                                sdvm.DataCollection.Insert(sdvm.DataCollection.Count - 1, insertldm);
+                            }
+                        }
+                    }
+                }
+
+                catch (NullReferenceException ure)
+                {
                     MessengerInstance.Send<string>(ure.Message, "ReadDataError");
-                 }
-             }
+                }
+            }
 
             if (_datascollection.Count == 0)
             {
@@ -1695,7 +1937,7 @@ namespace Inter_face.ViewModel
                 removeAdataItem((int)DataType.Station);
                 return;
             }
-            
+
             SingleDataViewModel sdvm = null;
 
             foreach (ISingleDataViewModel Singleitem in _DataBin)
@@ -1708,109 +1950,109 @@ namespace Inter_face.ViewModel
                 }
             }
 
-             if (sdvm == null)
-             {                 
+            if (sdvm == null)
+            {
 
-                 try
-                 {
-                     GDoper.GetBjData(out czxlist, out czslist);
+                try
+                {
+                    GDoper.GetBjData(out czxlist, out czslist);
 
-                     sdvm = new SingleDataViewModel();
-                     sdvm.TypeNameProperty = "车站";
-                     sdvm.ShowDataProperty = true;
-                     sdvm.TypeNum = (int)DataType.Station;
+                    sdvm = new SingleDataViewModel();
+                    sdvm.TypeNameProperty = "车站";
+                    sdvm.ShowDataProperty = true;
+                    sdvm.TypeNum = (int)DataType.Station;
 
-                     int n = 0;
-                     int m = 0;
-                     string[] parts = { };                     
-                     float offset = 0;
-                     float len = 0;
-                     float pos = 0;
-                     
+                    int n = 0;
+                    int m = 0;
+                    string[] parts = { };
+                    float offset = 0;
+                    float len = 0;
+                    float pos = 0;
 
-                     foreach (ChangeToTxt.CheZhanOutputData item in czxlist)
-                     {
 
-                         offset = 0;
-                         if (n == 0)
-                         {
-                             len = ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000 - 50) / ScaleProperty > 0 ?
-                                 ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000 - 50) / ScaleProperty : 0;
-                             pos = float.Parse(pdxlist[0].Qdglb);
+                    foreach (ChangeToTxt.CheZhanOutputData item in czxlist)
+                    {
 
-                             for (int i = int.Parse(pdxlist[0].Ldh); i < int.Parse(czxlist[0].Ldh); i++)
-                             {
-                                 parts = cdlxlist[m].Split(':');
-                                 offset += float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);                                 
-                                 m++;
-                             }
-                             len = len - offset / ScaleProperty;
+                        offset = 0;
+                        if (n == 0)
+                        {
+                            len = ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000 - 50) / ScaleProperty > 0 ?
+                                ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000 - 50) / ScaleProperty : 0;
+                            pos = float.Parse(pdxlist[0].Qdglb);
 
-                             sdvm.DataCollection.Add(new StationDataMode()
-                             {
-                                 HatProperty = item.Gh,
-                                 LengthProperty = len,
-                                 RealLength = len + 50 / ScaleProperty,
-                                 PositionProperty = pos,
-                                 Type = DataType.Station,
-                                 SectionNumProperty = 1,
-                                 ScaleProperty = ScaleProperty,
-                                 SelectedProperty = false,
-                                 PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                                 StationNameProperty = "区间"
-                             });
-                         }
-                         else
-                         {
-                             ChangeToTxt.CheZhanOutputData presdm = czxlist[n - 1];                             
-                             pos = float.Parse(presdm.Glb);
+                            for (int i = int.Parse(pdxlist[0].Ldh); i < int.Parse(czxlist[0].Ldh); i++)
+                            {
+                                parts = cdlxlist[m].Split(':');
+                                offset += float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
+                                m++;
+                            }
+                            len = len - offset / ScaleProperty;
 
-                             for (int i = int.Parse(presdm.Ldh); i < int.Parse(item.Ldh); i++)
-                             {
-                                 parts = cdlxlist[m].Split(':');
-                                 offset += float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);                                 
-                                 m++;
-                             }
+                            sdvm.DataCollection.Add(new StationDataMode()
+                            {
+                                HatProperty = item.Gh,
+                                LengthProperty = len,
+                                RealLength = len + 50 / ScaleProperty,
+                                PositionProperty = pos,
+                                Type = DataType.Station,
+                                SectionNumProperty = 1,
+                                ScaleProperty = ScaleProperty,
+                                SelectedProperty = false,
+                                PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
+                                StationNameProperty = "区间"
+                            });
+                        }
+                        else
+                        {
+                            ChangeToTxt.CheZhanOutputData presdm = czxlist[n - 1];
+                            pos = float.Parse(presdm.Glb);
 
-                             len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000 - 100 - offset) / ScaleProperty;
-                             sdvm.DataCollection.Add(new StationDataMode()
-                             {
-                                 HatProperty = presdm.Gh,
-                                 LengthProperty = len,
-                                 RealLength = len + 100 / ScaleProperty,
-                                 PositionProperty = pos,
-                                 Type = DataType.Station,
-                                 SectionNumProperty = int.Parse(presdm.Ldh),
-                                 ScaleProperty = ScaleProperty,
-                                 SelectedProperty = false,
-                                 PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                                 StationNameProperty = "区间"
-                             });
-                         }
+                            for (int i = int.Parse(presdm.Ldh); i < int.Parse(item.Ldh); i++)
+                            {
+                                parts = cdlxlist[m].Split(':');
+                                offset += float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
+                                m++;
+                            }
 
-                         sdvm.DataCollection.Add(new StationDataMode()
-                         {
-                             HatProperty = item.Gh,
-                             LengthProperty = 100 / ScaleProperty,
-                             RealLength = 100 / ScaleProperty,
-                             PositionProperty = float.Parse(item.Glb),
-                             Type = DataType.Station,
-                             SectionNumProperty = int.Parse(item.Ldh),
-                             ScaleProperty = ScaleProperty,
-                             SelectedProperty = false,
-                             PathDataProperty = "1:1 0:#FFDC5625:#FF35F30E:M15,0 L30,15 L15,30 L0,15 z",
-                             StationNameProperty = item.Bjsj
-                         });
+                            len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000 - 100 - offset) / ScaleProperty;
+                            sdvm.DataCollection.Add(new StationDataMode()
+                            {
+                                HatProperty = presdm.Gh,
+                                LengthProperty = len,
+                                RealLength = len + 100 / ScaleProperty,
+                                PositionProperty = pos,
+                                Type = DataType.Station,
+                                SectionNumProperty = int.Parse(presdm.Ldh),
+                                ScaleProperty = ScaleProperty,
+                                SelectedProperty = false,
+                                PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
+                                StationNameProperty = "区间"
+                            });
+                        }
 
-                         n++;
-                     }
-                 }
+                        sdvm.DataCollection.Add(new StationDataMode()
+                        {
+                            HatProperty = item.Gh,
+                            LengthProperty = 100 / ScaleProperty,
+                            RealLength = 100 / ScaleProperty,
+                            PositionProperty = float.Parse(item.Glb),
+                            Type = DataType.Station,
+                            SectionNumProperty = int.Parse(item.Ldh),
+                            ScaleProperty = ScaleProperty,
+                            SelectedProperty = false,
+                            PathDataProperty = "1:1 0:#FFDC5625:#FF35F30E:M15,0 L30,15 L15,30 L0,15 z",
+                            StationNameProperty = item.Bjsj
+                        });
 
-                 catch (NullReferenceException ure)
-                 {
-                     MessengerInstance.Send<string>(ure.Message, "ReadDataError");
-                 }
-             }
+                        n++;
+                    }
+                }
+
+                catch (NullReferenceException ure)
+                {
+                    MessengerInstance.Send<string>(ure.Message, "ReadDataError");
+                }
+            }
 
             if (_datascollection.Count == 0)
             {
@@ -1822,7 +2064,7 @@ namespace Inter_face.ViewModel
                 {
                     if (sdvm.TypeNum < _datascollection[i].TypeNum)
                     {
-                        _datascollection.Insert(i, sdvm);                        
+                        _datascollection.Insert(i, sdvm);
                         break;
                     }
                     else if (i == _datascollection.Count - 1 && sdvm.TypeNum != _datascollection[i].TypeNum)
@@ -1834,7 +2076,7 @@ namespace Inter_face.ViewModel
             }
 
             IsCheZhanLoadedProperty = true;
-            CountProperty = DatasCollection.Count;            
+            CountProperty = DatasCollection.Count;
         }
 
         public void LoadXinHaoSData()
@@ -1971,7 +2213,7 @@ namespace Inter_face.ViewModel
                                     PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
                                     StationNameProperty = "Q" + int.Parse(presdm.Ldh).ToString() + "+" +
                                     (presdm.Bjlx.Equals("1") ?
-                                        //标记类型：信号机编号：所属车站名：信号机类型：车站中心坐标
+                                    //标记类型：信号机编号：所属车站名：信号机类型：车站中心坐标
                                     string.Format("{0}:{1}:{2}", presdm.Bjlx, presdm.Bjsj, FormatStationPosition(presdm.Bjsj.Split(':')[1])) :
                                     string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj))
                                 });
@@ -2072,7 +2314,7 @@ namespace Inter_face.ViewModel
             CountProperty = DatasCollection.Count;
         }
 
-      
+
 
         public void LoadXinHaoData()
         {
@@ -2113,7 +2355,7 @@ namespace Inter_face.ViewModel
                     float offset = 0;
                     float len = 0;
                     float pos = 0;
-                    float addingpart = 200;                    
+                    float addingpart = 200;
 
                     if (xhxlist.Count == 0)
                     {
@@ -2128,7 +2370,7 @@ namespace Inter_face.ViewModel
                             m++;
                         }
 
-                        len = ((float.Parse(pdxlist[pdxlist.Count - 1].Qdglb) - 
+                        len = ((float.Parse(pdxlist[pdxlist.Count - 1].Qdglb) -
                                 float.Parse(pdxlist[0].Qdglb)) * 1000 +
                                 float.Parse(pdxlist[pdxlist.Count - 1].Pc) - offset) / ScaleProperty;
 
@@ -2163,7 +2405,7 @@ namespace Inter_face.ViewModel
                                 }
 
                                 len = ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000) / ScaleProperty > 0 ?
-                                    ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000 - offset) / ScaleProperty 
+                                    ((float.Parse(item.Glb) - float.Parse(pdxlist[0].Qdglb)) * 1000 - offset) / ScaleProperty
                                     : 0;
 
                                 sdvm.DataCollection.Add(new StationDataMode()
@@ -2195,14 +2437,14 @@ namespace Inter_face.ViewModel
                                     m++;
                                 }
 
-                               /* if (presdm.Bjlx.Equals("3"))
-                                {
-                                    len = ((float.Parse(item.Glb) - float.Parse(presdm.Bjsj.Split(':')[1].Split('+')[0]) * 1000 -
-                                            offset - addingpart)) / ScaleProperty;
-                                }
-                                else*/
-                                    len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000
-                                          - offset - addingpart) / ScaleProperty;
+                                /* if (presdm.Bjlx.Equals("3"))
+                                 {
+                                     len = ((float.Parse(item.Glb) - float.Parse(presdm.Bjsj.Split(':')[1].Split('+')[0]) * 1000 -
+                                             offset - addingpart)) / ScaleProperty;
+                                 }
+                                 else*/
+                                len = ((float.Parse(item.Glb) - float.Parse(presdm.Glb)) * 1000
+                                      - offset - addingpart) / ScaleProperty;
 
                                 sdvm.DataCollection.Add(new StationDataMode()
                                 {
@@ -2217,14 +2459,14 @@ namespace Inter_face.ViewModel
                                     PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
                                     StationNameProperty = "Q" + int.Parse(presdm.Ldh).ToString() + "+" +
                                     (presdm.Bjlx.Equals("1") ?
-                                        //标记类型：信号机编号：所属车站名：信号机类型：车站中心坐标
+                                    //标记类型：信号机编号：所属车站名：信号机类型：车站中心坐标
                                     string.Format("{0}:{1}:{2}", presdm.Bjlx, presdm.Bjsj, FormatStationPosition(presdm.Bjsj.Split(':')[1])) :
                                     string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj))
                                 });
                             }
 
                             float currentlen = float.Parse(item.Bjlx.Equals("3") ? item.Bjsj.Split(':')[4] : "200");
-                           
+
                             sdvm.DataCollection.Add(new StationDataMode()
                             {
                                 HatProperty = item.Gh,
@@ -2331,15 +2573,15 @@ namespace Inter_face.ViewModel
             {
                 foreach (ChangeToTxt.CheZhanOutputData item in czxlist)
                 {
-                    if(item.Bjsj.Equals(stationame))
+                    if (item.Bjsj.Equals(stationame))
                     {
                         pos = float.Parse(item.Glb).ToString("F3");
                         return string.Format("{0} {1}+{2}", item.Gh, pos.Split('.')[0], pos.Split('.')[1]);
-                    }                    
+                    }
                 }
                 return string.Empty;
             }
-        }     
+        }
 
         public void LoadLiChengXData()
         {
@@ -2375,8 +2617,8 @@ namespace Inter_face.ViewModel
                 sdvm.TypeNum = (int)DataType.Position;
                 try
                 {
-                    int starter = (int)Math.Floor(float.Parse(pdxlist[0].Qdglb));                    
-                    
+                    int starter = (int)Math.Floor(float.Parse(pdxlist[0].Qdglb));
+
                     float offset = 0;
                     string[] parts = null;
 
@@ -2388,17 +2630,17 @@ namespace Inter_face.ViewModel
 
                     float rawender = float.Parse(pdxlist[pdxlist.Count - 1].Qdglb) +
                         float.Parse(pdxlist[pdxlist.Count - 1].Pc) / 1000;
-                    int ender = (int)Math.Ceiling(rawender + offset / 1000);               
+                    int ender = (int)Math.Ceiling(rawender + offset / 1000);
                     int step = 1;
                     int p = 0;
 
-                    for (int i = starter; i < ender; i+=step)
+                    for (int i = starter; i < ender; i += step)
                     {
                         lc = 0;
-                        pathes = string.Empty;                        
-                        
+                        pathes = string.Empty;
+
                         float le = 0;
-                        float et = 0;                        
+                        float et = 0;
                         int nearcount = 0;
                         int index = 0;
                         int firstl = 0;
@@ -2529,34 +2771,34 @@ namespace Inter_face.ViewModel
                             if (parts != null && Math.Floor(float.Parse(parts[0].Split('+')[1]) / 1000) == i) continue;
                         }
 
-                       /* if (i == starter)
-                        {
-                            int firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);
-                            pathes = string.Format("M0,25 L0,40 {0},40", lc);
+                        /* if (i == starter)
+                         {
+                             int firstl = (int)Math.Round((float.Parse(pdxlist[0].Qdglb) - starter) * 1000, 0);
+                             pathes = string.Format("M0,25 L0,40 {0},40", lc);
 
-                            for (int j = (int)Math.Ceiling(firstl / 100d); j < 10; j++)
-                            {
-                                pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
-                                lc += 100 / ScaleProperty;
-                            }
+                             for (int j = (int)Math.Ceiling(firstl / 100d); j < 10; j++)
+                             {
+                                 pathes += string.Format("M{0},35 L{1},40 {2},40", lc, lc, lc + 100 / ScaleProperty);
+                                 lc += 100 / ScaleProperty;
+                             }
 
-                            sdvm.DataCollection.Add(new StationDataMode()
-                            {
-                                HatProperty = pdxlist[0].Gh,
-                                LengthProperty = (1000 - firstl) / ScaleProperty,
-                                PositionProperty = starter + firstl / 1000,
-                                Type = DataType.Position,
-                                SectionNumProperty = int.Parse(pdxlist[0].Ldh),
-                                ScaleProperty = ScaleProperty,
-                                SelectedProperty = false,
-                                PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
-                                StationNameProperty = string.Empty
-                            });
+                             sdvm.DataCollection.Add(new StationDataMode()
+                             {
+                                 HatProperty = pdxlist[0].Gh,
+                                 LengthProperty = (1000 - firstl) / ScaleProperty,
+                                 PositionProperty = starter + firstl / 1000,
+                                 Type = DataType.Position,
+                                 SectionNumProperty = int.Parse(pdxlist[0].Ldh),
+                                 ScaleProperty = ScaleProperty,
+                                 SelectedProperty = false,
+                                 PathDataProperty = string.Format("2:1 0:#00DC5625:#FF000000:{0}", pathes),
+                                 StationNameProperty = string.Empty
+                             });
 
-                            step = 1;
-                            starter = -1;
-                            continue;
-                        }*/
+                             step = 1;
+                             starter = -1;
+                             continue;
+                         }*/
 
                         lc = 0;
                         pathes = string.Empty;
@@ -2597,7 +2839,7 @@ namespace Inter_face.ViewModel
                 }
             }
 
-           
+
             if (_datascollection.Count == 0)
             {
                 _datascollection.Add(sdvm);
@@ -2624,7 +2866,7 @@ namespace Inter_face.ViewModel
         }
 
         private void removeAdataItem(int typenum)
-        {           
+        {
             foreach (ISingleDataViewModel item in _datascollection)
             {
                 if (item.TypeNum == typenum)
@@ -2654,7 +2896,7 @@ namespace Inter_face.ViewModel
                 if (data % 2 == 0)
                     data = data + 1;
 
-                if(singledata.DataCollection.Select((p) => { return (StationDataMode)p; }).
+                if (singledata.DataCollection.Select((p) => { return (StationDataMode)p; }).
                     Count((q) =>
                     {
                         string[] parts = q.StationNameProperty.Split(':');
@@ -2664,7 +2906,7 @@ namespace Inter_face.ViewModel
                     }) > 0)
                 {
                     data = data + 2;
-                }            
+                }
             }
             else
             {
@@ -2749,14 +2991,20 @@ namespace Inter_face.ViewModel
                         if (sec != cdlxlist.Count() + 1)
                         {
                             parts = cdlxlist[sec - 1].Split(':');
+                           
+                            //问题出在这
                             if ((pos + divide * ScaleProperty / 1000 + odd / 1000) > float.Parse(parts[0].Split('+')[1]) / 1000)
                             {
-                                offset = float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
-                                sec += 1;
+                                if(cdlxlist.Count() != 1 || !parts[0].Equals(parts[1]))
+                                {
+                                    offset = float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
+                                    sec += 1;
+                                }
+                                
                             }
                         }
                         else
-                            parts = cdlxlist[sec - 2].Split(':');                        
+                            parts = cdlxlist[sec - 2].Split(':');
                     }
 
                     pos = pos + (divide + odd) * ScaleProperty / 1000 + offset / 1000;
@@ -2805,9 +3053,12 @@ namespace Inter_face.ViewModel
                         parts = cdlxlist[sec - 1].Split(':');
                         if ((pos + divide * ScaleProperty / 1000) > float.Parse(parts[0].Split('+')[1]) / 1000)
                         {
-                            offset = float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
-                            sec += 1;
-                            continue;
+                            if (cdlxlist.Count() != 1 || !parts[0].Equals(parts[1]))
+                            {
+                                offset = float.Parse(parts[1].Split('+')[1]) - float.Parse(parts[0].Split('+')[1]);
+                                sec += 1;
+                                continue;
+                            }                                
                         }
                     }
                     else
@@ -2831,7 +3082,7 @@ namespace Inter_face.ViewModel
             ISingleDataViewModel singledata;
             //sec:name
             string[] takens = taken.Split(':');
-           
+
             if (!SeletedXinhaoS)
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
             else
@@ -2964,7 +3215,7 @@ namespace Inter_face.ViewModel
 
             if (offset < 0)
             {
-                signals = SeletedSignals.Select(p => p as StationDataMode).ToList();                
+                signals = SeletedSignals.Select(p => p as StationDataMode).ToList();
             }
             else
             {
@@ -3115,9 +3366,10 @@ namespace Inter_face.ViewModel
                 MessageBox.Show("调整错误", "错误", MessageBoxButton.OK);
             }
         }
-       
+
         private void InsertXinhaoX(float position, int secnum, string singletype, StationDataMode stationsignalinfo)
         {
+            //插入信号机后路段号增加1
             ISingleDataViewModel singledata;
             if (!SeletedXinhaoS)
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
@@ -3129,10 +3381,10 @@ namespace Inter_face.ViewModel
             string[] parts = { };
             StationDataMode newqj = null;
             StationDataMode newxh = null;
-           
+
             if (singledata.DataCollection.Count == 0)
-            {               
-                
+            {
+
                 for (int i = int.Parse(pdxlist[0].Ldh); i < secnum; i++)
                 {
                     parts = cdlxlist[i - 1].Split(':');
@@ -3143,7 +3395,7 @@ namespace Inter_face.ViewModel
                 {
                     HatProperty = pdxlist[0].Gh,
                     //长度不包括信号机所占位置(表现长度）
-                    LengthProperty = ((pos - float.Parse(pdxlist[0].Qdglb)) * 1000 - offset)/ScaleProperty,
+                    LengthProperty = ((pos - float.Parse(pdxlist[0].Qdglb)) * 1000 - offset) / ScaleProperty,
                     RealLength = ((pos - float.Parse(pdxlist[0].Qdglb)) * 1000 - offset) / ScaleProperty,
                     PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L50,0",
                     PositionProperty = float.Parse(pdxlist[0].Qdglb),
@@ -3159,7 +3411,7 @@ namespace Inter_face.ViewModel
                 if (singletype.Equals("2"))
                 {
                     newxh = new StationDataMode()
-                    {                        
+                    {
                         HatProperty = secnum == 1 ?
                                 cdlxlist[0].Split(':')[0].Split('+')[0] :
                                 secnum == cdlxlist.Count() + 1 ?
@@ -3307,7 +3559,7 @@ namespace Inter_face.ViewModel
                                 cdlxlist[secnum - 1].Split(':')[0].Split('+')[0],
                                 LengthProperty = 200 / ScaleProperty,
                                 RealLength = 200 / ScaleProperty,
-                                PathDataProperty = 
+                                PathDataProperty =
                                 SeletedXinhaoS ?
                          "1:1 0:#FFDC5625:#FF000000:M388,269 C394,269,399,264,399,258 C399,251,394,247,388,247 C381,247,376,251,376,258 C376,264,381,269,388,269 M347,242 L347,258 L376,258 M347,257 L347,270 M412,269 C418,269,423,264,423,258 C423,252,418,247,412,247 C405,247,400,252,400,258 C400,264,405,269,412,267 z" :
                         "1:1 0:#FFDC5625:#FF000000:M383,333 C377,333,371,328,371,322 C371,316,376,311,383,311 C389,310,394,315,394,321 C395,328,389,333,383,333 M424,337 L423,321 L394,322 M423,321 L423,308 M359,333 C352,333,347,328,347,322 C347,316,352,311,358,311 C365,311,370,316,370,322 C370,328,365,333,359,333 z",
@@ -3344,8 +3596,8 @@ namespace Inter_face.ViewModel
 
                         singledata.DataCollection.Insert(i, currentsdm);
 
-                       
-                        
+
+
                         singledata.DataCollection.Insert(i + 1, newxh);
 
                         singledata.DataCollection.Insert(i + 2, newqj);
@@ -3376,8 +3628,8 @@ namespace Inter_face.ViewModel
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
                 DianFXinfo.Type = DataType.SingleS;
             }
-                
-            float offset = 0;            
+
+            float offset = 0;
             float len = 0;
             string[] parts = { };
             string[] dfxinfos = DianFXinfo.StationNameProperty.Split(':');
@@ -3508,8 +3760,8 @@ namespace Inter_face.ViewModel
                     sdm.LengthProperty.ToString("F3")
                     );
 
-       
-        MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
+
+                MessengerInstance.Send<DianFXneededInfosMode>(new DianFXneededInfosMode()
                 {
                     CdlListProperty = cdlxlist,
                     DfxInfosProperty = dfxinfosstring,
@@ -3519,7 +3771,7 @@ namespace Inter_face.ViewModel
                     IsUpdataProperty = false,
                     DerictionProperty = SeletedXinhaoS ? 1 : 0
                 },
-                "DfxInputInfos");
+                        "DfxInputInfos");
 
                 dianfxwindow.ShowDialog();
             }
@@ -3535,7 +3787,7 @@ namespace Inter_face.ViewModel
                 {
                     MessageBox.Show("未选中对象！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
-                }               
+                }
                 _takenOfcurrentDFX = sdm.StationNameProperty;
 
                 StationDataMode presdm = CurrentDatasProperty.DataCollection[index - 2] as StationDataMode;
@@ -3606,8 +3858,8 @@ namespace Inter_face.ViewModel
                 InsertDianFXx(ghs, DianFXinfo);
             }
         }
-        
-        private int DeleteDianFXx(string taken) 
+
+        private int DeleteDianFXx(string taken)
         {
             ISingleDataViewModel singledata;
             string[] dfxinfos = taken.Split(':');
@@ -3637,7 +3889,7 @@ namespace Inter_face.ViewModel
             return index - 1;
         }
 
-        private void InsertXinhaoS(float position, int secnum, string singletype,StationDataMode stationsignalinfo)
+        private void InsertXinhaoS(float position, int secnum, string singletype, StationDataMode stationsignalinfo)
         {
             InsertXinhaoX(position, secnum, singletype, stationsignalinfo);
         }
@@ -3678,10 +3930,12 @@ namespace Inter_face.ViewModel
                     singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
                 else
                     singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+
                 var stationsignals = singledata.DataCollection.
                     Where(p => (!((StationDataMode)p).StationNameProperty.StartsWith("Q")
                         && ((StationDataMode)p).StationNameProperty.Split(':')[0].Equals("1"))).
                     Select(q => (StationDataMode)q);
+
                 List<StationDataMode> stationSignallist = new List<StationDataMode>();
                 string mark = string.Empty;
 
@@ -3832,7 +4086,7 @@ namespace Inter_face.ViewModel
                 }
             }
 
-            catch(System.InvalidOperationException ioe)
+            catch (System.InvalidOperationException ioe)
             {
                 MessengerInstance.Send<string>("读入信号数据出错", "ReadDataError");
             }
@@ -3858,7 +4112,7 @@ namespace Inter_face.ViewModel
             if (!SeletedXinhaoS)
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
             else
-                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);            
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
 
             IEnumerable<StationDataMode> oriStaions = singledata.DataCollection.
                 Where(p => ((StationDataMode)p).StationNameProperty.StartsWith("1")).Select(q => (StationDataMode)q);
@@ -3874,14 +4128,14 @@ namespace Inter_face.ViewModel
                                 p.PositionProperty == -1;
                      }) == 1)
                 {
-                    removedtakens.Add(station.StationNameProperty);                   
+                    removedtakens.Add(station.StationNameProperty);
                 }
             }
 
             foreach (string taken in removedtakens)
             {
                 DeleteXinhao(taken);
-            }     
+            }
 
             oriStaions = singledata.DataCollection.
                Where(p => ((StationDataMode)p).StationNameProperty.StartsWith("1")).Select(q => (StationDataMode)q);
@@ -3912,7 +4166,7 @@ namespace Inter_face.ViewModel
                         moveXinhaoX(matchedmode.StationNameProperty, offset, parts[1]);
                 }
 
-                catch(System.InvalidOperationException ioe)
+                catch (System.InvalidOperationException ioe)
                 {
                     InsertXinhaoX(item.PositionProperty, item.SectionNumProperty, "1", item);
                 }
@@ -3941,7 +4195,7 @@ namespace Inter_face.ViewModel
 
                 if (singledata.DataCollection.Count > 1)
                 {
-                    
+
 
                     for (int i = 1; i < singledata.DataCollection.Count - 1; i += 2)
                     {
@@ -3967,7 +4221,7 @@ namespace Inter_face.ViewModel
                         {
                             sig_data_s.StartPosProperty = singledata.DataCollection[i].PositionProperty * 1000;
                             break;
-                        }                            
+                        }
 
                         currentqj = singledata.DataCollection[i + 1] as StationDataMode;
                         nextxinhao = singledata.DataCollection[i + 2] as StationDataMode;
@@ -3994,7 +4248,7 @@ namespace Inter_face.ViewModel
                         }
                         else
                         {
-                            nextqj =singledata.DataCollection[i + 3] as StationDataMode;
+                            nextqj = singledata.DataCollection[i + 3] as StationDataMode;
                             sig_data_s.DistenceProperty.Add((currentqj.RealLength + nextqj.RealLength) * currentqj.ScaleProperty);
                             dfxinfo = nextxinhao.StationNameProperty;
 
@@ -4043,7 +4297,7 @@ namespace Inter_face.ViewModel
                             }
 
                             sig_data_s.DianFxInfoProperty.Add(dfxinfo);
-                        }                        
+                        }
                     }
                 }
 
@@ -4151,7 +4405,7 @@ namespace Inter_face.ViewModel
                             }
 
                             sig_data_x.DianFxInfoProperty.Add(dfxinfo);
-                        }                       
+                        }
                     }
                 }
 
@@ -4169,17 +4423,17 @@ namespace Inter_face.ViewModel
                     });
 
                     exportAsoneThread.Start();
-                    ShowProcessWindow();                   
+                    ShowProcessWindow();
                 }
             }
 
             catch (System.InvalidOperationException ioe)
-            {                
+            {
                 MessengerInstance.Send<string>("上下行信号机数据不完整", "ReadDataError");
             }
 
             catch
-            {                
+            {
                 MessengerInstance.Send<string>("输出信号机数据出错", "ReadDataError");
             }
         }
@@ -4221,7 +4475,7 @@ namespace Inter_face.ViewModel
                         if (parts[0].Equals("3"))
                             continue;
 
-                        offset = 0;                        
+                        offset = 0;
 
                         if (parts[0].Equals("1"))
                         {
@@ -4236,7 +4490,7 @@ namespace Inter_face.ViewModel
                                 else
                                 {
                                     stationame = string.Empty;
-                                    sig_data_s.StartPosProperty= currentxinhao.PositionProperty * 1000;
+                                    sig_data_s.StartPosProperty = currentxinhao.PositionProperty * 1000;
                                     sig_data_s.IDProperty.Add(parts[1]);
                                     sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
                                     sig_data_s.StationNameProperty.Add(parts[2]);
@@ -4249,14 +4503,14 @@ namespace Inter_face.ViewModel
                         sig_data_s.IDProperty.Add(parts[1]);
                         sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
                         if (parts[0].Equals("1"))
-                        {                            
+                        {
                             sig_data_s.StationNameProperty.Add(parts[2]);
                         }
                         else
                         {
                             sig_data_s.StationNameProperty.Add(string.Empty);
                         }
-                        
+
                         if (i + 1 == singledata.DataCollection.Count - 1)
                             break;
 
@@ -4334,7 +4588,7 @@ namespace Inter_face.ViewModel
                             }
 
                             sig_data_s.DianFxInfoProperty.Add(dfxinfo);
-                        }                        
+                        }
                     }
                 }
 
@@ -4355,7 +4609,7 @@ namespace Inter_face.ViewModel
                             continue;
 
                         offset = 0;
-                       
+
                         if (parts[0].Equals("1"))
                         {
                             if (!parts[2].Equals(stationame))
@@ -4382,7 +4636,7 @@ namespace Inter_face.ViewModel
                         sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
 
                         if (parts[0].Equals("1"))
-                        {                            
+                        {
                             sig_data_x.StationNameProperty.Add(parts[2]);
                         }
                         else
@@ -4482,7 +4736,7 @@ namespace Inter_face.ViewModel
                             }
 
                             sig_data_x.DianFxInfoProperty.Add(dfxinfo);
-                        }                        
+                        }
                     }
                 }
 
@@ -4499,7 +4753,7 @@ namespace Inter_face.ViewModel
                         CloseProcessWindow();
                     });
                     exportsparatelyThread.Start();
-                    ShowProcessWindow();                   
+                    ShowProcessWindow();
                 }
             }
 
@@ -4525,7 +4779,7 @@ namespace Inter_face.ViewModel
 
             try
             {
-                
+                //从左到右
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
                 foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
@@ -4566,19 +4820,14 @@ namespace Inter_face.ViewModel
 
             catch
             {
-                MessengerInstance.Send<string>("下行信号机数据不可见，保存出错", "ReadDataError");
-                return;
-            }
-
-            finally
-            {
-                Cursor = 0;
+                MessengerInstance.Send<string>("下行信号机数据不可见，数据将不保存", "ReadDataError");
+                //return;
             }
 
             bjData = string.Empty;
             try
             {
-                
+                //从右到左
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
                 foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
@@ -4599,7 +4848,7 @@ namespace Inter_face.ViewModel
                             default:
                                 break;
                         }
-                        
+
                         xhx.Add(new ChangeToTxt.CheZhanOutputData()
                         {
                             Bjlx = parts[0],
@@ -4626,7 +4875,7 @@ namespace Inter_face.ViewModel
                         Thread savexhThread = new Thread(() =>
                         {
                             GDoper.SaveXhData(xhs, xhx, _xhdataPath);
-                            IsXinhaoChanged = false;                            
+                            IsXinhaoChanged = false;
                         });
                         savexhThread.Start();
                         ShowProcessWindow();
@@ -4641,16 +4890,16 @@ namespace Inter_face.ViewModel
                     Thread savexhThread = new Thread(() =>
                         {
                             GDoper.SaveXhData(xhs, xhx, _xhdataPath);
-                            IsXinhaoChanged = false;                            
+                            IsXinhaoChanged = false;
                         });
                     savexhThread.Start();
                     ShowProcessWindow();
                 }
             }
 
-            catch 
+            catch
             {
-                MessengerInstance.Send<string>("上行信号机数据不可见，保存出错", "ReadDataError");
+                MessengerInstance.Send<string>("上行信号机数据不可见，数据将不保存", "ReadDataError");
             }
 
             Cursor = 0;
@@ -4868,7 +5117,7 @@ namespace Inter_face.ViewModel
                     {
                         _xhdataPath = Path.Combine(Path.GetDirectoryName(openxhdataDialog.FileName),
                                               Path.GetFileNameWithoutExtension(openxhdataDialog.FileName) + ".xh");
-                        _xhdataPath= _xhdataPath.TrimEnd(' ');
+                        _xhdataPath = _xhdataPath.TrimEnd(' ');
                         File.Delete(_xhdataPath);
                         File.Copy(openxhdataDialog.FileName, _xhdataPath);
                         File.Delete(openxhdataDialog.FileName);
@@ -4894,7 +5143,7 @@ namespace Inter_face.ViewModel
                 {
                     Cursor = 0;
                 }
-            }           
+            }
 
         }
 
@@ -4904,13 +5153,13 @@ namespace Inter_face.ViewModel
             {
                 if (hadanyXhdata())
                 {
-                    if (MessageBox.Show("未保存信号数据将会丢失，是否继续？", "提示", 
+                    if (MessageBox.Show("未保存信号数据将会丢失，是否继续？", "提示",
                         MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.Yes)
                     {
                         cleanXhdata();
                         CanloadxhProperty = true;
                         return;
-                    }                    
+                    }
                 }
                 CanloadxhProperty = true;
             }
@@ -4943,25 +5192,25 @@ namespace Inter_face.ViewModel
                         watch.Elapsed.Seconds.ToString()), "ReadDataRight");
                 }
 
-                catch (ExtractData.AutoBuildOperator.ErrorPosException epe)
-                {                   
+                catch (AutoBuildOperator.ErrorPosException epe)
+                {
                     MessengerInstance.Send(
                        string.Format("{0}|{1}", epe.Message, epe.ErrorPosMessageProperty), "FixErrorWithOperate");
                 }
 
-                catch (ExtractData.AutoBuildOperator.ErrorMatchException eme)
+                catch (AutoBuildOperator.ErrorMatchException eme)
                 {
                     MessengerInstance.Send<string>(
                         string.Format("{0}|{1}", eme.Message, eme.ErrorPosMessageProperty), "ReadDataErrorWithOperate");
                 }
 
-                catch (ExtractData.AutoBuildOperator.ErrorDistencException ede)
+                catch (AutoBuildOperator.ErrorDistencException ede)
                 {
                     MessengerInstance.Send<string>(
                         string.Format("{0}|{1}", ede.Message, ede.ErrorPosMessageProperty), "ReadDataErrorWithOperate");
                 }
 
-                catch(System.Exception ex)
+                catch (System.Exception ex)
                 {
                     MessengerInstance.Send<string>(
                         string.Format("{0}|{1}", ex.Message, ex.Source), "ReadDataErrorWithOperate");
@@ -4994,7 +5243,7 @@ namespace Inter_face.ViewModel
                                                              ".xhbackup");
                 if (File.Exists(backupfile))
                 {
-                    if (MessageBox.Show("是否保存对信号数据的修改？", "提示", MessageBoxButton.YesNo, 
+                    if (MessageBox.Show("是否保存对信号数据的修改？", "提示", MessageBoxButton.YesNo,
                         MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         SaveXhData();
@@ -5204,8 +5453,8 @@ namespace Inter_face.ViewModel
                         }
                     }
                 }
-            }           
-           
+            }
+
         }
 
         private void ExportToOtFormat()
@@ -5237,9 +5486,375 @@ namespace Inter_face.ViewModel
                 {
                     MessengerInstance.Send<string>("输出OT文件失败！", "ReadDataError");
                 }
-            }            
-            
+            }
+
         }
+
+        private void ExportToTkBjFormat()
+        {
+            string[] parts;
+            List<string> lastItems;
+            string bjData = string.Empty;
+            ISingleDataViewModel singledata;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sbs = new System.Text.StringBuilder();
+            int index = 0;
+            int j = 0;
+            string currentStationName = string.Empty;
+            float lastpos = 0;
+            string zjfx = "1";
+            bool getStart = false;
+            string oldstring;
+            string newstring;
+
+            List<ChangeToTxt.CheZhanOutputData> czs;
+            List<ChangeToTxt.CheZhanOutputData> czx;
+            List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
+            List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
+
+            gdo.GetBjData(out czx, out czs);
+
+            try
+            {
+                //从左到右
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                {
+                    parts = item.StationNameProperty.Split(':');
+                    if (!parts[0].StartsWith("Q"))
+                    {
+                        switch (parts[0])
+                        {
+                            case "1":
+                                bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                break;
+                            case "2":
+                                bjData = parts[1];
+                                break;
+                            case "3":
+                                //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
+                                bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        xhs.Add(new ChangeToTxt.CheZhanOutputData()
+                        {
+                            Bjlx = parts[0],
+                            Bjsj = bjData,
+                            Gh = item.HatProperty,
+                            Glb = item.PositionProperty.ToString("F3"),
+                            Index = string.Empty,
+                            Ldh = item.SectionNumProperty.ToString(),
+                            Zjfx = "1"
+                        });
+                    }
+                }
+            }
+
+            catch
+            {
+                MessengerInstance.Send<string>("下行信号机数据不可见，数据将不输出", "ReadDataError");
+            }
+
+            bjData = string.Empty;
+            try
+            {
+                //从右到左
+                singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                foreach (StationDataMode item in singledata.DataCollection.ToArray())
+                {
+                    parts = item.StationNameProperty.Split(':');
+                    if (!parts[0].StartsWith("Q"))
+                    {
+                        switch (parts[0])
+                        {
+                            case "1":
+                                bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                break;
+                            case "2":
+                                bjData = parts[1];
+                                break;
+                            case "3":
+                                bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                break;
+                            default:
+                                break;
+                        }
+
+                        xhx.Add(new ChangeToTxt.CheZhanOutputData()
+                        {
+                            Bjlx = parts[0],
+                            Bjsj = bjData,
+                            Gh = item.HatProperty,
+                            Glb = item.PositionProperty.ToString("F3"),
+                            Index = string.Empty,
+                            Ldh = item.SectionNumProperty.ToString(),
+                            Zjfx = "1"
+                        });
+                    }
+                }
+            }
+
+            catch
+            {
+                MessengerInstance.Send("上行信号机数据不可见，数据将不输出", "ReadDataError");
+            }
+
+            lastpos = -1;
+            lastItems = new List<string>(new string[] { "0", "-1", "0", "0", "1", "1" });
+            foreach (var item in czx)
+            {
+                if (!item.Bjlx.Equals("1"))
+                    continue;
+
+                currentStationName = item.Bjsj;
+                index++;
+                if (lastpos == -1)
+                {
+                    //zjfx = "1";
+                }
+                else
+                {
+                    //lastpos存在问题                    
+                    if (float.Parse(item.Glb) >= lastpos)                        
+                        zjfx = "1";
+                    else
+                    {
+                        oldstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        lastItems.RemoveAt(4);
+                        lastItems.Insert(4, "0");
+                       newstring= string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        sb.Replace(oldstring, newstring);
+                    }
+                        
+                }
+                sb.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}", 
+                              index.ToString(), item.Glb, item.Bjlx, item.Bjsj, zjfx, item.Ldh));
+                lastpos = float.Parse(item.Glb);
+                lastItems.Clear();
+                lastItems.AddRange(new string[] { index.ToString(), item.Glb, item.Bjlx, item.Bjsj, item.Zjfx, item.Ldh });
+
+                for (int i = j; i < xhs.Count; i++)
+                {
+                    index++;
+                    parts = xhs[i].Bjsj.Split(':');
+                    if (float.Parse(xhs[i].Glb) >= lastpos)
+                        zjfx = "1";
+                    else
+                    {
+                        oldstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        lastItems.RemoveAt(4);
+                        lastItems.Insert(4, "0");
+                        newstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                               lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        sb.Replace(oldstring, newstring);
+                    };
+                    lastpos = float.Parse(xhs[i].Glb);
+
+                    if (xhs[i].Bjlx.Equals("1"))
+                    {
+                        if (parts[1].Equals(currentStationName))
+                        {
+                            getStart = true;
+                            
+                            sb.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), xhs[i].Glb, parts[2].Equals("J") ? 11 : 12, 
+                              xhs[i].Bjsj, zjfx, xhs[i].Ldh));
+
+                            lastItems.Clear();
+                            lastItems.AddRange(new string[] { index.ToString(),
+                                xhs[i].Glb, parts[2].Equals("J") ? "11" : "12", xhs[i].Bjsj, zjfx, xhs[i].Ldh });
+                        }
+                        else
+                        {
+                            if (getStart)
+                            {
+                                sb.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), xhs[i].Glb, parts[2].Equals("J") ? 11 : 12,
+                              xhs[i].Bjsj, zjfx, xhs[i].Ldh));
+
+                                lastItems.Clear();
+                                lastItems.AddRange(new string[] { index.ToString(),
+                                xhs[i].Glb, parts[2].Equals("J") ? "11" : "12", xhs[i].Bjsj, zjfx, xhs[i].Ldh });
+                                j = i + 1;
+                                getStart = false;
+                            }
+                            
+                            break;
+                        }
+                    }
+                    else if (xhs[i].Bjlx.Equals("3"))
+                    {
+                        string[] subParts = xhs[i].Bjsj.Split(':');
+                        zjfx = float.Parse(subParts[3].Split('+')[0]) >= float.Parse(subParts[1].Split('+')[0]) ? "1" : "0";
+
+                        sb.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), subParts[1].Split('+')[0], 5,
+                              xhs[i].Bjsj, zjfx, subParts[1].Split('+')[1]));
+
+                        index++;
+                        zjfx = "1";
+                        sb.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), subParts[3].Split('+')[0], 6,
+                              xhs[i].Bjsj, zjfx, subParts[3].Split('+')[1]));
+
+                        lastItems.Clear();
+                        lastItems.AddRange(new string[] { index.ToString(),
+                                subParts[3].Split('+')[0], "6", xhs[i].Bjsj, zjfx, subParts[3].Split('+')[1] });
+                    }
+                    else
+                    {
+                        sb.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), xhs[i].Glb, 2, 
+                              xhs[i].Bjsj, zjfx, xhs[i].Ldh));
+
+                        lastItems.Clear();
+                        lastItems.AddRange(new string[] { index.ToString(),
+                                xhs[i].Glb, "2", xhs[i].Bjsj, zjfx, xhs[i].Ldh });
+                    }
+                }
+            }
+
+            index = 0;
+            j = xhx.Count - 1;
+            lastpos = -1;
+            oldstring = string.Empty;
+            newstring = string.Empty;
+
+            foreach (var item in czs)
+            {
+                if (!item.Bjlx.Equals("1"))
+                    continue;
+
+                currentStationName = item.Bjsj;
+                index++;
+                if (lastpos == -1)
+                {
+                    zjfx = "0";
+                }
+                else
+                {
+                    if (float.Parse(item.Glb) < lastpos)
+                        zjfx = "0";
+                    else
+                    {
+                        oldstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        lastItems.RemoveAt(4);
+                        lastItems.Insert(4, "1");
+                        newstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                               lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        sb.Replace(oldstring, newstring);
+                    }
+                }
+                sbs.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), item.Glb, item.Bjlx, item.Bjsj, zjfx, item.Ldh));
+                lastpos = float.Parse(item.Glb);
+                lastItems.Clear();
+                lastItems.AddRange(new string[] { index.ToString(), item.Glb, item.Bjlx, item.Bjsj, item.Zjfx, item.Ldh });
+
+                for (int i = j; i >= 0; i--)
+                {
+                    index++;
+                    parts = xhx[i].Bjsj.Split(':');
+                    if (float.Parse(xhx[i].Glb) < lastpos)
+                        zjfx = "0";
+                    else
+                    {
+                        oldstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        lastItems.RemoveAt(4);
+                        lastItems.Insert(4, "1");
+                        newstring = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                               lastItems[0], lastItems[1], lastItems[2], lastItems[3], lastItems[4], lastItems[5]);
+                        sb.Replace(oldstring, newstring);
+                    };
+
+                    lastpos = float.Parse(xhx[i].Glb);
+                    if (xhx[i].Bjlx.Equals("1"))
+                    {
+                        if (parts[1].Equals(currentStationName))
+                        {
+                            getStart = true;
+                            sbs.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), xhx[i].Glb, parts[2].Equals("J") ? 11 : 12,
+                              xhx[i].Bjsj, zjfx, xhx[i].Ldh));
+
+                            lastItems.Clear();
+                            lastItems.AddRange(new string[] { index.ToString(),
+                                xhx[i].Glb, parts[2].Equals("J") ? "11" : "12", xhx[i].Bjsj, zjfx, xhx[i].Ldh });
+                        }
+                        else
+                        {
+                            if (getStart)
+                            {
+                                sbs.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), xhx[i].Glb, parts[2].Equals("J") ? 11 : 12,
+                              xhx[i].Bjsj, zjfx, xhx[i].Ldh));
+
+                                lastItems.Clear();
+                                lastItems.AddRange(new string[] { index.ToString(),
+                                xhx[i].Glb, parts[2].Equals("J") ? "11" : "12", xhx[i].Bjsj, zjfx, xhx[i].Ldh });
+                                j = i - 1;
+                                getStart = false;
+                            }
+
+                            break;
+                        }
+                    }
+                    else if (xhx[i].Bjlx.Equals("3"))
+                    {
+                        string[] subParts = xhx[i].Bjsj.Split(':');
+                        zjfx = float.Parse(subParts[3].Split('+')[0]) > float.Parse(subParts[1].Split('+')[0]) ? "0" : "1";
+
+                        sbs.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), subParts[3].Split('+')[0], 5,
+                              xhx[i].Bjsj, zjfx, subParts[3].Split('+')[1]));
+
+                        index++;
+                        zjfx = "0";
+                        sbs.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), subParts[1].Split('+')[0], 6,
+                              xhx[i].Bjsj, zjfx, subParts[1].Split('+')[1]));
+                    }
+                    else
+                    {
+                        sbs.AppendLine(string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}",
+                              index.ToString(), xhx[i].Glb, 2,
+                              xhx[i].Bjsj, zjfx, xhx[i].Ldh));
+
+                        lastItems.Clear();
+                        lastItems.AddRange(new string[] { index.ToString(),
+                                xhx[i].Glb, "2", xhx[i].Bjsj, zjfx, xhx[i].Ldh });
+                    }
+                }
+            }
+
+            SaveFileDialog savexhdataDialog = new SaveFileDialog();
+            savexhdataDialog.Title = "导出铁科信号数据";
+            savexhdataDialog.Filter = "所有文件|*.*";
+            savexhdataDialog.AddExtension = false;
+            savexhdataDialog.OverwritePrompt = true;            
+
+            if (savexhdataDialog.ShowDialog() == true)
+            {
+                string xhxpath = string.Format("{0}.{1}", savexhdataDialog.FileName, "bjx");
+                string xhspath = string.Format("{0}.{1}", savexhdataDialog.FileName, "bjs");
+
+                File.Delete(xhxpath);
+                File.AppendAllText(xhxpath, sb.ToString(), System.Text.Encoding.BigEndianUnicode);
+                File.Delete(xhspath);                
+                File.AppendAllText(xhspath, sbs.ToString(), System.Text.Encoding.BigEndianUnicode);
+                MessengerInstance.Send("输出铁科格式文件完成！", "ReadDataRight");
+            }
+        }
+    
+
         private bool hadanyXhdata()
         {
             foreach (ISingleDataViewModel Singleitem in _DataBin)
@@ -5702,11 +6317,14 @@ namespace Inter_face.ViewModel
 
         private void calculateAverageGrade(int countOfBlocks, bool positiveToZero)
         {
-            //ISingleDataViewModel singledata;
-
-            ChangeToTxt ctt = new ChangeToTxt();
+            ISingleDataViewModel singledata;
+            List<IDataModel> signalCollection;
+            int totalSignalCount = 0;
+            ChangeToTxt ctt = null;
+            
             if (lineparts == null)
             {
+                ctt = new ChangeToTxt();
                 lineparts = ctt.ChangeToSimFormat(qxxlist, pdxlist, czxlist, cdlxlist.ToArray());
             }
             FormatLinepartStruct(lineparts);
@@ -5725,20 +6343,29 @@ namespace Inter_face.ViewModel
                 return;
             }
 
-            int currentindex = CurrentDatasProperty.DataCollection.IndexOf(sdm);
-            int includeBlocks = 0;
+            int currentindex = 0;            
             int endindex = 0;
-
+            //从右至左
             if (Direction == 0)
             {
-                //singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
-                if (currentindex + countOfBlocks + 1 > CurrentDatasProperty.DataCollection.Count)
+                singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
+                signalCollection = singledata.DataCollection.Where(
+                    p =>
+                    {
+                        parts = (p as StationDataMode).StationNameProperty.Split(':');
+                        return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                    }).ToList();
+                currentindex = signalCollection.IndexOf(sdm);
+                totalSignalCount = signalCollection.Count();
+
+                if (currentindex + countOfBlocks + 1 > totalSignalCount)
                 {
                     MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
                     return;
                 }
 
-                for (int i = currentindex + 1; i < CurrentDatasProperty.DataCollection.Count; i++)
+                /*for (int i = currentindex + 1; i < CurrentDatasProperty.DataCollection.Count; i++)
                 {
                     sdm = CurrentDatasProperty.DataCollection[i] as StationDataMode;
                     parts = sdm.StationNameProperty.Split(':');
@@ -5753,19 +6380,29 @@ namespace Inter_face.ViewModel
                         endindex = i;
                         break;
                     }
-                }
+                }*/
+                endindex = currentindex + countOfBlocks;
             }
             else
             {
-                //singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
+                singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
+                signalCollection = singledata.DataCollection.Where(
+                    p =>
+                    {
+                        parts = (p as StationDataMode).StationNameProperty.Split(':');
+                        return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                    }).ToList();
+                currentindex = signalCollection.IndexOf(sdm);
+                
                 if (currentindex - countOfBlocks < 0)
                 {
                     MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
                     return;
                 }
 
-
-                for (int i = currentindex - 1; i >= 0; i--)
+                endindex = currentindex - countOfBlocks;
+                /*for (int i = currentindex - 1; i >= 0; i--)
                 {
                     sdm = CurrentDatasProperty.DataCollection[i] as StationDataMode;
                     parts = sdm.StationNameProperty.Split(':');
@@ -5780,10 +6417,10 @@ namespace Inter_face.ViewModel
                         endindex = i;
                         break;
                     }
-                }
+                }*/
             }
 
-            StationDataMode endsdm = CurrentDatasProperty.DataCollection[endindex] as StationDataMode;
+            StationDataMode endsdm = signalCollection[endindex] as StationDataMode;
             StationDataMode startsdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
 
             string crp = getcurrentpos(startsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
@@ -5802,7 +6439,7 @@ namespace Inter_face.ViewModel
 
         private void FormatLinepartStruct(string[] lineparts)
         {
-            linePartsData = new List<LinepartStruct>();
+            linePartsData.Clear();
             //坡度：曲线半径：分段长度：起点里程：路段号：是否为隧道(0 - 否；1 - 是）
             string[] partinfo;
 
@@ -5852,9 +6489,9 @@ namespace Inter_face.ViewModel
                         else
                         {
                             if (positiveTozero)
-                                podu = float.Parse(linePartsData[i].Podu) < 0 ? 0 : float.Parse(linePartsData[i].Podu);
+                                podu = float.Parse(linePartsData[i - 1].Podu) < 0 ? 0 : float.Parse(linePartsData[i - 1].Podu);
                             else
-                                podu = float.Parse(linePartsData[i].Podu);
+                                podu = float.Parse(linePartsData[i - 1].Podu);
 
                             currentHeight += (((end - endpos) * podu) / 1000);
                             averateGrade = -currentHeight / dis * 1000;
@@ -5909,9 +6546,9 @@ namespace Inter_face.ViewModel
                         else
                         {
                             if (positiveTozero)
-                                podu = float.Parse(linePartsData[i].Podu) > 0 ? 0 : float.Parse(linePartsData[i].Podu);
+                                podu = float.Parse(linePartsData[i - 1].Podu) > 0 ? 0 : float.Parse(linePartsData[i - 1].Podu);
                             else
-                                podu = float.Parse(linePartsData[i].Podu);
+                                podu = float.Parse(linePartsData[i - 1].Podu);
 
                             currentHeight += ((endpos - end) * -podu / 1000);
                             averateGrade = -currentHeight / dis * 1000;
@@ -6292,6 +6929,23 @@ namespace Inter_face.ViewModel
                                           {
                                               LoadXinHaoSData();
                                           }));
+            }
+        }
+        private RelayCommand _loadDetailInfoCommand;
+
+        /// <summary>
+        /// Gets the LoadDetailInfoCommand.
+        /// </summary>
+        public RelayCommand LoadDetailInfoCommand
+        {
+            get
+            {
+                return _loadDetailInfoCommand
+                    ?? (_loadDetailInfoCommand = new RelayCommand(
+                    () =>
+                    {
+                        LoadDetailInfo();
+                    }));
             }
         }
         private RelayCommand _InsertXinhaoCommand;
@@ -6845,6 +7499,24 @@ namespace Inter_face.ViewModel
                     () =>
                     {
                         begincalculateAverageGrade();
+                    }));
+            }
+        }
+
+        private RelayCommand _exportToTkBjFormatCommand;
+
+        /// <summary>
+        /// Gets the ExportToTkBjFormatCommand.
+        /// </summary>
+        public RelayCommand ExportToTkBjFormatCommand
+        {
+            get
+            {
+                return _exportToTkBjFormatCommand
+                    ?? (_exportToTkBjFormatCommand = new RelayCommand(
+                    () =>
+                    {
+                        ExportToTkBjFormat();
                     }));
             }
         }

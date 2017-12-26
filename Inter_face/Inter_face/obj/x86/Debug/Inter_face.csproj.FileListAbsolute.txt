@@ -120,7 +120,6 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\ko\System.Windows.Interactivity.resources.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\zh-Hans\System.Windows.Interactivity.resources.dll
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\bin\Debug\zh-Hant\System.Windows.Interactivity.resources.dll
-F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Inter_face.csprojResolveAssemblyReference.cache
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ProcessForm.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\App.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\ACdlWindow.g.cs
@@ -140,6 +139,7 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\LdhInfoWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ModifyFilenamesWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ProcessWindow.g.cs
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ShowDetailInfoWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\SpeedBreakWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\StationSignalWindow.g.cs
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\TractionPowerOpWindow.g.cs
@@ -164,6 +164,7 @@ F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_fa
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\LdhInfoWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ModifyFilenamesWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ProcessWindow.baml
+F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\ShowDetailInfoWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\SpeedBreakWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\StationSignalWindow.baml
 F:\360data\重要数据\我的文档\GitHub\LineDataOperator\Inter_face\Inter_face\obj\x86\Debug\Views\TractionPowerOpWindow.baml

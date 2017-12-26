@@ -718,11 +718,11 @@ namespace Inter_face.ViewModel
                 if (i == cdl.Count + 1)
                 {
                     parts = cdl[i - 2].Split(':');
-                    if(usedPos>= decimal.Parse(parts[0].Split('+')[1]) && usedPos <= end)
+                    if (usedPos >= start && usedPos <= end)
                     {
                         sec = i;
                         break;
-                    }                    
+                    }
                     else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos - offset >= 0.0009m)
                     {
                         sec = i - 1;
@@ -730,7 +730,7 @@ namespace Inter_face.ViewModel
                     }
                 }
                 else
-                {                    
+                {
                     parts = cdl[i - 1].Split(':');
                     end = decimal.Parse(parts[0].Split('+')[1]);
                     if (usedPos >= start && usedPos <= end)
@@ -747,17 +747,17 @@ namespace Inter_face.ViewModel
                             break;
                         }
                     }
-                   /* if (usedPos + offset - decimal.Parse(parts[0].Split('+')[1]) > 0.0009m)
-                    {
-                        sec = i + 1;
-                        offset += (decimal.Parse(parts[1].Split('+')[1]) - decimal.Parse(parts[0].Split('+')[1]));
-                        continue;
-                    }
-                    else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos - offset >= 0.0009m)
-                    {
-                        sec = i;
-                        break;
-                    }*/
+                    /* if (usedPos + offset - decimal.Parse(parts[0].Split('+')[1]) > 0.0009m)
+                     {
+                         sec = i + 1;
+                         offset += (decimal.Parse(parts[1].Split('+')[1]) - decimal.Parse(parts[0].Split('+')[1]));
+                         continue;
+                     }
+                     else if (decimal.Parse(parts[0].Split('+')[1]) - usedPos - offset >= 0.0009m)
+                     {
+                         sec = i;
+                         break;
+                     }*/
                 }
             }
 
