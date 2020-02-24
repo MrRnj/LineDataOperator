@@ -49,6 +49,8 @@ namespace Inter_face.ViewModel
         private AutoBuildOperator ABoper;
         private GraphyDataOper gdo;
         private DianFXInfos existDfxInfos;
+        private List<MoreinfoStruct> infosS;
+        private List<MoreinfoStruct> infosX;
 
         List<ChangeToTxt.PoduOutputData> pdxlist;
         List<ChangeToTxt.PoduOutputData> pdslist;
@@ -741,10 +743,16 @@ namespace Inter_face.ViewModel
                             QuikSaveXhdataThread = new Thread(() =>
                             {
                                 ISingleDataViewModel singledata = null;
+                                List<IDataModel> signalCollection = new List<IDataModel>();
                                 List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
                                 List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
                                 string[] parts;
                                 string bjData = string.Empty;
+                                string moreinfo = string.Empty;
+                                string bjlx = string.Empty;
+                                infosS.Clear();
+                                infosX.Clear();
+                                bool getsignalCollection = false;
 
                                 try
                                 {
@@ -754,21 +762,73 @@ namespace Inter_face.ViewModel
                                 catch
                                 {
                                     singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
-                                }
+                                }                                
+
                                 if (singledata != null)
                                 {
+
+                                    do
+                                    {
+                                        try
+                                        {
+                                            signalCollection = singledata.DataCollection.Where(p =>
+                                            {
+                                                parts = (p as StationDataMode).StationNameProperty.Split(':');
+                                                return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                                            }).ToList();
+                                            getsignalCollection = true;
+                                        }
+                                        catch
+                                        {
+                                            getsignalCollection = false;
+                                            Thread.Sleep(100);
+                                        }
+                                        
+                                    } while (!getsignalCollection);
+                                    
+
                                     foreach (StationDataMode item in singledata.DataCollection.ToArray())
                                     {
+                                        moreinfo = string.Empty;
                                         parts = item.StationNameProperty.Split(':');
+
                                         if (!parts[0].StartsWith("Q"))
                                         {
-                                            switch (parts[0])
+                                            bjlx = parts[0];
+                                            switch (bjlx)
                                             {
                                                 case "1":
                                                     bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                                    moreinfo = calculateAverageGrade(7, false, item, 1, signalCollection);
+
+                                                    if (moreinfo.Equals("-1"))
+                                                    {
+                                                        moreinfo = "超出线路范围";
+                                                    }
+                                                    else
+                                                    {
+                                                        parts = moreinfo.Split(':');
+                                                        moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                                        parts = calculateAverageGrade(7, true, item, 1, signalCollection).Split(':');
+                                                        moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                                    }
                                                     break;
                                                 case "2":
                                                     bjData = parts[1];
+                                                    moreinfo = calculateAverageGrade(7, false, item, 1, signalCollection);
+
+                                                    if (moreinfo.Equals("-1"))
+                                                    {
+                                                        moreinfo = "超出线路范围";
+                                                    }
+                                                    else
+                                                    {
+                                                        parts = moreinfo.Split(':');
+                                                        moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                                        parts = calculateAverageGrade(7, true, item, 1, signalCollection).Split(':');
+                                                        moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                                    }
                                                     break;
                                                 case "3":
                                                     //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
@@ -780,14 +840,22 @@ namespace Inter_face.ViewModel
 
                                             xhs.Add(new ChangeToTxt.CheZhanOutputData()
                                             {
-                                                Bjlx = parts[0],
+                                                Bjlx = bjlx,
                                                 Bjsj = bjData,
                                                 Gh = item.HatProperty,
                                                 Glb = item.PositionProperty.ToString("F3"),
                                                 Index = string.Empty,
                                                 Ldh = item.SectionNumProperty.ToString(),
-                                                Zjfx = "1"
+                                                Zjfx = "1",
+                                                MoreInfo = moreinfo
                                             });
+
+                                            item.MoreInfo = moreinfo;
+                                            /*infosS.Add(new MoreinfoStruct()
+                                            {
+                                                ID = string.Format("{0}+{1}", item.PositionProperty.ToString("F3"), bjData),
+                                                Info = moreinfo
+                                            });*/
                                         }
                                     }
                                 }
@@ -801,22 +869,71 @@ namespace Inter_face.ViewModel
                                 catch
                                 {
                                     singledata = _DataBin.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
-                                }
+                                }                                
 
                                 if (singledata != null)
                                 {
+                                    do
+                                    {
+                                        try
+                                        {
+                                            signalCollection = singledata.DataCollection.Where(
+                                                p =>
+                                                {
+                                                    parts = (p as StationDataMode).StationNameProperty.Split(':');
+                                                    return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+                                                }).ToList();
+
+                                            getsignalCollection = true;
+                                        }
+                                        catch
+                                        {
+                                            getsignalCollection = false;
+                                            Thread.Sleep(100);
+                                        }
+                                    } while (!getsignalCollection);                                    
+
                                     foreach (StationDataMode item in singledata.DataCollection.ToArray())
                                     {
+                                        moreinfo = string.Empty;
                                         parts = item.StationNameProperty.Split(':');
+
                                         if (!parts[0].StartsWith("Q"))
                                         {
-                                            switch (parts[0])
+                                            bjlx = parts[0];
+                                            switch (bjlx)
                                             {
                                                 case "1":
                                                     bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                                    moreinfo = calculateAverageGrade(7, false, item, 0, signalCollection);
+
+                                                    if (moreinfo.Equals("-1"))
+                                                    {
+                                                        moreinfo = "超出线路范围";
+                                                    }
+                                                    else
+                                                    {
+                                                        parts = moreinfo.Split(':');
+                                                        moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                                        parts = calculateAverageGrade(7, true, item, 0, signalCollection).Split(':');
+                                                        moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                                    }
                                                     break;
                                                 case "2":
                                                     bjData = parts[1];
+                                                    moreinfo = calculateAverageGrade(7, false, item, 0, signalCollection);
+
+                                                    if (moreinfo.Equals("-1"))
+                                                    {
+                                                        moreinfo = "超出线路范围";
+                                                    }
+                                                    else
+                                                    {
+                                                        parts = moreinfo.Split(':');
+                                                        moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                                        parts = calculateAverageGrade(7, true, item, 0, signalCollection).Split(':');
+                                                        moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                                    }
                                                     break;
                                                 case "3":
                                                     bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
@@ -827,14 +944,22 @@ namespace Inter_face.ViewModel
 
                                             xhx.Add(new ChangeToTxt.CheZhanOutputData()
                                             {
-                                                Bjlx = parts[0],
+                                                Bjlx = bjlx,
                                                 Bjsj = bjData,
                                                 Gh = item.HatProperty,
                                                 Glb = item.PositionProperty.ToString("F3"),
                                                 Index = string.Empty,
                                                 Ldh = item.SectionNumProperty.ToString(),
-                                                Zjfx = "1"
+                                                Zjfx = "1",
+                                                MoreInfo = moreinfo
                                             });
+
+                                            item.MoreInfo = moreinfo;
+                                            /* infosX.Add(new MoreinfoStruct()
+                                             {
+                                                 ID = string.Format("{0}+{1}", item.PositionProperty.ToString("F3"), bjData),
+                                                 Info = moreinfo
+                                             });*/
                                         }
                                     }
                                 }
@@ -977,6 +1102,8 @@ namespace Inter_face.ViewModel
             ABoper = AutoBuildOperator.CreatOper(_prePdpath, _preBjpath, _preQxpath);
             SDexportor = SignalDataExportor.CreatOper(_XHEPath);
             linePartsData = new List<LinepartStruct>();
+            infosS = new List<MoreinfoStruct>();
+            infosX = new List<MoreinfoStruct>();
             _DataBin = new List<ISingleDataViewModel>();
             _takenOfcurrentDFX = string.Empty;
             _xhdataPath = string.Empty;
@@ -1141,7 +1268,7 @@ namespace Inter_face.ViewModel
                                                 }
 
                                                 string crp = getcurrentpos(startsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
-                                                string endcrp = getcurrentpos(endsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+                                                string endcrp = getcurrentpos(endsdm.PositionProperty.ToString("#0.00"), endsdm.SectionNumProperty);
 
                                                 float averageGrade = GetAvrHeight((int)Math.Ceiling(decimal.Parse(crp)),
                                                                Math.Abs(float.Parse(endcrp) - float.Parse(crp)),
@@ -1261,12 +1388,23 @@ namespace Inter_face.ViewModel
                     if (sdm != null)
                     {
                         CurrentDatasProperty.SelectedIndex = -1;
-                        moveXinhaoX(sdm.StationNameProperty, (float)Math.Round(p));
-                        if (mxwindow != null)
+                        try
                         {
-                            mxwindow.Close();
-                            mxwindow = null;
+                            moveXinhaoX(sdm.StationNameProperty, (float)Math.Round(p));
                         }
+                        catch(InvalidDataException e)
+                        {
+                            MessageBox.Show(e.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        finally
+                        {
+                            if (mxwindow != null)
+                            {
+                                mxwindow.Close();
+                                mxwindow = null;
+                            }
+                        }                        
+                        
                         /*CurrentDatasProperty.SelectedIndex = index;
 
                         string[] parts = { };
@@ -1413,7 +1551,20 @@ namespace Inter_face.ViewModel
                 p =>
                 {
                     string[] infos = p.Split(':');
-                    calculateAverageGrade(int.Parse(infos[0]), infos[1].Equals("1") ? true : false);
+                    string result = calculateAverageGrade(int.Parse(infos[0]), infos[1].Equals("1") ? true : false, CurrentDatasProperty.CurrentDataProperty as StationDataMode, Direction);
+                    string[] parts = result.Split(':');
+
+                    if (result != string.Empty)
+                    {
+                        if (result.Equals("-1"))
+                        {
+                            MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
+                        }
+                        else
+                        {
+                            MessengerInstance.Send(string.Format("总长为{0}m，平均坡度为{1}‰", parts[1], parts[0]), "GetMoreInfos");
+                        }
+                    }
                 });
         }
 
@@ -2104,7 +2255,16 @@ namespace Inter_face.ViewModel
                 try
                 {
                     Cursor = 1;
+                    infosX.Clear();
                     GDoper.GetXhDataS(out xhslist);
+                    /*for (int i = 1; i <= xhslist.Count; i++)
+                    {
+                        infosX.Add(new MoreinfoStruct()
+                        {
+                            ID = string.Format("{0}+{1}", i, xhslist[i].Glb),
+                            Info = xhslist[i].MoreInfo
+                        });
+                    } */              
 
                     sdvm = new SingleDataViewModel();
                     sdvm.TypeNameProperty = "信号机(X)";
@@ -2147,7 +2307,8 @@ namespace Inter_face.ViewModel
                             ScaleProperty = ScaleProperty,
                             SelectedProperty = false,
                             PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                            StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString()
+                            StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString(),
+                            MoreInfo = string.Empty
                         });
                     }
                     else
@@ -2180,7 +2341,8 @@ namespace Inter_face.ViewModel
                                     ScaleProperty = ScaleProperty,
                                     SelectedProperty = false,
                                     PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                                    StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString()
+                                    StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString(),
+                                    MoreInfo = string.Empty
                                 });
                             }
                             else
@@ -2215,7 +2377,8 @@ namespace Inter_face.ViewModel
                                     (presdm.Bjlx.Equals("1") ?
                                     //标记类型：信号机编号：所属车站名：信号机类型：车站中心坐标
                                     string.Format("{0}:{1}:{2}", presdm.Bjlx, presdm.Bjsj, FormatStationPosition(presdm.Bjsj.Split(':')[1])) :
-                                    string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj))
+                                    string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj)),
+                                    MoreInfo = string.Empty
                                 });
                             }
                             //M-27,30 L5,30 M57,31 C57,47 45,59 30,59 C15,59 2.5,47 3,31 C3,15 15,3 30,3 C45,3 57,15 57,31 z
@@ -2235,7 +2398,8 @@ namespace Inter_face.ViewModel
                                 "1:1 0:#FFDC5625:#FF000000:M400,208 C409,208,418,200,418,191 C418,181,409,174,400,174 C390,174,382,181,382,191 C382,200,390,208,400,208 M353,191 L383,191 M353,171 L353,212"),
                                 StationNameProperty = (item.Bjlx.Equals("1") ?
                                     string.Format("{0}:{1}:{2}", item.Bjlx, item.Bjsj, FormatStationPosition(item.Bjsj.Split(':')[1])) :
-                                    string.Format("{0}:{1}", item.Bjlx, item.Bjsj))
+                                    string.Format("{0}:{1}", item.Bjlx, item.Bjsj)),
+                                MoreInfo = item.MoreInfo
                             });
 
                             n++;
@@ -2266,7 +2430,8 @@ namespace Inter_face.ViewModel
                             ScaleProperty = ScaleProperty,
                             SelectedProperty = false,
                             PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                            StationNameProperty = "Q" + lastxh.SectionNumProperty.ToString() + "+" + lastxh.StationNameProperty
+                            StationNameProperty = "Q" + lastxh.SectionNumProperty.ToString() + "+" + lastxh.StationNameProperty,
+                            MoreInfo=string.Empty
                         });
                     }
                 }
@@ -2341,7 +2506,16 @@ namespace Inter_face.ViewModel
                 try
                 {
                     Cursor = 1;
+                    infosS.Clear();
                     GDoper.GetXhData(out xhxlist);
+                    /*for (int i = 1; i <= xhxlist.Count; i++)
+                    {
+                        infosS.Add(new MoreinfoStruct()
+                        {
+                            ID = string.Format("{0}+{1}", i, xhxlist[i].Glb),
+                            Info = xhxlist[i].MoreInfo
+                        });
+                    }  */               
 
                     sdvm = new SingleDataViewModel();
                     sdvm.TypeNameProperty = "信号机(S)";
@@ -2385,7 +2559,8 @@ namespace Inter_face.ViewModel
                             ScaleProperty = ScaleProperty,
                             SelectedProperty = false,
                             PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                            StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString()
+                            StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString(),
+                            MoreInfo = string.Empty
                         });
                     }
                     else
@@ -2419,7 +2594,8 @@ namespace Inter_face.ViewModel
                                     ScaleProperty = ScaleProperty,
                                     SelectedProperty = false,
                                     PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                                    StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString()
+                                    StationNameProperty = "Q" + pdxlist[0].Ldh + "+" + n.ToString(),
+                                    MoreInfo = string.Empty
                                 });
                             }
                             else
@@ -2461,7 +2637,8 @@ namespace Inter_face.ViewModel
                                     (presdm.Bjlx.Equals("1") ?
                                     //标记类型：信号机编号：所属车站名：信号机类型：车站中心坐标
                                     string.Format("{0}:{1}:{2}", presdm.Bjlx, presdm.Bjsj, FormatStationPosition(presdm.Bjsj.Split(':')[1])) :
-                                    string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj))
+                                    string.Format("{0}:{1}", presdm.Bjlx, presdm.Bjsj)),
+                                    MoreInfo = string.Empty
                                 });
                             }
 
@@ -2482,7 +2659,8 @@ namespace Inter_face.ViewModel
                                 "1:1 0:#FFDC5625:#FF000000:M371,143 C361,143,353,136,353,126 C353,117,361,109,371,109 C381,109,389,117,389,126 C389,136,381,143,371,143 M418,127 L388,127 M418,149 L418,105"),
                                 StationNameProperty = (item.Bjlx.Equals("1") ?
                                     string.Format("{0}:{1}:{2}", item.Bjlx, item.Bjsj, FormatStationPosition(item.Bjsj.Split(':')[1])) :
-                                    string.Format("{0}:{1}", item.Bjlx, item.Bjsj))
+                                    string.Format("{0}:{1}", item.Bjlx, item.Bjsj)),
+                                MoreInfo = item.MoreInfo
                             });
 
                             n++;
@@ -2513,7 +2691,8 @@ namespace Inter_face.ViewModel
                             ScaleProperty = ScaleProperty,
                             SelectedProperty = false,
                             PathDataProperty = "5:6 2 1 2:#00DC5625:#FF000000:M0,0 L500,0",
-                            StationNameProperty = "Q" + lastxh.SectionNumProperty.ToString() + "+" + lastxh.StationNameProperty
+                            StationNameProperty = "Q" + lastxh.SectionNumProperty.ToString() + "+" + lastxh.StationNameProperty,
+                            MoreInfo = string.Empty
                         });
                     }
                 }
@@ -3912,11 +4091,13 @@ namespace Inter_face.ViewModel
 
             preqj.LengthProperty = preqj.LengthProperty + currentqj.LengthProperty + 200 / ScaleProperty;
             preqj.RealLength = preqj.RealLength + currentqj.RealLength;
-
+            
+                       
             singledata.DataCollection.RemoveAt(index - 1);
             singledata.DataCollection.Insert(index - 1, preqj);
             singledata.DataCollection.RemoveAt(index);
             singledata.DataCollection.RemoveAt(index);
+
             _datascollection_CollectionChanged(null, null);
         }
 
@@ -4206,6 +4387,17 @@ namespace Inter_face.ViewModel
                         offset = 0;
                         sig_data_s.IDProperty.Add(currentxinhao.StationNameProperty.Split(':')[1]);
                         sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
+                        //added
+                        sig_data_s.MoreInofs.Add(currentxinhao.MoreInfo);
+                       
+                        /*foreach (var info in infosS)
+                        {
+                            if (info.ID.Equals(
+                                string.Format("{0}+{1}", i, currentxinhao.PositionProperty.ToString("F3"))))
+                            {
+                                sig_data_s.MoreInofs.Add(info.Info);
+                            }
+                        } */                       
 
                         if (currentxinhao.StationNameProperty.Split(':')[0].Equals("1"))
                         {
@@ -4318,6 +4510,16 @@ namespace Inter_face.ViewModel
                         offset = 0;
                         sig_data_x.IDProperty.Add(currentxinhao.StationNameProperty.Split(':')[1]);
                         sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
+                        sig_data_x.MoreInofs.Add(currentxinhao.MoreInfo);
+
+                        /*foreach (var info in infosX)
+                        {
+                            if (info.ID.Equals(
+                                string.Format("{0}+{1}", i, currentxinhao.PositionProperty.ToString("F3"))))
+                            {
+                                sig_data_x.MoreInofs.Add(info.Info);
+                            }
+                        }*/
 
                         if (currentxinhao.StationNameProperty.Split(':')[0].Equals("1"))
                         {
@@ -4494,6 +4696,7 @@ namespace Inter_face.ViewModel
                                     sig_data_s.IDProperty.Add(parts[1]);
                                     sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
                                     sig_data_s.StationNameProperty.Add(parts[2]);
+                                    sig_data_s.MoreInofs.Add(currentxinhao.MoreInfo);
                                     datas_s.Add(sig_data_s);
                                     continue;
                                 }
@@ -4502,6 +4705,8 @@ namespace Inter_face.ViewModel
 
                         sig_data_s.IDProperty.Add(parts[1]);
                         sig_data_s.HatProperty.Add(currentxinhao.HatProperty);
+                        sig_data_s.MoreInofs.Add(currentxinhao.MoreInfo);
+
                         if (parts[0].Equals("1"))
                         {
                             sig_data_s.StationNameProperty.Add(parts[2]);
@@ -4626,6 +4831,7 @@ namespace Inter_face.ViewModel
                                     sig_data_x.IDProperty.Add(parts[1]);
                                     sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
                                     sig_data_x.StationNameProperty.Add(parts[2]);
+                                    sig_data_x.MoreInofs.Add(currentxinhao.MoreInfo);
                                     datas_x.Add(sig_data_x);
                                     continue;
                                 }
@@ -4634,6 +4840,7 @@ namespace Inter_face.ViewModel
 
                         sig_data_x.IDProperty.Add(parts[1]);
                         sig_data_x.HatProperty.Add(currentxinhao.HatProperty);
+                        sig_data_x.MoreInofs.Add(currentxinhao.MoreInfo);
 
                         if (parts[0].Equals("1"))
                         {
@@ -4771,28 +4978,71 @@ namespace Inter_face.ViewModel
         private void SaveXhData()
         {
             ISingleDataViewModel singledata;
+            List<IDataModel> signalCollection = new List<IDataModel>();
             List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
             List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
             string[] parts;
             string bjData = string.Empty;
+            string moreinfo = string.Empty;
+            string bjlx = string.Empty;
+            infosS.Clear();
+            infosX.Clear();
+            int index = 1;
             Cursor = 1;
 
             try
             {
                 //从左到右
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                signalCollection = singledata.DataCollection.Where(
+                        p =>
+                        {
+                            parts = (p as StationDataMode).StationNameProperty.Split(':');
+                            return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                        }).ToList();
+
                 foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
+                    moreinfo = string.Empty;
                     parts = item.StationNameProperty.Split(':');
+
                     if (!parts[0].StartsWith("Q"))
                     {
-                        switch (parts[0])
+                        bjlx = parts[0];
+                        switch (bjlx)
                         {
                             case "1":
                                 bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                moreinfo = calculateAverageGrade(7, false, item, 1, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 1, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }                                
                                 break;
                             case "2":
                                 bjData = parts[1];
+                                moreinfo = calculateAverageGrade(7, false, item, 1, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 1, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "3":
                                 //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
@@ -4804,15 +5054,24 @@ namespace Inter_face.ViewModel
 
                         xhs.Add(new ChangeToTxt.CheZhanOutputData()
                         {
-                            Bjlx = parts[0],
+                            Bjlx = bjlx,
                             Bjsj = bjData,
                             Gh = item.HatProperty,
                             Glb = item.PositionProperty.ToString("F3"),
                             Index = string.Empty,
                             Ldh = item.SectionNumProperty.ToString(),
-                            Zjfx = "1"
-                        });
+                            Zjfx = "1",
+                            MoreInfo = moreinfo
+                        });                        
                     }
+
+                    item.MoreInfo = moreinfo;
+                    /*infosS.Add(new MoreinfoStruct()
+                    {
+                        ID = string.Format("{0}+{1}", index, item.PositionProperty.ToString("F3")),
+                        Info = moreinfo
+                    });*/
+                    index++;
                 }
                 //Doper.SaveXhData(xhs, xhx);
                 IsXinhaoChanged = false;
@@ -4825,22 +5084,61 @@ namespace Inter_face.ViewModel
             }
 
             bjData = string.Empty;
+            index = 1;
+
             try
             {
                 //从右到左
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                signalCollection = singledata.DataCollection.Where(
+                        p =>
+                        {
+                            parts = (p as StationDataMode).StationNameProperty.Split(':');
+                            return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                        }).ToList();
+
                 foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
+                    moreinfo = string.Empty;
                     parts = item.StationNameProperty.Split(':');
+
                     if (!parts[0].StartsWith("Q"))
                     {
-                        switch (parts[0])
+                        bjlx = parts[0];
+                        switch (bjlx)
                         {
                             case "1":
                                 bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                moreinfo = calculateAverageGrade(7, false, item, 0, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 0, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "2":
                                 bjData = parts[1];
+                                moreinfo = calculateAverageGrade(7, false, item, 0, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 0, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "3":
                                 bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
@@ -4851,15 +5149,25 @@ namespace Inter_face.ViewModel
 
                         xhx.Add(new ChangeToTxt.CheZhanOutputData()
                         {
-                            Bjlx = parts[0],
+                            Bjlx = bjlx,
                             Bjsj = bjData,
                             Gh = item.HatProperty,
                             Glb = item.PositionProperty.ToString("F3"),
                             Index = string.Empty,
                             Ldh = item.SectionNumProperty.ToString(),
-                            Zjfx = "1"
+                            Zjfx = "1",
+                            MoreInfo = moreinfo
                         });
+                       
                     }
+
+                    item.MoreInfo = moreinfo;
+                    /*infosX.Add(new MoreinfoStruct()
+                    {
+                        ID = string.Format("{0}+{1}", item.PositionProperty.ToString("F3"), bjData),
+                        Info = moreinfo
+                    });*/
+                    //index++;
                 }
 
                 GDoper.SaveXhdataCompleted += GDoper_SaveXhdataCompleted;
@@ -4913,29 +5221,71 @@ namespace Inter_face.ViewModel
         private void saveOtherXhData()
         {
             ISingleDataViewModel singledata;
+            List<IDataModel> signalCollection = new List<IDataModel>();
             List<ChangeToTxt.CheZhanOutputData> xhs = new List<ChangeToTxt.CheZhanOutputData>();
             List<ChangeToTxt.CheZhanOutputData> xhx = new List<ChangeToTxt.CheZhanOutputData>();
             string[] parts;
             string bjData = string.Empty;
+            string moreinfo = string.Empty;
+            string bjlx = string.Empty;
+            infosX.Clear();
+            infosS.Clear();
             Cursor = 1;
             Thread saveOtherxhdataTread;
 
             try
             {
-
+                //从左到右
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.SingleS);
+                signalCollection = singledata.DataCollection.Where(
+                        p =>
+                        {
+                            parts = (p as StationDataMode).StationNameProperty.Split(':');
+                            return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                        }).ToList();
+
                 foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
+                    moreinfo = string.Empty;
                     parts = item.StationNameProperty.Split(':');
+
                     if (!parts[0].StartsWith("Q"))
                     {
-                        switch (parts[0])
+                        bjlx = parts[0];
+                        switch (bjlx)
                         {
                             case "1":
                                 bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                moreinfo = calculateAverageGrade(7, false, item, 1, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 1, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "2":
                                 bjData = parts[1];
+                                moreinfo = calculateAverageGrade(7, false, item, 1, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 1, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "3":
                                 //电分相名称：无电区左边缘（路段号+里程）：无电区中心（路段号+里程）：无电区右边缘（路段号+里程）：无电区长度
@@ -4947,14 +5297,22 @@ namespace Inter_face.ViewModel
 
                         xhs.Add(new ChangeToTxt.CheZhanOutputData()
                         {
-                            Bjlx = parts[0],
+                            Bjlx = bjlx,
                             Bjsj = bjData,
                             Gh = item.HatProperty,
                             Glb = item.PositionProperty.ToString("F3"),
                             Index = string.Empty,
                             Ldh = item.SectionNumProperty.ToString(),
-                            Zjfx = "1"
+                            Zjfx = "1",
+                            MoreInfo = moreinfo
                         });
+
+                        item.MoreInfo = moreinfo;
+                        /*infosS.Add(new MoreinfoStruct()
+                        {
+                            ID = string.Format("{0}+{1}", item.PositionProperty.ToString("F3"), bjData),
+                            Info = moreinfo
+                        });*/
                     }
                 }
                 //Doper.SaveXhData(xhs, xhx);
@@ -4970,20 +5328,57 @@ namespace Inter_face.ViewModel
             bjData = string.Empty;
             try
             {
-
+                //从右到左
                 singledata = DatasCollection.Single(p => p.TypeNum == (int)DataType.Single);
+                signalCollection = singledata.DataCollection.Where(
+                        p =>
+                        {
+                            parts = (p as StationDataMode).StationNameProperty.Split(':');
+                            return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+
+                        }).ToList();
+
                 foreach (StationDataMode item in singledata.DataCollection.ToArray())
                 {
+                    moreinfo = string.Empty;
                     parts = item.StationNameProperty.Split(':');
+
                     if (!parts[0].StartsWith("Q"))
                     {
-                        switch (parts[0])
+                        bjlx = parts[0];
+                        switch (bjlx)
                         {
                             case "1":
                                 bjData = string.Format("{0}:{1}:{2}", parts[1], parts[2], parts[3]);
+                                moreinfo = calculateAverageGrade(7, false, item, 0, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 0, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "2":
                                 bjData = parts[1];
+                                moreinfo = calculateAverageGrade(7, false, item, 0, signalCollection);
+
+                                if (moreinfo.Equals("-1"))
+                                {
+                                    moreinfo = "超出线路范围";
+                                }
+                                else
+                                {
+                                    parts = moreinfo.Split(':');
+                                    moreinfo = string.Format("{0},{1}", parts[1], parts[0]);
+                                    parts = calculateAverageGrade(7, true, item, 0, signalCollection).Split(':');
+                                    moreinfo = string.Format("{0}({1})", moreinfo, parts[0]);
+                                }
                                 break;
                             case "3":
                                 bjData = string.Format("{0}:{1}:{2}:{3}:{4}", parts[1], parts[2], parts[3], parts[4], parts[5]);
@@ -4994,14 +5389,22 @@ namespace Inter_face.ViewModel
 
                         xhx.Add(new ChangeToTxt.CheZhanOutputData()
                         {
-                            Bjlx = parts[0],
+                            Bjlx = bjlx,
                             Bjsj = bjData,
                             Gh = item.HatProperty,
                             Glb = item.PositionProperty.ToString("F3"),
                             Index = string.Empty,
                             Ldh = item.SectionNumProperty.ToString(),
-                            Zjfx = "1"
+                            Zjfx = "1",
+                            MoreInfo = moreinfo
                         });
+
+                        item.MoreInfo = moreinfo;
+                        /*infosX.Add(new MoreinfoStruct()
+                        {
+                            ID = string.Format("{0}+{1}", item.PositionProperty.ToString("F3"), bjData),
+                            Info = moreinfo
+                        });*/
                     }
                 }
 
@@ -5087,7 +5490,7 @@ namespace Inter_face.ViewModel
                         }
                         catch (ExtractData.WorkSheetBase.WorksheetNotOnlyException wne)
                         {
-                            MessengerInstance.Send<string>("读入信号机数据出错", "ReadDataError");
+                            MessengerInstance.Send("读入信号机数据出错", "ReadDataError");
                         }
                         finally
                         {
@@ -5129,6 +5532,7 @@ namespace Inter_face.ViewModel
                         GDoper.OpenXhData(_xhdataPath);
                         CanloadxhProperty = true;
                         CloseProcessWindow();
+                        
                     });
 
                     openxhThread.Start();
@@ -5156,6 +5560,7 @@ namespace Inter_face.ViewModel
                     if (MessageBox.Show("未保存信号数据将会丢失，是否继续？", "提示",
                         MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.Yes)
                     {
+                        _xhdataPath = string.Empty;
                         cleanXhdata();
                         CanloadxhProperty = true;
                         return;
@@ -5847,9 +6252,9 @@ namespace Inter_face.ViewModel
                 string xhspath = string.Format("{0}.{1}", savexhdataDialog.FileName, "bjs");
 
                 File.Delete(xhxpath);
-                File.AppendAllText(xhxpath, sb.ToString(), System.Text.Encoding.BigEndianUnicode);
+                File.AppendAllText(xhxpath, sb.ToString(), System.Text.Encoding.Default);
                 File.Delete(xhspath);                
-                File.AppendAllText(xhspath, sbs.ToString(), System.Text.Encoding.BigEndianUnicode);
+                File.AppendAllText(xhspath, sbs.ToString(), System.Text.Encoding.Default);
                 MessengerInstance.Send("输出铁科格式文件完成！", "ReadDataRight");
             }
         }
@@ -6315,13 +6720,17 @@ namespace Inter_face.ViewModel
             agWindow.Show();            
         }
 
-        private void calculateAverageGrade(int countOfBlocks, bool positiveToZero)
+
+
+        private string calculateAverageGrade(int countOfBlocks, bool positiveToZero, StationDataMode sdm, 
+                                             int dir, List<IDataModel> currentSingleCollection =null)
         {
             ISingleDataViewModel singledata;
-            List<IDataModel> signalCollection;
+            List<IDataModel> signalCollection = new List<IDataModel>();
             int totalSignalCount = 0;
             ChangeToTxt ctt = null;
-            
+            string result = string.Empty;
+
             if (lineparts == null)
             {
                 ctt = new ChangeToTxt();
@@ -6329,40 +6738,48 @@ namespace Inter_face.ViewModel
             }
             FormatLinepartStruct(lineparts);
 
-            StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            //StationDataMode sdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
             if (sdm.Type != DataType.Single && sdm.Type != DataType.SingleS)
             {
                 //MessengerInstance.Send("未选择信号机:f", "GetSignalInfo");
-                return;
-            }            
+                return string.Empty;
+            }
 
             string[] parts = sdm.StationNameProperty.Split(':');
             if (parts[0].StartsWith("Q") || parts[0].Equals("3"))
             {
                 //MessengerInstance.Send("未选择信号机", "GetSignalInfo");
-                return;
+                return string.Empty;
             }
 
-            int currentindex = 0;            
+            int currentindex = 0;
             int endindex = 0;
             //从右至左
-            if (Direction == 0)
+            if (dir == 0)
             {
-                singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
-                signalCollection = singledata.DataCollection.Where(
-                    p =>
-                    {
-                        parts = (p as StationDataMode).StationNameProperty.Split(':');
-                        return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+                if (currentSingleCollection == null)
+                {
+                    singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.Single);
+                    signalCollection = singledata.DataCollection.Where(
+                        p =>
+                        {
+                            parts = (p as StationDataMode).StationNameProperty.Split(':');
+                            return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
 
-                    }).ToList();
+                        }).ToList();
+                }
+                else
+                {
+                    signalCollection = currentSingleCollection;
+                }
+
                 currentindex = signalCollection.IndexOf(sdm);
                 totalSignalCount = signalCollection.Count();
 
                 if (currentindex + countOfBlocks + 1 > totalSignalCount)
                 {
-                    MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
-                    return;
+                    //MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
+                    return "-1";
                 }
 
                 /*for (int i = currentindex + 1; i < CurrentDatasProperty.DataCollection.Count; i++)
@@ -6385,20 +6802,28 @@ namespace Inter_face.ViewModel
             }
             else
             {
-                singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
-                signalCollection = singledata.DataCollection.Where(
-                    p =>
-                    {
-                        parts = (p as StationDataMode).StationNameProperty.Split(':');
-                        return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
+                if (currentSingleCollection == null)
+                {
+                    singledata = DatasCollection.SingleOrDefault(p => p.TypeNum == (int)DataType.SingleS);
+                    signalCollection = singledata.DataCollection.Where(
+                        p =>
+                        {
+                            parts = (p as StationDataMode).StationNameProperty.Split(':');
+                            return (parts[0].StartsWith("1") || parts[0].StartsWith("2"));
 
-                    }).ToList();
+                        }).ToList();
+                }
+                else
+                {
+                    signalCollection = currentSingleCollection;
+                }
+
                 currentindex = signalCollection.IndexOf(sdm);
-                
+
                 if (currentindex - countOfBlocks < 0)
                 {
-                    MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
-                    return;
+                    //MessengerInstance.Send("超出线路范围，请重新核对", "GetMoreInfos");
+                    return "-1";
                 }
 
                 endindex = currentindex - countOfBlocks;
@@ -6421,19 +6846,23 @@ namespace Inter_face.ViewModel
             }
 
             StationDataMode endsdm = signalCollection[endindex] as StationDataMode;
-            StationDataMode startsdm = CurrentDatasProperty.CurrentDataProperty as StationDataMode;
+            StationDataMode startsdm = sdm;
 
             string crp = getcurrentpos(startsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
-            string endcrp = getcurrentpos(endsdm.PositionProperty.ToString("#0.00"), sdm.SectionNumProperty);
+            string endcrp = getcurrentpos(endsdm.PositionProperty.ToString("#0.00"), endsdm.SectionNumProperty);
 
             float averageGrade = GetAvrHeight((int)Math.Ceiling(decimal.Parse(crp)),
                                                    Math.Abs(float.Parse(endcrp) - float.Parse(crp)),
-                                                   Direction, 
+                                                   dir,
                                                    positiveToZero);
+            //平均坡度：总距离
+            result = string.Format("{0}:{1}", averageGrade.ToString("#0.000"),
+                Math.Abs(float.Parse(endcrp) - float.Parse(crp)).ToString("#0.00"));
 
-            MessengerInstance.Send(string.Format("总长为{0}m，平均坡度为{1}‰", 
-                                                 Math.Abs(float.Parse(endcrp) - float.Parse(crp)).ToString("#0.00"), 
-                                                 averageGrade.ToString("#0.000")), "GetMoreInfos");
+            //MessengerInstance.Send(string.Format("总长为{0}m，平均坡度为{1}‰", 
+            //Math.Abs(float.Parse(endcrp) - float.Parse(crp)).ToString("#0.00"), 
+            //averageGrade.ToString("#0.000")), "GetMoreInfos");
+            return result;
 
         }
 
@@ -6555,7 +6984,7 @@ namespace Inter_face.ViewModel
                             break;
                         }
 
-                        for (int j = i - 1; j >= 0; j--)
+                        for (int j = i - 1; j > 0; j--)
                         {
                             totalLength += float.Parse(linePartsData[j - 1].Length);
                             if (totalLength < dis)
@@ -7566,6 +7995,12 @@ namespace Inter_face.ViewModel
             public string StartPos;
             public string Ludh;
             public bool Istunel;
+        }
+
+        public struct MoreinfoStruct
+        {
+            public string ID;
+            public string Info;
         }
     }
 }

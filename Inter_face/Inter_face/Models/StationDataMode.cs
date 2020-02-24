@@ -9,6 +9,8 @@ namespace Inter_face.Models
    public class StationDataMode : ViewModelBase, Inter_face.Models.IDataModel
     {
         public DataType Type { get; set; }   
+
+        public string MoreInfo { get; set; }
        
         /// <summary>
         /// The <see cref="PathDataProperty" /> property's name.

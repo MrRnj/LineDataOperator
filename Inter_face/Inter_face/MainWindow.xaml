@@ -9,7 +9,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
         xmlns:Backup="clr-namespace:Inter_face.BackUps"
         xmlns:Custom="http://www.galasoft.ch/mvvmlight" x:Class="Inter_face.MainWindow"
-        Title="数据转换" FontSize="18" mc:Ignorable="d" 
+        Title="数据转换2.0" FontSize="18" mc:Ignorable="d" 
                      Height="640" Width="933" WindowState="Maximized" Icon="icons/title.png" Loaded="RibbonWindow_Loaded">
     <Fluent:RibbonWindow.Resources>
         <Inter_face_Coverters:BoolenConverter x:Key="BoolenConverter"/>

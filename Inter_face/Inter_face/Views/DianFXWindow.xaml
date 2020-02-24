@@ -6,7 +6,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:Inter_face_Coverters="clr-namespace:Inter_face.Coverters" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:Custom="http://www.galasoft.ch/mvvmlight" mc:Ignorable="d"
 	x:Class="Inter_face.DianFXWindow"
 	x:Name="Window"
-	Title="DianFXWindow"
+	Title="修改电分相"
 	Width="1100" Height="182" MinWidth="1100" MaxHeight="200">
     <Window.Resources>
         <Inter_face_Coverters:ChartToColorConverter x:Key="ChartToColorConverter"/>

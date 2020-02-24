@@ -132,7 +132,6 @@ namespace Inter_face
             sendDispatcher();
         }
 
-
         private void initialWorkbooks()
         {
             last_star_pos = 0;
@@ -902,7 +901,7 @@ namespace Inter_face
             CreatNewwork cnk = new CreatNewwork(pdfilepath, qxfilepath, bjfilepath);
 
 
-            cnk.Loaderror += new CreatNewwork.LoaderrorEventhandler(cnk_Loaderror);
+            cnk.Loaderror += new CreatNewwork.LoaderrorEventhandler(cnk_Loaderror);            
             cnk.DatapathChanged += new CreatNewwork.DatapathChangedEvent(cnk_DatapathChanged);           
 
             IniSheets.MakeCleanBooks(pdfilepath, qxfilepath, bjfilepath, pdtempfilepath, qxtempfilepath, bjtemptfilepath);
@@ -1278,6 +1277,12 @@ namespace Inter_face
             {
                 OnLoaderror(null, new LoaderrorEventArgs("文件读取有误"));
             }
+
+            finally
+            {
+                if (ffs != null)
+                    ffs.Dispose();
+            }
         }
 
         #region DatapathChangedEvent
@@ -1629,7 +1634,7 @@ namespace Inter_face
             this.savefilepath = savefilepath;
 
             cte = new ChangeToExcel();
-            cte.SheetChanged += new ChangeToExcel.SheetChangedEventHandler(cte_SheetChanged);
+            cte.SheetChanged += new ChangeToExcel.SheetChangedEventHandler(cte_SheetChanged);            
         }
 
         public void Changemergedata() 
@@ -1647,6 +1652,12 @@ namespace Inter_face
             catch
             {
                 System.Windows.MessageBox.Show("输出数据出错！", "出错了！", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            finally
+            {
+                if (cte != null)
+                    cte.Dispose();
             }
         }
 
